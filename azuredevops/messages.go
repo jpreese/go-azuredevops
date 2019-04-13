@@ -42,18 +42,17 @@ func GetSubscriptionID(r *http.Request) string {
 //
 // https://docs.microsoft.com/en-us/azure/devops/service-hooks/events?toc=/azure/devops/integrate/toc.json&bc=/azure/devops/integrate/breadcrumb/toc.json&view=azure-devops
 //
-func ParseWebHook(payload []byte) (interface{}, error) {
-	var ret interface{}
+func ParseWebHook(payload []byte) (*Event, error) {
 	event := new(Event)
 	err := json.Unmarshal(payload, &event)
 	if err != nil {
 		return nil, err
 	}
 	if event.EventType != nil {
-		ret, err = event.ParsePayload()
+		_, err = event.ParsePayload()
 	}
 	/*
 		RawPayload: (*json.RawMessage)(&payload),
 	*/
-	return ret, err
+	return event, err
 }

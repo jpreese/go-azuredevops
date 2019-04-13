@@ -25,11 +25,11 @@ func TestParsePayload(t *testing.T) {
 			eventType: "git.pullrequest.created",
 		},
 		{
-			payload:   azuredevops.PullRequestResource{},
+			payload:   &azuredevops.PullRequestResource{},
 			eventType: "git.pullrequest.merged",
 		},
 		{
-			payload:   azuredevops.PullRequestResource{},
+			payload:   &azuredevops.PullRequestResource{},
 			eventType: "git.pullrequest.updated",
 		},
 	}
@@ -43,12 +43,11 @@ func TestParsePayload(t *testing.T) {
 			t.Fatalf("Marshal(%#v): %v", test.payload, err)
 		}
 		got, err := event.ParsePayload()
-		t.Fatalf("ParsePayload: %+v, %v", got, err)
 		if err != nil {
 			t.Fatalf("ParsePayload: %v", err)
 		}
 		if want := test.payload; !reflect.DeepEqual(got, want) {
-			t.Errorf("ParseWebHook(%#v, %#v) = %#v, want %#v", test.eventType, payload, got, want)
+			t.Errorf("ParsePayload(%#v, %#v) = %#v, want %#v", test.eventType, test.payload, got, want)
 		}
 	}
 }

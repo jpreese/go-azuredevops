@@ -15,14 +15,13 @@ import (
 // it returns the webhook payload with a parsed struct in the
 // Event.Resource field
 func (e *Event) ParsePayload() (payload interface{}, err error) {
-	parsedEvent := new(ParsedEvent)
 	switch *e.EventType {
 	case "git.pullrequest.created":
-		payload = PullRequestResource{}
+		payload = &PullRequestResource{}
 	case "git.pullrequest.merged":
-		payload = PullRequestResource{}
+		payload = &PullRequestResource{}
 	case "git.pullrequest.updated":
-		payload = PullRequestResource{}
+		payload = &PullRequestResource{}
 	default:
 		return payload, errors.New("Unknown EventType in webhook payload")
 	}
