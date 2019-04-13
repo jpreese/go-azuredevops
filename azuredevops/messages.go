@@ -51,8 +51,6 @@ func ParseWebHook(payload []byte) (*Event, error) {
 	if event.EventType != nil {
 		_, err = event.ParsePayload()
 	}
-	/*
-		RawPayload: (*json.RawMessage)(&payload),
-	*/
+
 	return event, err
 }
