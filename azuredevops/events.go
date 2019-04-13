@@ -17,11 +17,11 @@ import (
 func (e *Event) ParsePayload() (payload interface{}, err error) {
 	switch *e.EventType {
 	case "git.pullrequest.created":
-		payload = &PullRequestResource{}
+		payload = &GitPullRequest{}
 	case "git.pullrequest.merged":
-		payload = &PullRequestResource{}
+		payload = &GitPullRequest{}
 	case "git.pullrequest.updated":
-		payload = &PullRequestResource{}
+		payload = &GitPullRequest{}
 	case "git.push":
 		payload = &PushResource{}
 	default:

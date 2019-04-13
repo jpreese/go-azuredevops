@@ -21,15 +21,15 @@ func TestParsePayload(t *testing.T) {
 		eventType string
 	}{
 		{
-			payload:   &azuredevops.PullRequestResource{},
+			payload:   &azuredevops.GitPullRequest{},
 			eventType: "git.pullrequest.created",
 		},
 		{
-			payload:   &azuredevops.PullRequestResource{},
+			payload:   &azuredevops.GitPullRequest{},
 			eventType: "git.pullrequest.merged",
 		},
 		{
-			payload:   &azuredevops.PullRequestResource{},
+			payload:   &azuredevops.GitPullRequest{},
 			eventType: "git.pullrequest.updated",
 		},
 		{
