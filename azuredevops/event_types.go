@@ -9,37 +9,62 @@
 package azuredevops
 
 import (
-	"encoding/json"
 	"time"
 )
 
-// Event - Describes an Azure Devops webhook payload parent
-// For now, delay parsing Resource using *json.RawMessage
-// until we know EventType
-type Event struct {
-	SubscriptionID     *string             `json:"subscriptionId,omitempty"`
-	NotificationID     *int                `json:"notificationId,omitempty"`
-	ID                 *string             `json:"id,omitempty"`
-	EventType          *string             `json:"eventType,omitempty"`
-	Message            *Message            `json:"message,omitempty"`
-	DetailedMessage    *Message            `json:"detailedMessage,omitempty"`
-	RawPayload         *json.RawMessage    `json:"resource,omitempty"`
-	ResourceVersion    *string             `json:"resourceVersion,omitempty"`
-	ResourceContainers *ResourceContainers `json:"resourceContainers,omitempty"`
-	CreatedDate        *time.Time          `json:"createdDate,omitempty"`
-	Resource           *interface{}
+// ChangeCountDictionary
+type ChangeCountDictionary *map[string]int
+
+// GitChange
+// Describes file path and content changes
+type GitChange struct {
+	ChangeID           *int                      `json:"changeId,omitempty"`
+	ChangeType         *VersionControlChangeType `json:"changeType,omitempty"`
+	Item               *string                   `json:"item,omitempty"`
+	NewContent         *ItemContent              `json:"newContent,omitempty"`
+	NewContentTemplate *GitTemplate              `json:"newContentTemplate,omitempty"`
+	OriginalPath       *string                   `json:"originalPath,omitempty"`
+	SourceServerItem   *string                   `json:"sourceServerItem,omitempty"`
+	URL                *string                   `json:"url,omitempty"`
 }
 
-// Message represents an Azure Devops webhook message property
-type Message struct {
-	Text     *string `json:"text,omitempty"`
-	HTML     *string `json:"html,omitempty"`
-	Markdown *string `json:"markdown,omitempty"`
+// GitCommitRef
+type GitCommitRef struct {
+	Links            *[]ReferenceLinks      `json:"_links,omitempty"`
+	CommitID         *string                `json:"commitId,omitempty"`
+	Author           *GitUserDate           `json:"author,omitempty"`
+	Committer        *GitUserDate           `json:"committer,omitempty"`
+	Comment          *string                `json:"comment,omitempty"`
+	CommentTruncated *bool                  `json:"commentTruncated,omitempty"`
+	URL              *string                `json:"url,omitempty"`
+	ChangeCounts     *ChangeCountDictionary `json:"changeCounts,omitempty"`
+	Changes          *GitChange             `json:"changes,omitempty"`
+	Parents          *[]string              `json:"parents,omitempty"`
+	Push             *GitPushRef            `json:"push,omitempty"`
+	RemoteURL        *string                `json:"remoteUrl,omitempty"`
+	Statuses         *[]GitStatus           `json:"statuses,omitempty"`
+	WorkItems        *ResourceRef           `json:"workItems,omitempty"`
 }
 
-// GitPullRequest represents the resource field in a pull request event webhook
+// GitForkRef
+// Information about a fork ref.
+type GitForkRef struct {
+	Links          *[]ReferenceLinks `json:"_links,omitempty"`
+	Creator        *IdentityRef      `json:"creator,omitempty"`
+	IsLocked       *bool             `json:"isLocked,omitempty"`
+	IsLockedBy     *IdentityRef      `json:"isLockedBy,omitempty"`
+	Name           *string           `json:"name,omitempty"`
+	ObjectID       *string           `json:"objectId,omitempty"`
+	PeeledObjectID *string           `json:"peeledObjectId,omitempty"`
+	Repository     *GitRepository    `json:"repository,omitempty"`
+	Statuses       *[]GitStatus      `json:"statuses,omitempty"`
+	URL            *string           `json:"url,omitempty"`
+}
+
+// GitPullRequest
+// Represents all the data associated with a pull request.
 type GitPullRequest struct {
-	Links                 *ReferenceLinks                  `json:"_links,omitempty"`
+	Links                 *[]ReferenceLinks                `json:"_links,omitempty"`
 	ArtifactID            *string                          `json:"artifactId,omitempty"`
 	AutoCompleteSetBy     *IdentityRef                     `json:"autoCompleteSetBy,omitempty"`
 	ClosedBy              *IdentityRef                     `json:"closedBy,omitempty"`
@@ -76,21 +101,6 @@ type GitPullRequest struct {
 	WorkItemRefs          *[]ResourceRef                   `json:"workItemRefs,omitempty"`
 }
 
-// GitForkRef
-// Information about a fork ref.
-type GitForkRef struct {
-	Links          *ReferenceLinks `json:"_links,omitempty"`
-	Creator        *IdentityRef    `json:"creator,omitempty"`
-	IsLocked       *bool           `json:"isLocked,omitempty"`
-	IsLockedBy     *IdentityRef    `json:"isLockedBy,omitempty"`
-	Name           *string         `json:"name,omitempty"`
-	ObjectID       *string         `json:"objectId,omitempty"`
-	PeeledObjectID *string         `json:"peeledObjectId,omitempty"`
-	Repository     *GitRepository  `json:"repository,omitempty"`
-	Statuses       *[]GitStatus    `json:"statuses,omitempty"`
-	URL            *string         `json:"url,omitempty"`
-}
-
 // GitPullRequestCompletionOptions
 // Preferences about how the pull request should be completed.
 type GitPullRequestCompletionOptions struct {
@@ -102,6 +112,13 @@ type GitPullRequestCompletionOptions struct {
 	SquashMerge             *bool                        `json:"squashMerge,omitempty"`
 	TransitionWorkItems     *bool                        `json:"transitionWorkItems,omitempty"`
 	TriggeredByAutoComplete *bool                        `json:"triggeredByAutoComplete,omitempty"`
+}
+
+// GitPullRequestMergeOptions
+// The options which are used when a pull request merge is created.
+type GitPullRequestMergeOptions struct {
+	DetectRenameFalsePositives *bool `json:"detectRenameFalsePositives,omitempty"`
+	DisableRenames             *bool `json:"disableRenames,omitempty"`
 }
 
 // GitPullRequestMergeStrategy
@@ -118,24 +135,141 @@ type GitPullRequestMergeStrategy struct {
 	Squash        *string `json:"squash,omitempty"`
 }
 
-// PushResource represents the resource field in a code push request event webhook
-type PushResource struct {
-	ChangeSetID *int       `json:"changeSetID,omitempty"`
-	URL         *string    `json:"url,omitempty"`
-	Author      *AuthorRef `json:"author,omitempty"`
-	CheckedInBy *AuthorRef `json:"checkedInBy,omitempty"`
-	CreatedDate *time.Time `json:"createdDate,omitempty"`
-	Comment     *string    `json:"comment,omitempty"`
+// GitPush
+// Description of a code push request event.
+type GitPush struct {
+	Links      *[]ReferenceLinks `json:"_links,omitempty"`
+	Commits    *[]GitCommitRef   `json:"commits,omitempty"`
+	Date       *time.Time        `json:"date,omitempty"`
+	PushID     *int              `json:"pushId,omitempty"`
+	PushedBy   *IdentityRef      `json:"pushedBy,omitempty"`
+	RefUpdates *[]GitRefUpdate   `json:"refUpdates,omitempty"`
+	Repository *GitRepository    `json:"repository,omitempty"`
+	URL        *string           `json:"url,omitempty"`
 }
 
-type Repo struct {
-	ID        *string  `json:"id,omitempty"`
-	Name      *string  `json:"name,omitempty"`
-	URL       *string  `json:"url,omitempty"`
-	Project   *Project `json:"project,omitempty"`
-	Size      *int     `json:"size,omitempty"`
-	RemoteURL *string  `json:"remoteUrl,omitempty"`
-	SSHURL    *string  `json:"sshUrl,omitempty"`
+// GitRefUpdate
+type GitRefUpdate struct {
+	IsLocked     *bool   `json:"isLocked,omitempty"`
+	Name         *string `json:"name,omitempty"`
+	NewObjectID  *string `json:"newObjectId,omitempty"`
+	OldObjectID  *string `json:"oldObjectId,omitempty"`
+	RepositoryID *string `json:"repositoryId,omitempty"`
+}
+
+// GitRepository
+// Describes an Azure Devops Git repository.
+type GitRepository struct {
+	Links            *[]ReferenceLinks `json:"_links,omitempty"`
+	DefaultBranch    *string           `json:"defaultBranch,omitempty"`
+	ID               *string           `json:"id,omitempty"`
+	IsFork           *bool             `json:"isFork,omitempty"`
+	Name             *string           `json:"name,omitempty"`
+	ParentRepository *GitRepositoryRef `json:"parentRepository,omitempty"`
+	Project          *TeamProjectRef   `json:"project,omitempty"`
+	RemoteURL        *string           `json:"remoteUrl,omitempty"`
+	Size             *int              `json:"size,omitempty"`
+	SSHURL           *string           `json:"sshUrl,omitempty"`
+	URL              *string           `json:"url,omitempty"`
+	ValidRemoteURLs  *[]string         `json:"validRemoteUrls,omitempty"`
+}
+
+// GitRepositoryRef
+type GitRepositoryRef struct {
+	Collection *TeamProjectCollectionReference `json:"collection,omitempty"`
+	ID         *string                         `json:"id,omitempty"`
+	IsFork     *bool                           `json:"isFork,omitempty"`
+	Name       *string                         `json:"name,omitempty"`
+	Project    *TeamProjectRef                 `json:"project,omitempty"`
+	RemoteURL  *string                         `json:"remoteUrl,omitempty"`
+	SSHURL     *string                         `json:"sshUrl,omitempty"`
+	URL        *string                         `json:"url,omitempty"`
+}
+
+// GitStatus
+// This class contains the metadata of a service/extension posting a status.
+type GitStatus struct {
+	Links        *[]ReferenceLinks `json:"_links,omitempty"`
+	Context      *GitStatusContext `json:"context,omitempty"`
+	CreatedBy    *IdentityRef      `json:"createdBy,omitempty"`
+	CreationDate *time.Time        `json:"creationDate,omitempty"`
+	Description  *string           `json:"description,omitempty"`
+	ID           *int              `json:"id,omitempty"`
+	TargetURL    *string           `json:"targetUrl,omitempty"`
+	UpdatedDate  *time.Time        `json:"updatedDate,omitempty"`
+}
+
+// GitStatusContext
+// Status context that uniquely identifies the status.
+type GitStatusContext struct {
+	Genre *string `json:"genre,omitempty"`
+	Name  *string `json:"name,omitempty"`
+}
+
+// GitStatusState
+// State of the status.
+type GitStatusState struct {
+	Error         *string `json:"error,omitempty"`
+	Failed        *string `json:"failed,omitempty"`
+	NotApplicable *string `json:"notApplicable,omitempty"`
+	NotSet        *string `json:"notSet,omitempty"`
+	Pending       *string `json:"pending,omitempty"`
+	Succeeded     *string `json:"succeeded,omitempty"`
+}
+
+// GitTemplate
+type GitTemplate struct {
+	Name *string `json:"name,omitempty"`
+	Type *string `json:"type,omitempty"`
+}
+
+// GitUserDate
+// User info and date for Git operations.
+type GitUserDate struct {
+	Name  *string    `json:"name,omitempty"`
+	Email *string    `json:"email,omitempty"`
+	Date  *time.Time `json:"date,omitempty"`
+}
+
+// IdentityRef
+// Note that many of these fields are being deprecated in the 5.1 API
+// This struct follows the 5.0 API
+type IdentityRef struct {
+	Links             *[]ReferenceLinks `json:"_links,omitempty"`
+	Descriptor        *string           `json:"descriptor,omitempty"`
+	DirectoryAlias    *string           `json:"directoryAlias,omitempty"`
+	DisplayName       *string           `json:"displayName,omitempty"`
+	ID                *string           `json:"id,omitempty"`
+	ImageURL          *string           `json:"imageUrl,omitempty"`
+	Inactive          *bool             `json:"inactive,omitempty"`
+	IsAadIdentity     *bool             `json:"isAadIdentity,omitempty"`
+	IsContainer       *bool             `json:"isContainer,omitempty"`
+	IsDeletedInOrigin *bool             `json:"isDeletedInOrigin,omitempty"`
+	ProfileURL        *string           `json:"profileUrl,omitempty"`
+	URL               *string           `json:"url,omitempty"`
+	UniqueName        *string           `json:"uniqueName,omitempty"`
+}
+
+// IdentityRefWithVote
+// Identity information including a vote on a pull request.
+type IdentityRefWithVote struct {
+	IdentityRef
+	IsRequired  *bool                  `json:"isRequired,omitempty"`
+	ReviewerURL *string                `json:"reviewerUrl,omitempty"`
+	Vote        *int                   `json:"vote,omitempty"`
+	VotedFor    *[]IdentityRefWithVote `json:"votedFor,omitempty"`
+}
+
+// ItemContent
+type ItemContent struct {
+	Content     *string          `json:"content,omitempty"`
+	ContentType *ItemContentType `json:"contentType,omitempty"`
+}
+
+// ItemContentType
+type ItemContItemContentTypeent struct {
+	Base64Encoded *string `json:"base64Encoded,omitempty"`
+	RawText       *string `json:"rawText,omitempty"`
 }
 
 type Project struct {
@@ -149,67 +283,40 @@ type Project struct {
 	LastUpdateTime *time.Time `json:"lastUpdateTime,omitempty"`
 }
 
-// IdentityRef
-// Note that many of these fields are being deprecated in the 5.1 API
-// This struct follows the 5.0 API
-type IdentityRef struct {
-	Links             *ReferenceLinks `json:"_links,omitempty"`
-	Descriptor        *string         `json:"descriptor,omitempty"`
-	DirectoryAlias    *string         `json:"directoryAlias,omitempty"`
-	DisplayName       *string         `json:"displayName,omitempty"`
-	ID                *string         `json:"id,omitempty"`
-	ImageURL          *string         `json:"imageUrl,omitempty"`
-	Inactive          *bool           `json:"inactive,omitempty"`
-	IsAadIdentity     *bool           `json:"isAadIdentity,omitempty"`
-	IsContainer       *bool           `json:"isContainer,omitempty"`
-	IsDeletedInOrigin *bool           `json:"isDeletedInOrigin,omitempty"`
-	ProfileURL        *string         `json:"profileUrl,omitempty"`
-	URL               *string         `json:"url,omitempty"`
-	UniqueName        *string         `json:"uniqueName,omitempty"`
+// PullRequestAsyncStatus
+// The current status of the pull request merge.
+type PullRequestAsyncStatus struct {
+	Conflicts        *string `json:"conflicts,omitempty"`
+	Failure          *string `json:"failure,omitempty"`
+	NotSet           *string `json:"notSet,omitempty"`
+	Queued           *string `json:"queued,omitempty"`
+	RejectedByPolicy *string `json:"rejectedByPolicy,omitempty"`
+	Succeeded        *string `json:"succeeded,omitempty"`
+}
+
+// PullRequestMergeFailureType
+// The type of failure (if any) of the pull request merge.
+type PullRequestMergeFailureType struct {
+	CaseSensitive  *string `json:"caseSensitive,omitempty"`
+	None           *string `json:"none,omitempty"`
+	ObjectTooLarge *string `json:"objectTooLarge,omitempty"`
+	Unknown        *string `json:"Unknown,omitempty"`
+}
+
+// PullRequestStatus
+// The current status of the pull request merge.
+type PullRequestStatus struct {
+	Abandoned *string `json:"abandoned,omitempty"`
+	Active    *string `json:"active,omitempty"`
+	All       *string `json:"all,omitempty"`
+	Completed *string `json:"completed,omitempty"`
+	NotSet    *string `json:"notSet,omitempty"`
 }
 
 // ReferenceLinks
+// The class to represent a collection of REST reference links.
 type ReferenceLinks struct {
-	Links *interface{} `json:"links,omitempty"`
-}
-
-// Avatar
-type Avatar struct {
-	Href *string `json:"href,omitempty"`
-}
-
-// GitCommitRef
-type GitCommitRef struct {
-	Links            *ReferenceLinks        `json:"_links,omitempty"`
-	CommitID         *string                `json:"commitId,omitempty"`
-	Author           *GitUserDate           `json:"author,omitempty"`
-	Committer        *GitUserDate           `json:"committer,omitempty"`
-	Comment          *string                `json:"comment,omitempty"`
-	CommentTruncated *bool                  `json:"commentTruncated,omitempty"`
-	URL              *string                `json:"url,omitempty"`
-	ChangeCounts     *ChangeCountDictionary `json:"changeCounts,omitempty"`
-	Changes          *GitChange             `json:"changes,omitempty"`
-	Parents          *[]string              `json:"parents,omitempty"`
-	Push             *GitPushRef            `json:"push,omitempty"`
-	RemoteURL        *string                `json:"remoteUrl,omitempty"`
-	Statuses         *[]GitStatus           `json:"statuses,omitempty"`
-	WorkItems        *ResourceRef           `json:"workItems,omitempty"`
-}
-
-type GitChange struct {
-}
-
-type GitStatus struct {
-}
-
-type GitRepository struct {
-}
-
-// GitUserDate
-type GitUserDate struct {
-	Name  *string    `json:"name,omitempty"`
-	Email *string    `json:"email,omitempty"`
-	Date  *time.Time `json:"date,omitempty"`
+	Links *interface{} `json:",omitempty"`
 }
 
 // ResourceContainers provides information related to the Resources in a payload
@@ -224,6 +331,48 @@ type ResourceRef struct {
 	ID      *string `json:"id,omitempty"`
 	BaseURL *string `json:"baseUrl,omitempty"`
 	URL     *string `json:"url,omitempty"`
+}
+
+// TeamProjectCollectionReference
+// Reference object for a TeamProjectCollection.
+type TeamProjectCollectionReference struct {
+	ID   *string `json:"id,omitempty"`
+	Name *string `json:"name,omitempty"`
+	URL  *string `json:"url,omitempty"`
+}
+
+// TeamProjectReference
+// Represents a shallow reference to a TeamProject.
+type TeamProjectReference struct {
+	Abbreviation        *string `json:"abbreviation,omitempty"`
+	DefaultTeamImageUrl *string `json:"defaultTeamImageUrl,omitempty"`
+	Description         *string `json:"description,omitempty"`
+	ID                  *string `json:"id,omitempty"`
+	Name                *string `json:"name,omitempty"`
+	Revision            *string `json:"revision,omitempty"`
+	State               *string `json:"state,omitempty"`
+	URL                 *string `json:"url,omitempty"`
+	Visibility          *string `json:"visibility,omitempty"`
+}
+
+// VersionControlChangeType
+// The type of change that was made to the item.
+type VersionControlChangeType struct {
+	Add          *string `json:"add,omitempty"`
+	All          *string `json:"all,omitempty"`
+	Branch       *string `json:"branch,omitempty"`
+	Delete       *string `json:"delete,omitempty"`
+	Edit         *string `json:"edit,omitempty"`
+	Encoding     *string `json:"encoding,omitempty"`
+	Lock         *string `json:"lock,omitempty"`
+	Merge        *string `json:"merge,omitempty"`
+	None         *string `json:"none,omitempty"`
+	Property     *string `json:"property,omitempty"`
+	Rename       *string `json:"rename,omitempty"`
+	Rollback     *string `json:"rollback,omitempty"`
+	SourceRename *string `json:"sourceRename,omitempty"`
+	TargetRename *string `json:"targetRename,omitempty"`
+	Undelete     *string `json:"undelete,omitempty"`
 }
 
 // WebApiTagDefinition
