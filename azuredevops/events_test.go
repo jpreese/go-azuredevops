@@ -32,6 +32,10 @@ func TestParsePayload(t *testing.T) {
 			payload:   &azuredevops.PullRequestResource{},
 			eventType: "git.pullrequest.updated",
 		},
+		{
+			payload:   &azuredevops.PushResource{},
+			eventType: "git.push",
+		},
 	}
 
 	for _, test := range tests {

@@ -43,7 +43,7 @@ type PullRequestResource struct {
 	PullRequestID         *int           `json:"pullRequestId,omitempty"`
 	CodeReviewID          *int           `json:"codeReviewId,omitempty"`
 	Status                *string        `json:"status,omitempty"`
-	CreatedBy             *CreatedBy     `json:"createdBy,omitempty"`
+	CreatedBy             *AuthorRef     `json:"createdBy,omitempty"`
 	CreationDate          *time.Time     `json:"creationDate,omitempty"`
 	Title                 *string        `json:"title,omitempty"`
 	Description           *string        `json:"description,omitempty"`
@@ -60,6 +60,16 @@ type PullRequestResource struct {
 	Links                 *Links         `json:"_links,omitempty"`
 	SupportsIterations    *bool          `json:"supportsIterations,omitempty"`
 	ArtifactID            *string        `json:"artifactId,omitempty"`
+}
+
+// PushResource represents the resource field in a code push request event webhook
+type PushResource struct {
+	ChangeSetID *int       `json:"changeSetID,omitempty"`
+	URL         *string    `json:"url,omitempty"`
+	Author      *AuthorRef `json:"author,omitempty"`
+	CheckedInBy *AuthorRef `json:"checkedInBy,omitempty"`
+	CreatedDate *time.Time `json:"createdDate,omitempty"`
+	Comment     *string    `json:"comment,omitempty"`
 }
 
 type Repo struct {
@@ -83,7 +93,7 @@ type Project struct {
 	LastUpdateTime time.Time `json:"lastUpdateTime,omitempty"`
 }
 
-type CreatedBy struct {
+type AuthorRef struct {
 	DisplayName string `json:"displayName,omitempty"`
 	URL         string `json:"url,omitempty"`
 	Links       *Links `json:"_links,omitempty"`

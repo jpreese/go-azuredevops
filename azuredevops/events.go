@@ -22,6 +22,8 @@ func (e *Event) ParsePayload() (payload interface{}, err error) {
 		payload = &PullRequestResource{}
 	case "git.pullrequest.updated":
 		payload = &PullRequestResource{}
+	case "git.push":
+		payload = &PushResource{}
 	default:
 		return payload, errors.New("Unknown EventType in webhook payload")
 	}
