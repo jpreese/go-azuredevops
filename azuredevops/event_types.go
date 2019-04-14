@@ -362,7 +362,12 @@ type PullRequestStatus struct {
 
 // ReferenceLinks The class to represent a collection of REST reference links.
 type ReferenceLinks struct {
-	Links *interface{} `json:",omitempty"`
+	Links *map[string]Link `json:",omitempty"`
+}
+
+// Link A single item in a collection of ReferenceLinks.
+type Link struct {
+	Href *string `json:"href,omitempty"`
 }
 
 // ResourceContainers provides information related to the Resources in a payload
