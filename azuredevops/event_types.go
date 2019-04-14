@@ -134,10 +134,9 @@ type GitPullRequest struct {
 	CreatedBy             *IdentityRef                     `json:"createdBy,omitempty"`
 	CreationDate          *time.Time                       `json:"creationDate,omitempty"`
 	Description           *string                          `json:"description,omitempty"`
-	CreationDate          *time.Time                       `json:"creationDate,omitempty"`
 	ForkSource            *GitForkRef                      `json:"forkSource,omitempty"`
 	IsDraft               *bool                            `json:"isDraft,omitempty"`
-	Labels                *WebApiTagDefinition             `json:"labels,omitempty"`
+	Labels                *WebAPITagDefinition             `json:"labels,omitempty"`
 	LastMergeCommit       *GitCommitRef                    `json:"lastMergeCommit,omitempty"`
 	LastMergeSourceCommit *GitCommitRef                    `json:"lastMergeSourceCommit,omitempty"`
 	LastMergeTargetCommit *GitCommitRef                    `json:"lastMergeTargetCommit,omitempty"`
@@ -157,6 +156,13 @@ type GitPullRequest struct {
 	Title                 *string                          `json:"title,omitempty"`
 	URL                   *string                          `json:"url,omitempty"`
 	WorkItemRefs          *[]ResourceRef                   `json:"workItemRefs,omitempty"`
+}
+
+// GitPushRef Describes a push request
+type GitPushRef struct {
+	Commits    *[]GitCommitRef `json:"commits,omitempty"`
+	RefUpdates *[]GitRefUpdate `json:"refUpdates,omitempty"`
+	Repository *GitRepository  `json:"repository,omitempty"`
 }
 
 // GitPullRequestCompletionOptions describes preferences about how the pull
@@ -216,18 +222,18 @@ type GitRefUpdate struct {
 
 // GitRepository describes an Azure Devops Git repository.
 type GitRepository struct {
-	Links            *[]ReferenceLinks `json:"_links,omitempty"`
-	DefaultBranch    *string           `json:"defaultBranch,omitempty"`
-	ID               *string           `json:"id,omitempty"`
-	IsFork           *bool             `json:"isFork,omitempty"`
-	Name             *string           `json:"name,omitempty"`
-	ParentRepository *GitRepositoryRef `json:"parentRepository,omitempty"`
-	Project          *TeamProjectRef   `json:"project,omitempty"`
-	RemoteURL        *string           `json:"remoteUrl,omitempty"`
-	Size             *int              `json:"size,omitempty"`
-	SSHURL           *string           `json:"sshUrl,omitempty"`
-	URL              *string           `json:"url,omitempty"`
-	ValidRemoteURLs  *[]string         `json:"validRemoteUrls,omitempty"`
+	Links            *[]ReferenceLinks     `json:"_links,omitempty"`
+	DefaultBranch    *string               `json:"defaultBranch,omitempty"`
+	ID               *string               `json:"id,omitempty"`
+	IsFork           *bool                 `json:"isFork,omitempty"`
+	Name             *string               `json:"name,omitempty"`
+	ParentRepository *GitRepositoryRef     `json:"parentRepository,omitempty"`
+	Project          *TeamProjectReference `json:"project,omitempty"`
+	RemoteURL        *string               `json:"remoteUrl,omitempty"`
+	Size             *int                  `json:"size,omitempty"`
+	SSHURL           *string               `json:"sshUrl,omitempty"`
+	URL              *string               `json:"url,omitempty"`
+	ValidRemoteURLs  *[]string             `json:"validRemoteUrls,omitempty"`
 }
 
 // GitRepositoryRef
@@ -236,7 +242,7 @@ type GitRepositoryRef struct {
 	ID         *string                         `json:"id,omitempty"`
 	IsFork     *bool                           `json:"isFork,omitempty"`
 	Name       *string                         `json:"name,omitempty"`
-	Project    *TeamProjectRef                 `json:"project,omitempty"`
+	Project    *TeamProjectReference           `json:"project,omitempty"`
 	RemoteURL  *string                         `json:"remoteUrl,omitempty"`
 	SSHURL     *string                         `json:"sshUrl,omitempty"`
 	URL        *string                         `json:"url,omitempty"`
@@ -283,32 +289,6 @@ type GitUserDate struct {
 	Date  *time.Time `json:"date,omitempty"`
 }
 
-// IdentityRef describes an Azure Devops identity
-type IdentityRef struct {
-	Links             *[]ReferenceLinks `json:"_links,omitempty"`
-	Descriptor        *string           `json:"descriptor,omitempty"`
-	DirectoryAlias    *string           `json:"directoryAlias,omitempty"`
-	DisplayName       *string           `json:"displayName,omitempty"`
-	ID                *string           `json:"id,omitempty"`
-	ImageURL          *string           `json:"imageUrl,omitempty"`
-	Inactive          *bool             `json:"inactive,omitempty"`
-	IsAadIdentity     *bool             `json:"isAadIdentity,omitempty"`
-	IsContainer       *bool             `json:"isContainer,omitempty"`
-	IsDeletedInOrigin *bool             `json:"isDeletedInOrigin,omitempty"`
-	ProfileURL        *string           `json:"profileUrl,omitempty"`
-	URL               *string           `json:"url,omitempty"`
-	UniqueName        *string           `json:"uniqueName,omitempty"`
-}
-
-// IdentityRefWithVote Identity information including a vote on a pull request.
-type IdentityRefWithVote struct {
-	IdentityRef
-	IsRequired  *bool                  `json:"isRequired,omitempty"`
-	ReviewerURL *string                `json:"reviewerUrl,omitempty"`
-	Vote        *int                   `json:"vote,omitempty"`
-	VotedFor    *[]IdentityRefWithVote `json:"votedFor,omitempty"`
-}
-
 // ItemContent
 type ItemContent struct {
 	Content     *string          `json:"content,omitempty"`
@@ -316,7 +296,7 @@ type ItemContent struct {
 }
 
 // ItemContentType
-type ItemContItemContentTypeent struct {
+type ItemContentType struct {
 	Base64Encoded *string `json:"base64Encoded,omitempty"`
 	RawText       *string `json:"rawText,omitempty"`
 }
@@ -342,22 +322,35 @@ type PullRequestAsyncStatus struct {
 	Succeeded        *string `json:"succeeded,omitempty"`
 }
 
-// PullRequestMergeFailureType The type of failure (if any) of the pull request
-// merge.
-type PullRequestMergeFailureType struct {
-	CaseSensitive  *string `json:"caseSensitive,omitempty"`
-	None           *string `json:"none,omitempty"`
-	ObjectTooLarge *string `json:"objectTooLarge,omitempty"`
-	Unknown        *string `json:"Unknown,omitempty"`
+// PullRequestMergeFailureType The specific type of merge request failure
+type PullRequestMergeFailureType int
+
+// PullRequestMergeFailureType enum values
+const (
+	NoFailure PullRequestMergeFailureType = iota
+	UnknownFailure
+	CaseSensitive
+	ObjectTooLarge
+)
+
+func (d PullRequestMergeFailureType) String() string {
+	return [...]string{"none", "unknown", "caseSensitive", "objectTooLarge"}[d]
 }
 
 // PullRequestStatus The current status of the pull request merge.
-type PullRequestStatus struct {
-	Abandoned *string `json:"abandoned,omitempty"`
-	Active    *string `json:"active,omitempty"`
-	All       *string `json:"all,omitempty"`
-	Completed *string `json:"completed,omitempty"`
-	NotSet    *string `json:"notSet,omitempty"`
+type PullRequestStatus int
+
+// PullRequestStatus enum values
+const (
+	Abandoned PullRequestStatus = iota
+	Active
+	IncludeAll
+	Completed
+	NotSet
+)
+
+func (d PullRequestStatus) String() string {
+	return [...]string{"abandoned", "active", "all", "completed", "notSet"}[d]
 }
 
 // ReferenceLinks The class to represent a collection of REST reference links.
