@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/benmatselby/go-azuredevops/azuredevops"
+	"github.com/mcdafydd/go-azuredevops/azuredevops"
 )
 
 const (

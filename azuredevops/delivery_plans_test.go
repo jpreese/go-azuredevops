@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/benmatselby/go-azuredevops/azuredevops"
+	"github.com/mcdafydd/go-azuredevops/azuredevops"
 )
 
 const (
