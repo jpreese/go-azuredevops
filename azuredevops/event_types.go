@@ -60,6 +60,16 @@ func (d GitObjectType) String() string {
 // ChangeCountDictionary maps the number of changes to each type
 type ChangeCountDictionary *map[VersionControlChangeType]int
 
+type FileContentMetadata struct {
+	ContentType *string `json:"contentType,omitempty"`
+	Encoding    *int    `json:"encoding,omitempty"`
+	Extension   *string `json:"extension,omitempty"`
+	FileName    *string `json:"fileName,omitempty"`
+	IsBinary    *bool   `json:"isBinary,omitempty"`
+	IsImage     *bool   `json:"isImage,omitempty"`
+	VSLink      *string `json:"vsLink,omitempty"`
+}
+
 // GitChange describes file path and content changes
 type GitChange struct {
 	ChangeID           *int                      `json:"changeId,omitempty"`
@@ -113,11 +123,18 @@ type GitForkRef struct {
 
 // GitItem describes a single git item
 type GitItem struct {
-	CommitID              *string        `json:"commitId,omitempty"`
-	GitObjectType         *GitObjectType `json:"gitObjectType,omitempty"`
-	LatestProcessedChange *GitCommitRef  `json:"latestProcessedChange,omitempty"`
-	ObjectID              *string        `json:"objectId,omitempty"`
-	OriginalObjectID      *string        `json:"originalObjectId,omitempty"`
+	Links                 *[]ReferenceLinks    `json:"_links,omitempty"`
+	CommitID              *string              `json:"commitId,omitempty"`
+	Content               *string              `json:"content,omitempty"`
+	ContentMetadata       *FileContentMetadata `json:"contentMetadata,omitempty"`
+	GitObjectType         *GitObjectType       `json:"gitObjectType,omitempty"`
+	IsFolder              *bool                `json:"isFolder,omitempty"`
+	IsSymLink             *bool                `json:"isSymLink,omitempty"`
+	LatestProcessedChange *GitCommitRef        `json:"latestProcessedChange,omitempty"`
+	ObjectID              *string              `json:"objectId,omitempty"`
+	OriginalObjectID      *string              `json:"originalObjectId,omitempty"`
+	Path                  *string              `json:"path,omitempty"`
+	URL                   *string              `json:"url,omitempty"`
 }
 
 // GitPullRequest represents all the data associated with a pull request.
