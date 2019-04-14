@@ -33,7 +33,7 @@ func TestParsePayload(t *testing.T) {
 			eventType: "git.pullrequest.updated",
 		},
 		{
-			payload:   &azuredevops.PushResource{},
+			payload:   &azuredevops.GitPush{},
 			eventType: "git.push",
 		},
 	}
