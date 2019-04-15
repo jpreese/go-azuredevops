@@ -60,6 +60,7 @@ func (d GitObjectType) String() string {
 // ChangeCountDictionary maps the number of changes to each type
 type ChangeCountDictionary *map[VersionControlChangeType]int
 
+// FileContentMetadata Describes files referenced by a GitItem
 type FileContentMetadata struct {
 	ContentType *string `json:"contentType,omitempty"`
 	Encoding    *int    `json:"encoding,omitempty"`
