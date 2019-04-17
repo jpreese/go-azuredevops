@@ -52,7 +52,7 @@ type GitRefListOptions struct {
 // ListRefs returns a list of the references for a git repo
 func (s *GitService) ListRefs(repo, refType string, opts *GitRefListOptions) ([]Ref, int, error) {
 	URL := fmt.Sprintf(
-		"/_apis/git/repositories/%s/refs/%s?api-version=4.1",
+		"/_apis/git/repositories/%s/refs/%s?api-version=5.1-preview.1",
 		repo,
 		refType,
 	)

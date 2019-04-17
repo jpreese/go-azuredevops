@@ -17,46 +17,48 @@ type WorkItemsService struct {
 // IterationWorkItems Represents work items in an iteration backlog
 type IterationWorkItems struct {
 	Links             *ReferenceLinks `json:"_links,omitempty"`
-	WorkItemRelations []WorkItemLink  `json:"workItemRelations"`
+	WorkItemRelations *[]WorkItemLink `json:"workItemRelations"`
 	URL               *string         `json:"url,omitempty"`
 }
 
 // WorkItemLink A link between two work items.
 type WorkItemLink struct {
-	Rel    *string           `json:"rel,omitempty"`
-	Source *WorkItemRelation `json:"source,omitempty"`
-	Target *WorkItemRelation `json:"target,omitempty"`
+	Rel    *string            `json:"rel,omitempty"`
+	Source *WorkItemReference `json:"source,omitempty"`
+	Target *WorkItemReference `json:"target,omitempty"`
 }
 
 // WorkItemListResponse describes the list response for work items
 type WorkItemListResponse struct {
-	WorkItems []WorkItem `json:"value,omitempty"`
+	WorkItems *[]WorkItem `json:"value,omitempty"`
 }
 
 // WorkItem describes an individual work item in TFS
 type WorkItem struct {
-	Links             *ReferenceLinks    `json:"_links,omitempty"`
-	CommentVersionRef *CommentVersionRef `json:"commentVersionRef,omitempty"`
-	Fields            *WorkItemFields    `json:"fields,omitempty"`
-	ID                *int               `json:"id,omitempty"`
-	Relations         *WorkItemRelation  `json:"relations,omitempty"`
-	Rev               *int               `json:"rev,omitempty"`
-	URL               *string            `json:"url,omitempty"`
+	Links             *ReferenceLinks                 `json:"_links,omitempty"`
+	CommentVersionRef *CommentVersionRef              `json:"commentVersionRef,omitempty"`
+	Fields            *map[string]WorkItemFieldUpdate `json:"fields,omitempty"`
+	ID                *int                            `json:"id,omitempty"`
+	Relations         *WorkItemRelation               `json:"relations,omitempty"`
+	Rev               *int                            `json:"rev,omitempty"`
+	URL               *string                         `json:"url,omitempty"`
 }
 
+/*
 // WorkItemFields describes all the fields for a given work item
 type WorkItemFields struct {
-	ID          int     `json:"System.Id"`
-	Title       string  `json:"System.Title"`
-	State       string  `json:"System.State"`
-	Type        string  `json:"System.WorkItemType"`
-	Points      float64 `json:"Microsoft.VSTS.Scheduling.StoryPoints"`
-	BoardColumn string  `json:"System.BoardColumn"`
-	CreatedBy   string  `json:"System.CreatedBy"`
-	AssignedTo  string  `json:"System.AssignedTo"`
-	Tags        string  `json:"System.Tags"`
-	TagList     []string
+	ID          *int     `json:"System.Id"`
+	Title       *string  `json:"System.Title"`
+	State       *string  `json:"System.State"`
+	Type        *string  `json:"System.WorkItemType"`
+	Points      *float64 `json:"Microsoft.VSTS.Scheduling.StoryPoints"`
+	BoardColumn *string  `json:"System.BoardColumn"`
+	CreatedBy   *string  `json:"System.CreatedBy"`
+	AssignedTo  *string  `json:"System.AssignedTo"`
+	Tags        *string  `json:"System.Tags"`
+	TagList     *[]string
 }
+*/
 
 // Describes an update to a work item field.
 type WorkItemFieldUpdate struct {
@@ -129,7 +131,7 @@ func (s *WorkItemsService) GetForIteration(team string, iteration Iteration) ([]
 		"/_apis/wit/workitems?ids=%s&fields=%s&api-version=%s",
 		strings.Join(workIds, ","),
 		strings.Join(fields, ","),
-		"4.1-preview",
+		"5.1-preview.1",
 	)
 
 	request, err := s.client.NewRequest("GET", URL, nil)
@@ -140,11 +142,7 @@ func (s *WorkItemsService) GetForIteration(team string, iteration Iteration) ([]
 	var response WorkItemListResponse
 	_, err = s.client.Execute(request, &response)
 
-	for index := range response.WorkItems {
-		response.WorkItems[index].Fields.TagList = strings.Split(response.WorkItems[index].Fields.Tags, "; ")
-	}
-
-	return response.WorkItems, err
+	return *response.WorkItems, err
 }
 
 // GetIdsForIteration will return an array of ids for a given iteration
@@ -154,7 +152,7 @@ func (s *WorkItemsService) GetIdsForIteration(team string, iteration Iteration) 
 		"/%s/_apis/work/teamsettings/iterations/%s/workitems?api-version=%s",
 		url.PathEscape(team),
 		iteration.ID,
-		"4.1-preview",
+		"5.1-preview.1",
 	)
 
 	request, err := s.client.NewRequest("GET", URL, nil)
@@ -167,9 +165,9 @@ func (s *WorkItemsService) GetIdsForIteration(team string, iteration Iteration) 
 	_, err = s.client.Execute(request, &response)
 
 	var queryIds []int
-	for index := 0; index < len(response.IterationWorkItems); index++ {
-		relationship := response.IterationWorkItems[index]
-		queryIds = append(queryIds, relationship.Target.ID)
+	for index := 0; index < len(*response.WorkItemRelations); index++ {
+		relationship := (*response.WorkItemRelations)[index]
+		queryIds = append(queryIds, *relationship.Target.ID)
 	}
 
 	return queryIds, err

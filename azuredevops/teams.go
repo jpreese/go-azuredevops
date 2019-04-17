@@ -31,7 +31,7 @@ type TeamsListOptions struct {
 
 // List returns list of the teams
 func (s *TeamsService) List(opts *TeamsListOptions) ([]Team, int, error) {
-	URL := fmt.Sprintf("/_apis/teams?api-version=4.1")
+	URL := fmt.Sprintf("/_apis/teams?api-version=5.1-preview.1")
 	URL, err := addOptions(URL, opts)
 
 	request, err := s.client.NewBaseRequest("GET", URL, nil)

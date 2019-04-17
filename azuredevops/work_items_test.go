@@ -3,7 +3,6 @@ package azuredevops_test
 import (
 	"fmt"
 	"net/http"
-	"reflect"
 	"testing"
 
 	"github.com/mcdafydd/go-azuredevops/azuredevops"
@@ -128,19 +127,17 @@ func TestWorkItems_GetForIteration(t *testing.T) {
 		idsResponse       string
 		getResponse       string
 		expectedWorkItems int
-		tagList           []string
 		tagString         string
 	}{
 		{
 			name:              "we get ids and we get iterations",
 			idsBaseURL:        getIdsURL,
-			actualIdsURL:      "/AZURE_DEVOPS_Project/AZURE_DEVOPS_TEAM/_apis/work/teamsettings/iterations/1/workitems?api-version=4.1-preview",
+			actualIdsURL:      "/AZURE_DEVOPS_Project/AZURE_DEVOPS_TEAM/_apis/work/teamsettings/iterations/1/workitems?api-version=5.1-preview.1",
 			getBaseURL:        getURL,
-			actualGetURL:      "/AZURE_DEVOPS_Project/_apis/wit/workitems?ids=1,3&fields=System.Id,System.Title,System.State,System.WorkItemType,Microsoft.VSTS.Scheduling.StoryPoints,System.BoardColumn,System.CreatedBy,System.AssignedTo,System.Tags&api-version=4.1-preview",
+			actualGetURL:      "/AZURE_DEVOPS_Project/_apis/wit/workitems?ids=1,3&fields=System.Id,System.Title,System.State,System.WorkItemType,Microsoft.VSTS.Scheduling.StoryPoints,System.BoardColumn,System.CreatedBy,System.AssignedTo,System.Tags&api-version=5.1-preview.1",
 			idsResponse:       getIdsResponse,
 			getResponse:       getResponse,
 			expectedWorkItems: 3,
-			tagList:           []string{"Tag1", "Tag2"},
 			tagString:         "Tag1; Tag2",
 		},
 	}
@@ -171,10 +168,6 @@ func TestWorkItems_GetForIteration(t *testing.T) {
 
 			if len(workItems) != tc.expectedWorkItems {
 				t.Fatalf("expected %d work items; got %d", tc.expectedWorkItems, len(workItems))
-			}
-
-			if !reflect.DeepEqual(workItems[1].Fields.TagList, tc.tagList) {
-				t.Fatalf("expected item %d to have a tag list of %v; got %v", 2, tc.tagList, workItems[1].Fields.TagList)
 			}
 
 			if workItems[1].Fields.Tags != tc.tagString {
