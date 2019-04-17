@@ -266,7 +266,23 @@ type GitRepositoryRef struct {
 	URL        *string                         `json:"url,omitempty"`
 }
 
-// GitStatus contains the metadata of a service/extension posting a status.
+// GitStatusState contains the metadata of a service/extension posting a status.
+type GitStatusState int
+
+// GitStatusState enum values
+const (
+	GitNotSet GitStatusState = iota
+	GitPending
+	GitSucceeded
+	GitFailed
+	GitError
+	GitNotApplicable
+)
+
+func (d GitStatusState) String() string {
+	return [...]string{"notSet", "pending", "succeeded", "failed", "error", "notApplicable"}[d]
+}
+
 type GitStatus struct {
 	Links        *[]ReferenceLinks `json:"_links,omitempty"`
 	Context      *GitStatusContext `json:"context,omitempty"`
@@ -274,24 +290,24 @@ type GitStatus struct {
 	CreationDate *time.Time        `json:"creationDate,omitempty"`
 	Description  *string           `json:"description,omitempty"`
 	ID           *int              `json:"id,omitempty"`
+	State        *GitStatusState   `json:"state,omitempty"`
 	TargetURL    *string           `json:"targetUrl,omitempty"`
 	UpdatedDate  *time.Time        `json:"updatedDate,omitempty"`
+}
+
+// GitPullRequestStatus This class contains the metadata of a service/extension
+// posting pull request status. Status can be associated with a pull request or
+// an iteration.
+type GitPullRequestStatus struct {
+	GitStatus
+	IterationID int        `json:"iterationId,omitempty"`
+	Properties  *time.Time `json:"properties,omitempty"`
 }
 
 // GitStatusContext Status context that uniquely identifies the status.
 type GitStatusContext struct {
 	Genre *string `json:"genre,omitempty"`
 	Name  *string `json:"name,omitempty"`
-}
-
-// GitStatusState State of the status.
-type GitStatusState struct {
-	Error         *string `json:"error,omitempty"`
-	Failed        *string `json:"failed,omitempty"`
-	NotApplicable *string `json:"notApplicable,omitempty"`
-	NotSet        *string `json:"notSet,omitempty"`
-	Pending       *string `json:"pending,omitempty"`
-	Succeeded     *string `json:"succeeded,omitempty"`
 }
 
 // GitTemplate
@@ -330,14 +346,21 @@ type Project struct {
 	LastUpdateTime *time.Time `json:"lastUpdateTime,omitempty"`
 }
 
-// PullRequestAsyncStatus The current status of the pull request merge.
-type PullRequestAsyncStatus struct {
-	Conflicts        *string `json:"conflicts,omitempty"`
-	Failure          *string `json:"failure,omitempty"`
-	NotSet           *string `json:"notSet,omitempty"`
-	Queued           *string `json:"queued,omitempty"`
-	RejectedByPolicy *string `json:"rejectedByPolicy,omitempty"`
-	Succeeded        *string `json:"succeeded,omitempty"`
+// PullRequestAsyncStatus The current status of a pull request merge.
+type PullRequestAsyncStatus int
+
+// PullRequestAsyncStatus enum values
+const (
+	MergeConflicts PullRequestAsyncStatus = iota
+	MergeFailure
+	MergeNotSet
+	MergeQueued
+	MergeRejectedByPolicy
+	MergeSucceeded
+)
+
+func (d PullRequestAsyncStatus) String() string {
+	return [...]string{"conflicts", "failure", "notSet", "queued", "rejectedByPolicy", "succeeded"}[d]
 }
 
 // PullRequestMergeFailureType The specific type of merge request failure
@@ -355,16 +378,16 @@ func (d PullRequestMergeFailureType) String() string {
 	return [...]string{"none", "unknown", "caseSensitive", "objectTooLarge"}[d]
 }
 
-// PullRequestStatus The current status of the pull request merge.
+// PullRequestStatus The current status of a pull request merge.
 type PullRequestStatus int
 
 // PullRequestStatus enum values
 const (
-	Abandoned PullRequestStatus = iota
-	Active
-	IncludeAll
-	Completed
-	NotSet
+	PullAbandoned PullRequestStatus = iota
+	PullActive
+	PullIncludeAll
+	PullCompleted
+	PullNotSet
 )
 
 func (d PullRequestStatus) String() string {
