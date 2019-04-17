@@ -14,14 +14,18 @@ type WorkItemsService struct {
 	client *Client
 }
 
-// WorkItemsResponse describes the relationships between work items
-type WorkItemsResponse struct {
-	WorkItemRelationships []WorkItemRelationship `json:"workItemRelations"`
+// IterationWorkItems Represents work items in an iteration backlog
+type IterationWorkItems struct {
+	Links             *ReferenceLinks `json:"_links,omitempty"`
+	WorkItemRelations []WorkItemLink  `json:"workItemRelations"`
+	URL               *string         `json:"url,omitempty"`
 }
 
-// WorkItemRelationship describes the workitem section of the response
-type WorkItemRelationship struct {
-	Target WorkItemRelation `json:"target"`
+// WorkItemLink A link between two work items.
+type WorkItemLink struct {
+	Rel    *string           `json:"rel,omitempty"`
+	Source *WorkItemRelation `json:"source,omitempty"`
+	Target *WorkItemRelation `json:"target,omitempty"`
 }
 
 // WorkItemListResponse describes the list response for work items
@@ -60,7 +64,11 @@ type WorkItemFieldUpdate struct {
 	OldValue *interface{} `json:"oldValue,omitempty"`
 }
 
+// WorkItemRelationUpdates Describes updates to a work item's relations.
 type WorkItemRelationUpdates struct {
+	Added   *WorkItemRelation `json:"added,omitempty"`
+	Removed *WorkItemRelation `json:"removed,omitempty"`
+	Updated *WorkItemRelation `json:"updated,omitempty"`
 }
 
 // CommentVersionRef refers to the specific version of a comment
@@ -68,6 +76,12 @@ type CommentVersionRef struct {
 	CommentID *int    `json:"commentId,omitempty"`
 	Version   *int    `json:"version,omitempty"`
 	URL       *string `json:"url,omitempty"`
+}
+
+// WorkItemReference Contains reference to a work item.
+type WorkItemReference struct {
+	ID  *int    `json:"id,omitempty"`
+	URL *string `json:"url,omitempty"`
 }
 
 // WorkItemRelation describes an intermediary between iterations and work items
@@ -148,12 +162,13 @@ func (s *WorkItemsService) GetIdsForIteration(team string, iteration Iteration) 
 		return nil, err
 	}
 
-	var response WorkItemsResponse
+	var response IterationWorkItems
+
 	_, err = s.client.Execute(request, &response)
 
 	var queryIds []int
-	for index := 0; index < len(response.WorkItemRelationships); index++ {
-		relationship := response.WorkItemRelationships[index]
+	for index := 0; index < len(response.IterationWorkItems); index++ {
+		relationship := response.IterationWorkItems[index]
 		queryIds = append(queryIds, relationship.Target.ID)
 	}
 
