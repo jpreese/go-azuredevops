@@ -46,26 +46,8 @@ type PullRequestsService struct {
 
 // PullRequestsResponse describes the pull requests response
 type PullRequestsResponse struct {
-	PullRequests []PullRequest `json:"value"`
-	Count        int           `json:"count"`
-}
-
-// PullRequest describes the pull request
-type PullRequest struct {
-	ID          int             `json:"pullRequestId,omitempty"`
-	Title       string          `json:"title"`
-	Description string          `json:"description"`
-	Status      string          `json:"status"`
-	Created     string          `json:"creationDate"`
-	Repo        PullRequestRepo `json:"repository"`
-	URL         string          `json:"url"`
-}
-
-// PullRequestRepo describes the repo within the pull request
-type PullRequestRepo struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
-	URL  string `json:"url"`
+	GitPullRequests []GitPullRequest `json:"value"`
+	Count           int              `json:"count"`
 }
 
 // PullRequestListOptions describes what the request to the API should look like
@@ -76,7 +58,7 @@ type PullRequestListOptions struct {
 
 // List returns list of the pull requests
 // utilising https://docs.microsoft.com/en-us/rest/api/vsts/git/pull%20requests/get%20pull%20requests%20by%20project
-func (s *PullRequestsService) List(opts *PullRequestListOptions) ([]PullRequest, int, error) {
+func (s *PullRequestsService) List(opts *PullRequestListOptions) ([]GitPullRequest, int, error) {
 	URL := fmt.Sprintf("/_apis/git/pullrequests?api-version=5.1-preview.1")
 	URL, err := addOptions(URL, opts)
 
@@ -87,7 +69,7 @@ func (s *PullRequestsService) List(opts *PullRequestListOptions) ([]PullRequest,
 	var response PullRequestsResponse
 	_, err = s.client.Execute(request, &response)
 
-	return response.PullRequests, response.Count, err
+	return response.GitPullRequests, response.Count, err
 }
 
 // Comment Represents a comment which is one of potentially many in a comment thread.
@@ -102,7 +84,7 @@ type Comment struct {
 	LastUpdatedDate        *time.Time        `json:"lastUpdatedDate,omitempty"`
 	ParentCommentID        *int              `json:"parentCommentId,omitempty"`
 	PublishedDate          *time.Time        `json:"publishedDate,omitempty"`
-	usersLiked             *[]IdentityRef    `json:"UsersLiked,omitempty"`
+	UsersLiked             *[]IdentityRef    `json:"usersLiked,omitempty"`
 }
 
 type CommentPosition struct {
