@@ -16,6 +16,7 @@ There is partial implementation for the following services
 * Favourites
 * Iterations
 * Pull Requests
+* Service Events (webhooks)
 * Work Items
 
 ## Usage
