@@ -36,6 +36,14 @@ func TestParsePayload(t *testing.T) {
 			payload:   &azuredevops.GitPush{},
 			eventType: "git.push",
 		},
+		{
+			payload:   &azuredevops.WorkItem{},
+			eventType: "workitem.commented",
+		},
+		{
+			payload:   &azuredevops.WorkItemUpdate{},
+			eventType: "workitem.updated",
+		},
 	}
 
 	for _, test := range tests {

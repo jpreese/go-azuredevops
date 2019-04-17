@@ -49,6 +49,10 @@ func (e *Event) ParsePayload() (payload interface{}, err error) {
 		payload = &GitPullRequest{}
 	case "git.push":
 		payload = &GitPush{}
+	case "workitem.commented":
+		payload = &WorkItem{}
+	case "workitem.updated":
+		payload = &WorkItemUpdate{}
 	default:
 		return payload, errors.New("Unknown EventType in webhook payload")
 	}

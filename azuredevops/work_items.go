@@ -5,6 +5,7 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
+	"time"
 )
 
 // WorkItemsService handles communication with the work items methods on the API
@@ -23,21 +24,20 @@ type WorkItemRelationship struct {
 	Target WorkItemRelation `json:"target"`
 }
 
-// WorkItemRelation describes an intermediary between iterations and work items
-type WorkItemRelation struct {
-	ID int `json:"id"`
-}
-
 // WorkItemListResponse describes the list response for work items
 type WorkItemListResponse struct {
-	WorkItems []WorkItem `json:"value"`
+	WorkItems []WorkItem `json:"value,omitempty"`
 }
 
 // WorkItem describes an individual work item in TFS
 type WorkItem struct {
-	ID     int            `json:"id"`
-	Rev    int            `json:"rev"`
-	Fields WorkItemFields `json:"fields"`
+	Links             *ReferenceLinks    `json:"_links,omitempty"`
+	CommentVersionRef *CommentVersionRef `json:"commentVersionRef,omitempty"`
+	Fields            *WorkItemFields    `json:"fields,omitempty"`
+	ID                *int               `json:"id,omitempty"`
+	Relations         *WorkItemRelation  `json:"relations,omitempty"`
+	Rev               *int               `json:"rev,omitempty"`
+	URL               *string            `json:"url,omitempty"`
 }
 
 // WorkItemFields describes all the fields for a given work item
@@ -52,6 +52,42 @@ type WorkItemFields struct {
 	AssignedTo  string  `json:"System.AssignedTo"`
 	Tags        string  `json:"System.Tags"`
 	TagList     []string
+}
+
+// Describes an update to a work item field.
+type WorkItemFieldUpdate struct {
+	NewValue *interface{} `json:"newValue,omitempty"`
+	OldValue *interface{} `json:"oldValue,omitempty"`
+}
+
+type WorkItemRelationUpdates struct {
+}
+
+// CommentVersionRef refers to the specific version of a comment
+type CommentVersionRef struct {
+	CommentID *int    `json:"commentId,omitempty"`
+	Version   *int    `json:"version,omitempty"`
+	URL       *string `json:"url,omitempty"`
+}
+
+// WorkItemRelation describes an intermediary between iterations and work items
+type WorkItemRelation struct {
+	Attributes *ReferenceLinks `json:"attributes,omitempty"`
+	Rel        *string         `json:"rel,omitempty"`
+	URL        *string         `json:"url,omitempty"`
+}
+
+// WorkItemUpdate Describes an update to a work item.
+type WorkItemUpdate struct {
+	Links       *ReferenceLinks                 `json:"attributes,omitempty"`
+	Fields      *map[string]WorkItemFieldUpdate `json:"fields,omitempty"`
+	ID          *int                            `json:"id,omitempty"`
+	Relations   *WorkItemRelationUpdates        `json:"relations,omitempty"`
+	Rev         *int                            `json:"rev,omitempty"`
+	RevisedBy   *IdentityRef                    `json:"revisedBy,omitempty"`
+	RevisedDate *time.Time                      `json:"revisedDate,omitempty"`
+	WorkItemID  *int                            `json:"workItemId,omitempty"`
+	URL         *string                         `json:"url,omitempty"`
 }
 
 // GetForIteration will get a list of work items based on an iteration name
