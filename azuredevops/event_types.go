@@ -108,8 +108,8 @@ type GitCommitRef struct {
 	WorkItems        *ResourceRef           `json:"workItems,omitempty"`
 }
 
-// GitForkRef provides information about a fork ref.
-type GitForkRef struct {
+// GitRef provides information about a git/fork ref.
+type GitRef struct {
 	Links          *[]ReferenceLinks `json:"_links,omitempty"`
 	Creator        *IdentityRef      `json:"creator,omitempty"`
 	IsLocked       *bool             `json:"isLocked,omitempty"`
@@ -152,7 +152,7 @@ type GitPullRequest struct {
 	CreatedBy             *IdentityRef                     `json:"createdBy,omitempty"`
 	CreationDate          *time.Time                       `json:"creationDate,omitempty"`
 	Description           *string                          `json:"description,omitempty"`
-	ForkSource            *GitForkRef                      `json:"forkSource,omitempty"`
+	ForkSource            *GitRef                          `json:"forkSource,omitempty"`
 	IsDraft               *bool                            `json:"isDraft,omitempty"`
 	Labels                *WebAPITagDefinition             `json:"labels,omitempty"`
 	LastMergeCommit       *GitCommitRef                    `json:"lastMergeCommit,omitempty"`
