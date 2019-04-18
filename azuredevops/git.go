@@ -1,8 +1,9 @@
 package azuredevops
 
 import (
+	"context"
 	"fmt"
-	"time"
+	"net/url"
 )
 
 // GitService handles communication with the git methods on the API
@@ -11,35 +12,18 @@ type GitService struct {
 	client *Client
 }
 
-// GitListRefsResponse describes the git refs list response
-type GitListRefsResponse struct {
-	Count int   `json:"count"`
-	Refs  []Ref `json:"value"`
+// GitRefsResponse describes the git refs list response
+type GitRefsResponse struct {
+	Count int         `json:"count"`
+	Refs  []GitStatus `json:"value"`
 }
 
-// Ref describes what the git reference looks like
-type Ref struct {
-	Name     string `json:"name,omitempty"`
-	ObjectID string `json:"objectId,omitempty"`
-	URL      string `json:"url,omitempty"`
-	Statuses []struct {
-		ID          int    `json:"id,omitempty"`
-		State       string `json:"state,omitempty"`
-		Description string `json:"description,omitempty"`
-		Context     struct {
-			Name  string `json:"name,omitempty"`
-			Genre string `json:"genre,omitempty"`
-		} `json:"context,omitempty"`
-		CreationDate time.Time `json:"creationDate,omitempty"`
-		CreatedBy    struct {
-			ID          string `json:"id,omitempty"`
-			DisplayName string `json:"displayName,omitempty"`
-			UniqueName  string `json:"uniqueName,omitempty"`
-			URL         string `json:"url,omitempty"`
-			ImageURL    string `json:"imageUrl,omitempty"`
-		} `json:"createdBy,omitempty"`
-		TargetURL string `json:"targetUrl,omitempty"`
-	} `json:"statuses,omitempty"`
+// GitRef describes what the git reference looks like
+type GitRef struct {
+	Name     string      `json:"name,omitempty"`
+	ObjectID string      `json:"objectId,omitempty"`
+	URL      string      `json:"url,omitempty"`
+	Statuses []GitStatus `json:"statuses,omitempty"`
 }
 
 // GitRefListOptions describes what the request to the API should look like
@@ -50,7 +34,7 @@ type GitRefListOptions struct {
 }
 
 // ListRefs returns a list of the references for a git repo
-func (s *GitService) ListRefs(repo, refType string, opts *GitRefListOptions) ([]Ref, int, error) {
+func (s *GitService) ListRefs(repo, refType string, opts *GitRefListOptions) ([]GitRef, int, error) {
 	URL := fmt.Sprintf(
 		"/_apis/git/repositories/%s/refs/%s?api-version=5.1-preview.1",
 		repo,
@@ -63,8 +47,29 @@ func (s *GitService) ListRefs(repo, refType string, opts *GitRefListOptions) ([]
 	if err != nil {
 		return nil, 0, err
 	}
-	var response GitListRefsResponse
+	var response GitRefsResponse
 	_, err = s.client.Execute(request, &response)
 
 	return response.Refs, response.Count, err
+}
+
+// CreateStatus creates a new status for a repository at the specified
+// reference. Ref can be a SHA, a branch name, or a tag name.
+// https://docs.microsoft.com/en-us/rest/api/azure/devops/git/statuses/create?view=azure-devops-rest-5.0
+func (s *GitService) CreateStatus(ctx context.Context, owner, repo, ref string, status *GitStatus) (*[]GitStatus, int, error) {
+	URL := fmt.Sprintf(
+		"/_apis/git/repositories/%s/commits/%s/statuses?api-version=5.1-preview.1",
+		url.QueryEscape(ref),
+		ref,
+	)
+
+	request, err := s.client.NewRequest("POST", URL, nil)
+	if err != nil {
+		return nil, 0, err
+	}
+	var response GitRefsResponse
+	_, err = s.client.Execute(request, &response)
+
+	return &response.Refs, response.Count, err
+	// return repoStatus, resp, nil
 }
