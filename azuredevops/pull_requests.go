@@ -72,6 +72,76 @@ func (s *PullRequestsService) List(opts *PullRequestListOptions) ([]GitPullReque
 	return response.GitPullRequests, response.Count, err
 }
 
+// List returns list of the pull requests
+// utilising https://docs.microsoft.com/en-us/rest/api/vsts/git/pull%20requests/get%20pull%20requests%20by%20project
+func (s *PullRequestsService) ListOne(pullNum int, opts *PullRequestListOptions) (*GitPullRequest, int, error) {
+	URL := fmt.Sprintf("/_apis/git/pullrequests/%d?api-version=5.1-preview.1", pullNum)
+	URL, err := addOptions(URL, opts)
+
+	request, err := s.client.NewRequest("GET", URL, nil)
+	if err != nil {
+		return nil, 0, err
+	}
+	var response GitPullRequest
+	_, err = s.client.Execute(request, &response)
+
+	return &response, 1, err
+}
+
+// Merge Completes a pull request
+// https://docs.microsoft.com/en-us/rest/api/azure/devops/git/pull%20requests/update?view=azure-devops-rest-5.1
+// pullRequest = EnableAutoCompleteOnAnExistingPullRequest(gitHttpClient, pullRequest, mergeCommitMessage);
+func (s *PullRequestsService) Merge(opts *PullRequestListOptions) (*GitPullRequest, int, error) {
+	URL := fmt.Sprintf("/_apis/git/pullrequests?api-version=5.1-preview.1")
+	URL, err := addOptions(URL, opts)
+
+	var autoCompleteSetBy = IdentityRef{}
+
+	mergeStrategy := GitPullRequestMergeStrategy{
+		noFastForward: "true",
+		//	rebase:        "false",
+		//	rebaseMerge:   "false",
+		//	squash:        "true",
+	}
+
+	pr := GitPullRequest{
+		AutoCompleteSetBy: autoCompleteSetBy,
+		CompletionOptions: prOptions,
+		Status:            &PullRequestStatus{},
+	}
+
+	prOptions := GitPullRequestCompletionOptions{
+		BypassPolicy:            false,
+		BypassReason:            "",
+		DeleteSourceBranch:      false,
+		MergeCommitMessage:      "",
+		MergeStrategy:           mergeStrategy,
+		SquashMerge:             false,
+		TransitionWorkItems:     true,
+		TriggeredByAutoComplete: false,
+	}
+
+	// Now we're ready to make our API call to merge the pull request.
+	options := &azuredevops.PullRequestOptions{
+		MergeMethod: method,
+	}
+
+	var prOpts = GitPullRequestCompletionOptions{
+		SquashMerge:        true,
+		DeleteSourceBranch: true, // false if prefered otherwise
+		MergeCommitMessage: mergeCommitMessages,
+	}
+
+	request, err := s.client.NewRequest("PATCH", URL, nil)
+	if err != nil {
+		return nil, 0, err
+	}
+	var response GitPullRequest
+	_, err = s.client.Execute(request, &response)
+
+	return response.GitPullRequest, response.Count, err
+}
+
 // Comment Represents a comment which is one of potentially many in a comment thread.
 type Comment struct {
 	Links                  *[]ReferenceLinks `json:"_links,omitempty"`

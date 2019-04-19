@@ -1,7 +1,6 @@
 package azuredevops
 
 import (
-	"context"
 	"fmt"
 	"net/url"
 	"time"
@@ -15,6 +14,12 @@ type GitService struct {
 
 // GitRefsResponse describes the git refs list response
 type GitRefsResponse struct {
+	Count int      `json:"count"`
+	Refs  []GitRef `json:"value"`
+}
+
+// GitStatusesResponse describes the git statuses response
+type GitStatusesResponse struct {
 	Count int         `json:"count"`
 	Refs  []GitStatus `json:"value"`
 }
@@ -127,14 +132,14 @@ type GitPullRequest struct {
 // GitPullRequestCompletionOptions describes preferences about how the pull
 // request should be completed.
 type GitPullRequestCompletionOptions struct {
-	BypassPolicy            *bool                        `json:"bypassPolicy,omitempty"`
-	BypassReason            *string                      `json:"bypassReason,omitempty"`
-	DeleteSourceBranch      *bool                        `json:"deleteSourceBranch,omitempty"`
-	MergeCommitMessage      *int                         `json:"mergeCommitMessage,omitempty"`
-	MergeStrategy           *GitPullRequestMergeStrategy `json:"mergeStrategy,omitempty"`
-	SquashMerge             *bool                        `json:"squashMerge,omitempty"`
-	TransitionWorkItems     *bool                        `json:"transitionWorkItems,omitempty"`
-	TriggeredByAutoComplete *bool                        `json:"triggeredByAutoComplete,omitempty"`
+	BypassPolicy            bool                        `json:"bypassPolicy,omitempty"`
+	BypassReason            string                      `json:"bypassReason,omitempty"`
+	DeleteSourceBranch      bool                        `json:"deleteSourceBranch,omitempty"`
+	MergeCommitMessage      int                         `json:"mergeCommitMessage,omitempty"`
+	MergeStrategy           GitPullRequestMergeStrategy `json:"mergeStrategy,omitempty"`
+	SquashMerge             bool                        `json:"squashMerge,omitempty"`
+	TransitionWorkItems     bool                        `json:"transitionWorkItems,omitempty"`
+	TriggeredByAutoComplete bool                        `json:"triggeredByAutoComplete,omitempty"`
 }
 
 // GitPullRequestMergeOptions describes the options which are used when a pull
@@ -298,10 +303,29 @@ func (s *GitService) ListRefs(repo, refType string, opts *GitRefListOptions) ([]
 	return response.Refs, response.Count, err
 }
 
+// Get Return a single GitRepository
+// https://docs.microsoft.com/en-us/rest/api/azure/devops/git/repositories/get%20repository?view=azure-devops-rest-5.1
+func (s *GitService) Get(repoName string) (*GitRepository, int, error) {
+	URL := fmt.Sprintf(
+		"/_apis/git/repositories/%s?api-version=5.1-preview.1",
+		repoName,
+	)
+
+	request, err := s.client.NewRequest("GET", URL, nil)
+	if err != nil {
+		return nil, 0, err
+	}
+	var response GitRepository
+	_, err = s.client.Execute(request, &response)
+
+	return &response, 1, err
+
+}
+
 // CreateStatus creates a new status for a repository at the specified
 // reference. Ref can be a SHA, a branch name, or a tag name.
 // https://docs.microsoft.com/en-us/rest/api/azure/devops/git/statuses/create?view=azure-devops-rest-5.0
-func (s *GitService) CreateStatus(ctx context.Context, owner, repo, ref string, status *GitStatus) (*[]GitStatus, int, error) {
+func (s *GitService) CreateStatus(owner, repoName, ref string, status *GitStatus) (*[]GitStatus, int, error) {
 	URL := fmt.Sprintf(
 		"/_apis/git/repositories/%s/commits/%s/statuses?api-version=5.1-preview.1",
 		url.QueryEscape(ref),
@@ -312,9 +336,8 @@ func (s *GitService) CreateStatus(ctx context.Context, owner, repo, ref string, 
 	if err != nil {
 		return nil, 0, err
 	}
-	var response GitRefsResponse
+	var response GitStatusesResponse
 	_, err = s.client.Execute(request, &response)
 
 	return &response.Refs, response.Count, err
-	// return repoStatus, resp, nil
 }

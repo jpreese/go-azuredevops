@@ -117,3 +117,50 @@ func TestPullRequestsService_List(t *testing.T) {
 		})
 	}
 }
+
+func TestPullRequestsService_ListOne(t *testing.T) {
+	tt := []struct {
+		name     string
+		URL      string
+		title    string
+		response string
+		count    int
+	}{
+		{name: "happy", URL: pullrequestsListURL, response: pullrequestsResponse, count: 1, title: "A new feature"},
+		{name: "there are no items in the response", URL: pullrequestsListURL, response: "{}", count: 0},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.name, func(t *testing.T) {
+			c, mux, _, teardown := setup()
+			defer teardown()
+
+			mux.HandleFunc(tc.URL, func(w http.ResponseWriter, r *http.Request) {
+				testMethod(t, r, "GET")
+				json := tc.response
+				fmt.Fprint(w, json)
+			})
+
+			opt := &azuredevops.PullRequestListOptions{}
+			num := 1
+			response, count, err := c.PullRequests.ListOne(num, opt)
+			if err != nil {
+				t.Fatalf("returned error: %v", err)
+			}
+
+			if count != tc.count {
+				t.Fatalf("expected count in response to be %d; got %d", tc.count, count)
+			}
+
+			if len(response) != tc.count {
+				t.Fatalf("expected length of response to be 0; got %d", len(response))
+			}
+
+			if count > 0 {
+				if tc.title != response[0].Title {
+					t.Fatalf("expected title to be %s; got %s", tc.title, response[0].Title)
+				}
+			}
+		})
+	}
+}
