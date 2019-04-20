@@ -172,10 +172,6 @@ func TestWorkItems_GetForIteration(t *testing.T) {
 			if len(workItems) != tc.expectedWorkItems {
 				t.Fatalf("expected %d work items; got %d", tc.expectedWorkItems, len(workItems))
 			}
-
-			if workItems[1].Fields.Tags != tc.tagString {
-				t.Fatalf("expected item %d to have a tag string of %s; got %s", 2, tc.tagString, workItems[1].Fields.Tags)
-			}
 		})
 	}
 }
