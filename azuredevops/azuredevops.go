@@ -13,18 +13,22 @@ import (
 )
 
 const (
-	baseURL   = "https://dev.azure.com/%s"
-	userAgent = "go-azuredevops"
+	APIVersion = "5.1-preview.1"
+	baseURL    = "https://dev.azure.com"
+	userAgent  = "go-azuredevops"
 )
 
 // Client for interacting with the Azure DevOps API
 type Client struct {
 	client *http.Client
 
+	// BaseURL Comprised of baseURL and account
 	BaseURL   string
 	UserAgent string
 
-	Account   string
+	// Account Required part of BaseURL
+	Account string
+	// Project Default project for api calls
 	Project   string
 	AuthToken string
 
@@ -48,7 +52,8 @@ func NewClient(account string, project string, token string) *Client {
 		Project:   project,
 		AuthToken: token,
 	}
-	c.BaseURL = fmt.Sprintf(baseURL, account)
+	// BaseURL
+	c.BaseURL = fmt.Sprintf("%s/%s", baseURL, account)
 
 	c.Boards = &BoardsService{client: c}
 	c.BuildDefinitions = &BuildDefinitionsService{client: c}
@@ -64,7 +69,7 @@ func NewClient(account string, project string, token string) *Client {
 	return c
 }
 
-// NewRequest creates an API request where the URL is relative from https://%s.visualstudio.com/%s.
+// NewRequest creates an API request where the URL is relative from baseURL
 // Basically this includes the project which is most requests to the API
 func (c *Client) NewRequest(method, URL string, body interface{}) (*http.Request, error) {
 	request, err := c.NewBaseRequest(
@@ -75,8 +80,8 @@ func (c *Client) NewRequest(method, URL string, body interface{}) (*http.Request
 	return request, err
 }
 
-// NewBaseRequest does not take into consideration the project
-// and simply uses the base https://%s.visualstudio.com base URL
+// NewBaseRequest does not take into consideration the default project
+// and simply uses the baseURL
 func (c *Client) NewBaseRequest(method, URL string, body interface{}) (*http.Request, error) {
 	var buf io.ReadWriter
 	if body != nil {
