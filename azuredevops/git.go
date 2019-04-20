@@ -131,11 +131,15 @@ type GitPullRequest struct {
 
 // GitPullRequestCompletionOptions describes preferences about how the pull
 // request should be completed.
+// SquashMerge is deprecated. You should explicity set the value of MergeStrategy. If
+// MergeStrategy is set to any value, the SquashMerge value will be ignored. If
+// MergeStrategy is not set, the merge strategy will be no-fast-forward if this flag is false, or squash if true.
+// https://docs.microsoft.com/en-us/rest/api/azure/devops/git/pull%20requests/update?view=azure-devops-rest-5.1#pullrequeststatus
 type GitPullRequestCompletionOptions struct {
 	BypassPolicy            bool                        `json:"bypassPolicy,omitempty"`
 	BypassReason            string                      `json:"bypassReason,omitempty"`
 	DeleteSourceBranch      bool                        `json:"deleteSourceBranch,omitempty"`
-	MergeCommitMessage      int                         `json:"mergeCommitMessage,omitempty"`
+	MergeCommitMessage      string                      `json:"mergeCommitMessage,omitempty"`
 	MergeStrategy           GitPullRequestMergeStrategy `json:"mergeStrategy,omitempty"`
 	SquashMerge             bool                        `json:"squashMerge,omitempty"`
 	TransitionWorkItems     bool                        `json:"transitionWorkItems,omitempty"`
@@ -150,17 +154,19 @@ type GitPullRequestMergeOptions struct {
 }
 
 // GitPullRequestMergeStrategy specifies the strategy used to merge the pull request
-// during completion. If MergeStrategy is not set to any value, a no-FF merge will be
-// created if SquashMerge == false. If MergeStrategy is not set to any value, the pull
-// request commits will be squash if SquashMerge == true. The SquashMerge member is
-// deprecated. It is recommended that you explicitly set MergeStrategy in all cases.
-// If an explicit value is provided for MergeStrategy, the SquashMerge member will
-// be ignored.
-type GitPullRequestMergeStrategy struct {
-	NoFastForward *string `json:"noFastForward,omitempty"`
-	Rebase        *string `json:"rebase,omitempty"`
-	RebaseMerge   *string `json:"rebaseMerge,omitempty"`
-	Squash        *string `json:"squash,omitempty"`
+// during completion.
+type GitPullRequestMergeStrategy int
+
+// GitPullRequestMergeStrategy enum values
+const (
+	NoFastForward GitPullRequestMergeStrategy = iota
+	Rebase
+	SebaseMerge
+	Squash
+)
+
+func (d GitPullRequestMergeStrategy) String() string {
+	return [...]string{"noFastForward", "rebase", "rebaseMerge", "squash"}[d]
 }
 
 // GitPush describes a code push request event.

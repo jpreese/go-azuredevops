@@ -79,11 +79,113 @@ func TestGitService_ListRefs(t *testing.T) {
 			}
 
 			if tc.index > -1 {
-				if refs[tc.index].Name != tc.refName {
-					t.Fatalf("expected git ref name %s, got %s", tc.refName, refs[tc.index].Name)
+				if *refs[tc.index].Name != tc.refName {
+					t.Fatalf("expected git ref name %s, got %s", tc.refName, *refs[tc.index].Name)
 				}
-				if refs[tc.index].ObjectID != tc.refID {
-					t.Fatalf("expected git ref object id %s, got %s", tc.refID, refs[tc.index].ObjectID)
+				if *refs[tc.index].ObjectID != tc.refID {
+					t.Fatalf("expected git ref object id %s, got %s", tc.refID, *refs[tc.index].ObjectID)
+				}
+			}
+
+			if len(refs) != tc.count {
+				t.Fatalf("expected length of git refs to be %d; got %d", tc.count, len(refs))
+			}
+
+			if count != tc.count {
+				t.Fatalf("expected git ref count to be %d; got %d", tc.count, count)
+			}
+		})
+	}
+}
+
+func TestGitService_ListRefs(t *testing.T) {
+	tt := []struct {
+		name     string
+		URL      string
+		response string
+		count    int
+		index    int
+		refName  string
+		refID    string
+	}{
+		{name: "return 6 refs", URL: gitRefsListURL, response: gitRefsListResponse, count: 6, index: 0, refName: "refs/heads/develop", refID: "67cae2b029dff7eb3dc062b49403aaedca5bad8d"},
+		{name: "can handle no refs returned", URL: gitRefsListURL, response: "{}", count: 0, index: -1},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.name, func(t *testing.T) {
+			c, mux, _, teardown := setup()
+			defer teardown()
+
+			mux.HandleFunc(tc.URL, func(w http.ResponseWriter, r *http.Request) {
+				testMethod(t, r, "GET")
+				json := tc.response
+				fmt.Fprint(w, json)
+			})
+
+			opts := azuredevops.GitRefListOptions{}
+			refs, count, err := c.Git.ListRefs("vscode", "heads", &opts)
+			if err != nil {
+				t.Fatalf("returned error: %v", err)
+			}
+
+			if tc.index > -1 {
+				if *refs[tc.index].Name != tc.refName {
+					t.Fatalf("expected git ref name %s, got %s", tc.refName, *refs[tc.index].Name)
+				}
+				if *refs[tc.index].ObjectID != tc.refID {
+					t.Fatalf("expected git ref object id %s, got %s", tc.refID, *refs[tc.index].ObjectID)
+				}
+			}
+
+			if len(refs) != tc.count {
+				t.Fatalf("expected length of git refs to be %d; got %d", tc.count, len(refs))
+			}
+
+			if count != tc.count {
+				t.Fatalf("expected git ref count to be %d; got %d", tc.count, count)
+			}
+		})
+	}
+}
+
+func TestGitService_Get(t *testing.T) {
+	tt := []struct {
+		name     string
+		URL      string
+		response string
+		count    int
+		index    int
+		refName  string
+		refID    string
+	}{
+		{name: "return 6 refs", URL: gitRefsListURL, response: gitRefsListResponse, count: 6, index: 0, refName: "refs/heads/develop", refID: "67cae2b029dff7eb3dc062b49403aaedca5bad8d"},
+		{name: "can handle no refs returned", URL: gitRefsListURL, response: "{}", count: 0, index: -1},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.name, func(t *testing.T) {
+			c, mux, _, teardown := setup()
+			defer teardown()
+
+			mux.HandleFunc(tc.URL, func(w http.ResponseWriter, r *http.Request) {
+				testMethod(t, r, "GET")
+				json := tc.response
+				fmt.Fprint(w, json)
+			})
+
+			opts := azuredevops.GitRefListOptions{}
+			refs, count, err := c.Git.CreateStatus("vscode", "heads", &opts)
+			if err != nil {
+				t.Fatalf("returned error: %v", err)
+			}
+
+			if tc.index > -1 {
+				if *refs[tc.index].Name != tc.refName {
+					t.Fatalf("expected git ref name %s, got %s", tc.refName, *refs[tc.index].Name)
+				}
+				if *refs[tc.index].ObjectID != tc.refID {
+					t.Fatalf("expected git ref object id %s, got %s", tc.refID, *refs[tc.index].ObjectID)
 				}
 			}
 
