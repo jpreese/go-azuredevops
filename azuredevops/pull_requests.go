@@ -59,7 +59,7 @@ type PullRequestListOptions struct {
 // List returns list of the pull requests
 // utilising https://docs.microsoft.com/en-us/rest/api/vsts/git/pull%20requests/get%20pull%20requests%20by%20project
 func (s *PullRequestsService) List(opts *PullRequestListOptions) ([]GitPullRequest, int, error) {
-	URL := fmt.Sprintf("/_apis/git/pullrequests?api-version=5.1-preview.1")
+	URL := fmt.Sprintf("/_apis/git/pullrequests?api-version=%s", APIVersion)
 	URL, err := addOptions(URL, opts)
 
 	request, err := s.client.NewRequest("GET", URL, nil)
@@ -75,8 +75,13 @@ func (s *PullRequestsService) List(opts *PullRequestListOptions) ([]GitPullReque
 // List returns list of the pull requests
 // utilising https://docs.microsoft.com/en-us/rest/api/vsts/git/pull%20requests/get%20pull%20requests%20by%20project
 func (s *PullRequestsService) ListOne(pullNum int, opts *PullRequestListOptions) (*GitPullRequest, int, error) {
-	URL := fmt.Sprintf("/_apis/git/pullrequests/%d?api-version=5.1-preview.1", pullNum)
+	URL := fmt.Sprintf("/_apis/git/pullrequests/%d?api-version=%s",
+		pullNum,
+		APIVersion,
+	)
 	URL, err := addOptions(URL, opts)
+
+	//opt := &RepositoryListByOrgOptions{"forks", ListOptions{Page: 2}}
 
 	request, err := s.client.NewRequest("GET", URL, nil)
 	if err != nil {

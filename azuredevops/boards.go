@@ -33,8 +33,9 @@ type BoardColumn struct {
 // utilising https://docs.microsoft.com/en-gb/rest/api/vsts/work/boards/list
 func (s *BoardsService) List(team string) ([]Board, error) {
 	URL := fmt.Sprintf(
-		"/%s/_apis/work/boards?api-version=5.1-preview.1",
+		"/%s/_apis/work/boards?api-version=%s",
 		url.PathEscape(team),
+		APIVersion,
 	)
 
 	request, err := s.client.NewRequest("GET", URL, nil)
@@ -50,9 +51,10 @@ func (s *BoardsService) List(team string) ([]Board, error) {
 // Get returns a single board utilising https://docs.microsoft.com/en-gb/rest/api/vsts/work/boards/get
 func (s *BoardsService) Get(team string, id string) (*Board, error) {
 	URL := fmt.Sprintf(
-		"/%s/_apis/work/boards/%s?api-version=5.1-preview.1",
+		"/%s/_apis/work/boards/%s?api-version=%s",
 		url.PathEscape(team),
 		id,
+		APIVersion,
 	)
 
 	request, err := s.client.NewRequest("GET", URL, nil)

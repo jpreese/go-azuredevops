@@ -174,13 +174,13 @@ func TestDeliveryPlansService_GetTimeLineDates(t *testing.T) {
 			name:        "no start date defaults to today with end of 65 days",
 			startDate:   "",
 			endDate:     time.Now().AddDate(0, 0, 65).Format("2006-01-02"),
-			expectedURL: "/AZURE_DEVOPS_Project/_apis/work/plans/7154147c-43ca-44a9-9df0-2fa0a7f9d6b2/deliverytimeline?api-version=5.0-preview.1&startDate=" + time.Now().Format("2006-01-02") + "&endDate=" + time.Now().AddDate(0, 0, 65).Format("2006-01-02"),
+			expectedURL: "/AZURE_DEVOPS_Project/_apis/work/plans/7154147c-43ca-44a9-9df0-2fa0a7f9d6b2/deliverytimeline?api-version=5.1-preview.1&startDate=" + time.Now().Format("2006-01-02") + "&endDate=" + time.Now().AddDate(0, 0, 65).Format("2006-01-02"),
 		},
 		{
 			name:        "if start date specified use start and end dates",
 			startDate:   "2010-01-01",
 			endDate:     "2010-03-07",
-			expectedURL: "/AZURE_DEVOPS_Project/_apis/work/plans/7154147c-43ca-44a9-9df0-2fa0a7f9d6b2/deliverytimeline?api-version=5.0-preview.1&startDate=2010-01-01&endDate=2010-03-07",
+			expectedURL: "/AZURE_DEVOPS_Project/_apis/work/plans/7154147c-43ca-44a9-9df0-2fa0a7f9d6b2/deliverytimeline?api-version=5.1-preview.1&startDate=2010-01-01&endDate=2010-03-07",
 		},
 	}
 

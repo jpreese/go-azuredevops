@@ -118,6 +118,9 @@ const (
 )
 
 func TestWorkItems_GetForIteration(t *testing.T) {
+	actualIdsURL := fmt.Sprintf("/AZURE_DEVOPS_Project/AZURE_DEVOPS_TEAM/_apis/work/teamsettings/iterations/1/workitems?api-version=%s", azuredevops.APIVersion)
+	actualGetURL := fmt.Sprintf("/AZURE_DEVOPS_Project/_apis/wit/workitems?ids=1,3&fields=System.Id,System.Title,System.State,System.WorkItemType,Microsoft.VSTS.Scheduling.StoryPoints,System.BoardColumn,System.CreatedBy,System.AssignedTo,System.Tags&api-version=%s", azuredevops.APIVersion)
+
 	tt := []struct {
 		name              string
 		idsBaseURL        string
@@ -132,9 +135,9 @@ func TestWorkItems_GetForIteration(t *testing.T) {
 		{
 			name:              "we get ids and we get iterations",
 			idsBaseURL:        getIdsURL,
-			actualIdsURL:      "/AZURE_DEVOPS_Project/AZURE_DEVOPS_TEAM/_apis/work/teamsettings/iterations/1/workitems?api-version=5.1-preview.1",
+			actualIdsURL:      actualIdsURL,
 			getBaseURL:        getURL,
-			actualGetURL:      "/AZURE_DEVOPS_Project/_apis/wit/workitems?ids=1,3&fields=System.Id,System.Title,System.State,System.WorkItemType,Microsoft.VSTS.Scheduling.StoryPoints,System.BoardColumn,System.CreatedBy,System.AssignedTo,System.Tags&api-version=5.1-preview.1",
+			actualGetURL:      actualGetURL,
 			idsResponse:       getIdsResponse,
 			getResponse:       getResponse,
 			expectedWorkItems: 3,

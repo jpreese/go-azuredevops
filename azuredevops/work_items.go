@@ -131,7 +131,7 @@ func (s *WorkItemsService) GetForIteration(team string, iteration Iteration) ([]
 		"/_apis/wit/workitems?ids=%s&fields=%s&api-version=%s",
 		strings.Join(workIds, ","),
 		strings.Join(fields, ","),
-		"5.1-preview.1",
+		APIVersion,
 	)
 
 	request, err := s.client.NewRequest("GET", URL, nil)
@@ -152,7 +152,7 @@ func (s *WorkItemsService) GetIdsForIteration(team string, iteration Iteration) 
 		"/%s/_apis/work/teamsettings/iterations/%s/workitems?api-version=%s",
 		url.PathEscape(team),
 		iteration.ID,
-		"5.1-preview.1",
+		APIVersion,
 	)
 
 	request, err := s.client.NewRequest("GET", URL, nil)

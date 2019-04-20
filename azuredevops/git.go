@@ -286,9 +286,10 @@ type GitUserDate struct {
 // ListRefs returns a list of the references for a git repo
 func (s *GitService) ListRefs(repo, refType string, opts *GitRefListOptions) ([]GitRef, int, error) {
 	URL := fmt.Sprintf(
-		"/_apis/git/repositories/%s/refs/%s?api-version=5.1-preview.1",
+		"/_apis/git/repositories/%s/refs/%s?api-version=%s",
 		repo,
 		refType,
+		APIVersion,
 	)
 
 	URL, err := addOptions(URL, opts)
@@ -307,8 +308,9 @@ func (s *GitService) ListRefs(repo, refType string, opts *GitRefListOptions) ([]
 // https://docs.microsoft.com/en-us/rest/api/azure/devops/git/repositories/get%20repository?view=azure-devops-rest-5.1
 func (s *GitService) Get(repoName string) (*GitRepository, int, error) {
 	URL := fmt.Sprintf(
-		"/_apis/git/repositories/%s?api-version=5.1-preview.1",
+		"/_apis/git/repositories/%s?api-version=%s",
 		repoName,
+		APIVersion,
 	)
 
 	request, err := s.client.NewRequest("GET", URL, nil)
@@ -327,9 +329,10 @@ func (s *GitService) Get(repoName string) (*GitRepository, int, error) {
 // https://docs.microsoft.com/en-us/rest/api/azure/devops/git/statuses/create?view=azure-devops-rest-5.0
 func (s *GitService) CreateStatus(owner, repoName, ref string, status *GitStatus) (*[]GitStatus, int, error) {
 	URL := fmt.Sprintf(
-		"/_apis/git/repositories/%s/commits/%s/statuses?api-version=5.1-preview.1",
+		"/_apis/git/repositories/%s/commits/%s/statuses?api-version=%s",
 		url.QueryEscape(ref),
 		ref,
+		APIVersion,
 	)
 
 	request, err := s.client.NewRequest("POST", URL, nil)

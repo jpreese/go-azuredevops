@@ -31,8 +31,9 @@ type Iteration struct {
 // utilising https://docs.microsoft.com/en-gb/rest/api/vsts/work/iterations/list
 func (s *IterationsService) List(team string) ([]Iteration, error) {
 	URL := fmt.Sprintf(
-		"/%s/_apis/work/teamsettings/iterations?api-version=5.1-preview.1",
+		"/%s/_apis/work/teamsettings/iterations?api-version=%s",
 		url.PathEscape(team),
+		APIVersion,
 	)
 
 	request, err := s.client.NewRequest("GET", URL, nil)

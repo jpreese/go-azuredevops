@@ -45,7 +45,7 @@ type BuildDefinitionsListOptions struct {
 // List returns a list of build definitions
 // utilising https://docs.microsoft.com/en-gb/rest/api/vsts/build/definitions/list
 func (s *BuildDefinitionsService) List(opts *BuildDefinitionsListOptions) ([]BuildDefinition, error) {
-	URL := fmt.Sprintf("_apis/build/definitions?api-version=5.1-preview.1")
+	URL := fmt.Sprintf("_apis/build/definitions?api-version=%s", APIVersion)
 	URL, err := addOptions(URL, opts)
 
 	request, err := s.client.NewRequest("GET", URL, nil)
