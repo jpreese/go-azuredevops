@@ -31,7 +31,7 @@ import "github.com/mcdafydd/go-azuredevops/azuredevops
 Construct a new Azure DevOps Client
 
 ```go
-v := azuredevops.NewClient(account, project, token)
+v := azuredevops.NewClient(account, project, token, nil)
 ```
 
 Get a list of iterations
