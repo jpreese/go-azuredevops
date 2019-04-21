@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	favouritesListURL      = "_apis/Favorite/Favorites"
+	favouritesListURL      = "/_apis/Favorite/Favorites"
 	favouritesListResponse = `{
 		"value": [
 			{
@@ -58,11 +58,11 @@ func TestFavouritesService_List(t *testing.T) {
 			}
 
 			if tc.index > -1 {
-				if favourites[tc.index].ArtifactName != tc.artifactName {
-					t.Fatalf("expected favourite artifact name %s, got %s", tc.artifactName, favourites[tc.index].ArtifactName)
+				if *favourites[tc.index].ArtifactName != tc.artifactName {
+					t.Fatalf("expected favourite artifact name %s, got %s", tc.artifactName, *favourites[tc.index].ArtifactName)
 				}
-				if favourites[tc.index].ArtifactID != tc.artifactID {
-					t.Fatalf("expected favourite artifact id %s, got %s", tc.artifactID, favourites[tc.index].ArtifactID)
+				if *favourites[tc.index].ArtifactID != tc.artifactID {
+					t.Fatalf("expected favourite artifact id %s, got %s", tc.artifactID, *favourites[tc.index].ArtifactID)
 				}
 			}
 

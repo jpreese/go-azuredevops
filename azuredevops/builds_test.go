@@ -93,7 +93,7 @@ func TestBuildsService_Queue(t *testing.T) {
 		// *** test invalid enums too
 		requestBuild := &azuredevops.Build{
 			Status: "completed",
-			Definition: azuredevops.BuildDefinition{
+			Definition: &azuredevops.BuildDefinition{
 				Name: "build-one",
 			},
 		}

@@ -70,14 +70,14 @@ type FileContentMetadata struct {
 
 // GitRefsResponse describes the git list refs response
 type GitRefsResponse struct {
-	Count int       `json:"count"`
-	Value []*GitRef `json:"value"`
+	Count   int       `json:"count"`
+	GitRefs []*GitRef `json:"value"`
 }
 
 // GitStatusesResponse describes the git statuses response
 type GitStatusesResponse struct {
-	Count int          `json:"count"`
-	Value []*GitStatus `json:"value"`
+	Count       int          `json:"count"`
+	GitStatuses []*GitStatus `json:"value"`
 }
 
 // GitChange describes file path and content changes
@@ -363,7 +363,7 @@ func (s *GitService) ListRefs(repo, refType string, opts *GitRefListOptions) ([]
 	var response GitRefsResponse
 	_, err = s.client.Execute(request, &response)
 
-	return response.Value, response.Count, err
+	return response.GitRefs, response.Count, err
 }
 
 // GetRepository Return a single GitRepository

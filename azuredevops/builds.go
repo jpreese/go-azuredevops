@@ -12,24 +12,25 @@ type BuildsService struct {
 
 // BuildsListResponse is the wrapper around the main response for the List of Builds
 type BuildsListResponse struct {
+	Count  int     `json:"count"`
 	Builds []Build `json:"value"`
 }
 
 type buildOrchestrationPlanSchema struct {
-	Type   int    `json:"orchestrationType"`
-	PlanID string `json:"planId"`
+	Type   *int    `json:"orchestrationType,omitempty"`
+	PlanID *string `json:"planId,omitempty"`
 }
 
 // Build represents a build
 type Build struct {
-	Definition    BuildDefinition  `json:"definition"`
+	Definition    *BuildDefinition `json:"definition,omitempty"`
 	Controller    *BuildController `json:"controller,omitempty"`
 	LastChangedBy *IdentityRef     `json:"lastChangedBy,omitempty"`
 	DeletedBy     *IdentityRef     `json:"deletedBy,omitempty"`
-	BuildNumber   string           `json:"buildNumber,omitempty"`
-	FinishTime    string           `json:"finishTime,omitempty"`
-	Branch        string           `json:"sourceBranch"`
-	Repository    Repository       `json:"repository"`
+	BuildNumber   *string          `json:"buildNumber,omitempty"`
+	FinishTime    *string          `json:"finishTime,omitempty"`
+	Branch        *string          `json:"sourceBranch,omitempty"`
+	Repository    *Repository      `json:"repository,omitempty"`
 	Demands       []struct {
 		Name  string `json:"name"`
 		Value string `json:"value"`
@@ -39,16 +40,7 @@ type Build struct {
 		Type string `json:"type"`
 		URL  string `json:"url"`
 	} `json:"logs,omitempty"`
-	Project *struct {
-		Abbreviation string `json:"abbreviation"`
-		Description  string `json:"description"`
-		ID           string `json:"id"`
-		Name         string `json:"name"`
-		Revision     int    `json:"revision"`
-		State        string `json:"state"`
-		URL          string `json:"url"`
-		Visibility   string `json:"visibility"`
-	} `json:"project,omitempty"`
+	Project             *TeamProjectReference `json:"project,omitempty"`
 	Properties          map[string]string
 	Priority            string                         `json:"priority,omitempty"`
 	OrchestrationPlan   *buildOrchestrationPlanSchema  `json:"orchestrationPlan,omitempty"`

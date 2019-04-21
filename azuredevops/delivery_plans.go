@@ -13,33 +13,33 @@ type DeliveryPlansService struct {
 
 // DeliveryPlansListResponse describes the delivery plans list response
 type DeliveryPlansListResponse struct {
-	DeliveryPlans []DeliveryPlan `json:"value"`
-	Count         int            `json:"count"`
+	Count         int             `json:"count"`
+	DeliveryPlans []*DeliveryPlan `json:"value"`
 }
 
 // DeliveryPlanTimeLine describes the delivery plan get response
 type DeliveryPlanTimeLine struct {
-	StartDate string         `json:"startDate"`
-	EndDate   string         `json:"endDate"`
-	ID        string         `json:"id"`
-	Revision  int            `json:"revision"`
-	Teams     []DeliveryTeam `json:"teams"`
+	StartDate *string         `json:"startDate,omitempty"`
+	EndDate   *string         `json:"endDate,omitempty"`
+	ID        *string         `json:"id,omitempty"`
+	Revision  *int            `json:"revision,omitempty"`
+	Teams     []*DeliveryTeam `json:"teams,omitempty"`
 }
 
 // DeliveryPlan describes an plan
 type DeliveryPlan struct {
-	ID      string `json:"id"`
-	Name    string `json:"name"`
-	Type    string `json:"type"`
-	Created string `json:"createdDate"`
-	URL     string `json:"url"`
+	ID      *string `json:"id,omitempty"`
+	Name    *string `json:"name,omitempty"`
+	Type    *string `json:"type,omitempty"`
+	Created *string `json:"createdDate,omitempty"`
+	URL     *string `json:"url,omitempty"`
 }
 
 // DeliveryTeam describes the teams in a specific plan
 type DeliveryTeam struct {
-	ID         string      `json:"id"`
-	Name       string      `json:"name"`
-	Iterations []Iteration `json:"iterations"`
+	ID         *string      `json:"id,omitempty"`
+	Name       *string      `json:"name,omitempty"`
+	Iterations []*Iteration `json:"iterations,omitempty"`
 }
 
 const (
@@ -62,7 +62,7 @@ type DeliveryPlansListOptions struct {
 }
 
 // List returns a list of delivery plans
-func (s *DeliveryPlansService) List(opts *DeliveryPlansListOptions) ([]DeliveryPlan, int, error) {
+func (s *DeliveryPlansService) List(opts *DeliveryPlansListOptions) ([]*DeliveryPlan, int, error) {
 	URL := fmt.Sprintf("_apis/work/plans?api-version=%s", APIVersion)
 	URL, err := addOptions(URL, opts)
 

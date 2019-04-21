@@ -46,14 +46,14 @@ type PullRequestsService struct {
 
 // PullRequestsCommitsResponse describes a pull requests commits response
 type PullRequestsCommitsResponse struct {
-	Value []*GitCommitRef `json:"value"`
-	Count int             `json:"count"`
+	Count         int             `json:"count"`
+	GitCommitRefs []*GitCommitRef `json:"value"`
 }
 
 // PullRequestsListResponse describes a pull requests list response
 type PullRequestsListResponse struct {
-	Value []*GitPullRequest `json:"value"`
-	Count int               `json:"count"`
+	Count           int               `json:"count"`
+	GitPullRequests []*GitPullRequest `json:"value"`
 }
 
 // PullRequestListOptions describes what the request to the API should look like
@@ -75,7 +75,7 @@ func (s *PullRequestsService) List(opts *PullRequestListOptions) ([]*GitPullRequ
 	var resp PullRequestsListResponse
 	_, err = s.client.Execute(req, &resp)
 
-	return resp.Value, resp.Count, err
+	return resp.GitPullRequests, resp.Count, err
 }
 
 // List returns list of the pull requests
@@ -207,8 +207,8 @@ func (s *PullRequestsService) ListCommits(repo string, pullNum int) ([]*GitCommi
 		return nil, 0, err
 	}
 
-	var resp = new(PullRequestsCommitsResponse)
+	var resp PullRequestsCommitsResponse
 	_, err = s.client.Execute(req, resp)
 
-	return resp.Value, resp.Count, nil
+	return resp.GitCommitRefs, resp.Count, nil
 }

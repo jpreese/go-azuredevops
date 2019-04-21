@@ -41,7 +41,7 @@ type TeamsListOptions struct {
 // TeamsListResponse Requests that may return multiple entities use this format
 type TeamsListResponse struct {
 	Count int     `json:"count,omitempty"`
-	Value []*Team `json:"value,omitempty"`
+	Teams []*Team `json:"value,omitempty"`
 }
 
 // TeamProjectCollectionReference Reference object for a TeamProjectCollection.
@@ -79,5 +79,5 @@ func (s *TeamsService) List(opts *TeamsListOptions) ([]*Team, int, error) {
 	var response TeamsListResponse
 	_, err = s.client.Execute(request, &response)
 
-	return response.Value, response.Count, err
+	return response.Teams, response.Count, err
 }

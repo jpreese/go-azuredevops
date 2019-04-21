@@ -169,11 +169,10 @@ func TestGitService_Get(t *testing.T) {
 			}
 
 			if count > 0 {
-				if *resp.Name != tc.repoName {
-					t.Fatalf("expected git ref name %s, got %s", tc.repoName, *resp.Name)
-				}
-				if *resp.ID != tc.id {
-					t.Fatalf("expected git ref object id %s, got %s", tc.id, *resp.ID)
+				want := &azuredevops.GitRepository{}
+
+				if !reflect.DeepEqual(resp, want) {
+					t.Errorf("Repositories.Get returned %+v, want %+v", resp, want)
 				}
 			}
 

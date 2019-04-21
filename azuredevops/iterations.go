@@ -13,15 +13,16 @@ type IterationsService struct {
 
 // IterationsResponse describes the iterations response
 type IterationsResponse struct {
-	Iterations []Iteration `json:"value"`
+	Count      int         `json:"count,omitempty"`
+	Iterations []Iteration `json:"value,omitempty"`
 }
 
 // Iteration describes an iteration
 type Iteration struct {
-	ID        string          `json:"id"`
-	Name      string          `json:"name"`
-	Path      string          `json:"path"`
-	URL       string          `json:"url"`
+	ID        string          `json:"id,omitempty"`
+	Name      string          `json:"name,omitempty"`
+	Path      string          `json:"path,omitempty"`
+	URL       string          `json:"url,omitempty"`
 	StartDate string          `json:"startDate,omitempty"`
 	EndDate   string          `json:"finishDate,omitempty"`
 	WorkItems [][]interface{} `json:"workItems,omitempty"`

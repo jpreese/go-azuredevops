@@ -12,8 +12,8 @@ type BuildDefinitionsService struct {
 
 // BuildDefinitionsListResponse describes the build definitions list response
 type BuildDefinitionsListResponse struct {
-	Value []BuildDefinition `json:"value"`
-	Count int               `json:"count"`
+	Count            int                `json:"count"`
+	BuildDefinitions []*BuildDefinition `json:"value"`
 }
 
 // Repository represents a repository used by a build definition
@@ -44,7 +44,7 @@ type BuildDefinitionsListOptions struct {
 
 // List returns a list of build definitions
 // utilising https://docs.microsoft.com/en-gb/rest/api/vsts/build/definitions/list
-func (s *BuildDefinitionsService) List(opts *BuildDefinitionsListOptions) ([]BuildDefinition, error) {
+func (s *BuildDefinitionsService) List(opts *BuildDefinitionsListOptions) ([]*BuildDefinition, error) {
 	URL := fmt.Sprintf("_apis/build/definitions?api-version=%s", APIVersion)
 	URL, err := addOptions(URL, opts)
 
@@ -55,5 +55,5 @@ func (s *BuildDefinitionsService) List(opts *BuildDefinitionsListOptions) ([]Bui
 	var response BuildDefinitionsListResponse
 	_, err = s.client.Execute(request, &response)
 
-	return response.Value, err
+	return response.BuildDefinitions, err
 }

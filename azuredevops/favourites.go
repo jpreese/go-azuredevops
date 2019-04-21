@@ -12,20 +12,20 @@ type FavouritesService struct {
 
 // FavouritesResponse describes the favourites response
 type FavouritesResponse struct {
-	Count      int         `json:"count"`
-	Favourites []Favourite `json:"value"`
+	Count      int          `json:"count"`
+	Favourites []*Favourite `json:"value"`
 }
 
 // Favourite describes what a favourite is
 type Favourite struct {
-	ID           string `json:"id"`
-	ArtifactName string `json:"artifactName"`
-	ArtifactType string `json:"artifactType"`
-	ArtifactID   string `json:"artifactId"`
+	ID           *string `json:"id,omitempty"`
+	ArtifactName *string `json:"artifactName,omitempty"`
+	ArtifactType *string `json:"artifactType,omitempty"`
+	ArtifactID   *string `json:"artifactId,omitempty"`
 }
 
 // List returns a list of the favourite items from for the user
-func (s *FavouritesService) List() ([]Favourite, int, error) {
+func (s *FavouritesService) List() ([]*Favourite, int, error) {
 	URL := fmt.Sprintf(
 		"_apis/Favorite/Favorites?artifactType=%s",
 		"Microsoft.TeamFoundation.Git.Repository", // @todo This needs fixing

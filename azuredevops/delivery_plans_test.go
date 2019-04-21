@@ -101,12 +101,12 @@ func TestDeliveryPlansService_List(t *testing.T) {
 			}
 
 			if tc.index > -1 {
-				if plans[tc.index].ID != tc.planID {
-					t.Fatalf("expected delivery plan id %s, got %s", tc.planID, plans[tc.index].ID)
+				if *plans[tc.index].ID != tc.planID {
+					t.Fatalf("expected delivery plan id %s, got %s", tc.planID, *plans[tc.index].ID)
 				}
 
-				if plans[tc.index].Name != tc.planName {
-					t.Fatalf("expected delivery plan name %s, got %s", tc.planName, plans[tc.index].Name)
+				if *plans[tc.index].Name != tc.planName {
+					t.Fatalf("expected delivery plan name %s, got %s", tc.planName, *plans[tc.index].Name)
 				}
 			}
 
@@ -138,19 +138,19 @@ func TestDeliveryPlansService_GetTimeLine(t *testing.T) {
 		t.Fatalf("returned error: %v", err)
 	}
 
-	if timeline.ID != "7154147c-43ca-44a9-9df0-2fa0a7f9d6b2" {
-		t.Fatalf("expected delivery plan id %s, got %s", planID, timeline.ID)
+	if *timeline.ID != "7154147c-43ca-44a9-9df0-2fa0a7f9d6b2" {
+		t.Fatalf("expected delivery plan id %s, got %s", planID, *timeline.ID)
 	}
 
-	if timeline.Teams[0].Name != "Team One" {
-		t.Fatalf("expected delivery plan to have team[0].Name of %s, got %s", "Team One", timeline.Teams[0].Name)
+	if *timeline.Teams[0].Name != "Team One" {
+		t.Fatalf("expected delivery plan to have team[0].Name of %s, got %s", "Team One", *timeline.Teams[0].Name)
 	}
 
 	if timeline.Teams[0].Iterations[0].Name != "Iteration One" {
 		t.Fatalf(
 			"expected delivery plan to have team[0].Iterations[0].Name of %s, got %s",
 			"Iteration One",
-			timeline.Teams[0].Name,
+			*timeline.Teams[0].Name,
 		)
 	}
 

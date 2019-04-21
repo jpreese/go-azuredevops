@@ -13,8 +13,8 @@ type BoardsService struct {
 
 // ListBoardsResponse describes the boards response
 type ListBoardsResponse struct {
-	Count *int              `json:"count,omitempty"`
-	Value []*BoardReference `json:"value,omitempty"`
+	Count           *int              `json:"count,omitempty"`
+	BoardReferences []*BoardReference `json:"value,omitempty"`
 }
 
 // Board describes a board
@@ -85,7 +85,7 @@ type FieldReference struct {
 // utilising https://docs.microsoft.com/en-gb/rest/api/vsts/work/boards/list
 func (s *BoardsService) List(team string) ([]*BoardReference, error) {
 	URL := fmt.Sprintf(
-		"/%s/_apis/work/boards?api-version=%s",
+		"%s/_apis/work/boards?api-version=%s",
 		url.PathEscape(team),
 		APIVersion,
 	)
@@ -97,13 +97,13 @@ func (s *BoardsService) List(team string) ([]*BoardReference, error) {
 	var response ListBoardsResponse
 	_, err = s.client.Execute(request, &response)
 
-	return response.Value, err
+	return response.BoardReferences, err
 }
 
 // Get returns a single board utilising https://docs.microsoft.com/en-gb/rest/api/vsts/work/boards/get
 func (s *BoardsService) Get(team string, id string) (*Board, error) {
 	URL := fmt.Sprintf(
-		"/%s/_apis/work/boards/%s?api-version=%s",
+		"%s/_apis/work/boards/%s?api-version=%s",
 		url.PathEscape(team),
 		id,
 		APIVersion,

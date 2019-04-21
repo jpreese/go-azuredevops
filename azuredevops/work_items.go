@@ -30,7 +30,8 @@ type WorkItemLink struct {
 
 // WorkItemListResponse describes the list response for work items
 type WorkItemListResponse struct {
-	WorkItems *[]WorkItem `json:"value,omitempty"`
+	Count     int         `json:"count,omitempty"`
+	WorkItems []*WorkItem `json:"value,omitempty"`
 }
 
 // WorkItem describes an individual work item in TFS
@@ -108,7 +109,7 @@ type WorkItemUpdate struct {
 
 // GetForIteration will get a list of work items based on an iteration name
 // utilising https://docs.microsoft.com/en-gb/rest/api/vsts/wit/work%20items/list
-func (s *WorkItemsService) GetForIteration(team string, iteration Iteration) ([]WorkItem, error) {
+func (s *WorkItemsService) GetForIteration(team string, iteration Iteration) ([]*WorkItem, error) {
 	queryIds, err := s.GetIdsForIteration(team, iteration)
 	if err != nil {
 		return nil, err
@@ -142,7 +143,7 @@ func (s *WorkItemsService) GetForIteration(team string, iteration Iteration) ([]
 	var response WorkItemListResponse
 	_, err = s.client.Execute(request, &response)
 
-	return *response.WorkItems, err
+	return response.WorkItems, err
 }
 
 // GetIdsForIteration will return an array of ids for a given iteration

@@ -13,7 +13,8 @@ type TestsService struct {
 
 // TestListResponse is the wrapper around the main response for the List of Tests
 type TestListResponse struct {
-	Tests []Test `json:"value"`
+	Count int     `json:"count,omitempty"`
+	Tests []*Test `json:"value,omitempty"`
 }
 
 // Test represents a test
@@ -44,7 +45,7 @@ type TestsListOptions struct {
 
 // List returns list of the tests
 // utilising https://docs.microsoft.com/en-gb/rest/api/vsts/test/runs/list
-func (s *TestsService) List(opts *TestsListOptions) ([]Test, error) {
+func (s *TestsService) List(opts *TestsListOptions) ([]*Test, error) {
 	URL := fmt.Sprintf("_apis/test/runs?api-version=4.1")
 	URL, err := addOptions(URL, opts)
 
