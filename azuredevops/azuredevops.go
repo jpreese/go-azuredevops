@@ -43,6 +43,7 @@ type Client struct {
 	Iterations       *IterationsService
 	PullRequests     *PullRequestsService
 	Teams            *TeamsService
+	Tests            *TestsService
 	WorkItems        *WorkItemsService
 }
 
@@ -90,6 +91,7 @@ func NewClient(account string, project string, token string, httpClient *http.Cl
 	c.PullRequests = &PullRequestsService{client: c}
 	c.WorkItems = &WorkItemsService{client: c}
 	c.Teams = &TeamsService{client: c}
+	c.Tests = &TestsService{client: c}
 	c.DeliveryPlans = &DeliveryPlansService{client: c}
 
 	return c, nil
