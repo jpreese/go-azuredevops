@@ -47,9 +47,9 @@ for index := 0; index < len(iterations); index++ {
 ## Contributing
 This library is re-using a lot of the code and style from the [go-github](https://github.com/google/go-github/) library:
 
-* Receiving struct members should be pointers (google/go-github#19)
-* Debate on whether nillable fields are important for receiving structs, especially when also using separate request structs.  Other popular libraries also use pointers approach, but it is often viewed as a big ugly.  (google/go-github#537)
-* Large receiving struct types should return []*Type, not []Type (google/go-github#375)
+* Receiving struct members should be pointers [google/go-github#19](https://github.com/google/go-github/issues/19)
+* Debate on whether nillable fields are important for receiving structs, especially when also using separate request structs.  Other popular libraries also use pointers approach, but it is often viewed as a big ugly. [google/go-github#537](https://github.com/google/go-github/issues/537)
+* Large receiving struct types should return []*Type, not []Type [google/go-github#375](https://github.com/google/go-github/pull/375)
 
 May add separate request structs soon.
 
