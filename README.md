@@ -7,7 +7,7 @@
 [![codecov](https://codecov.io/gh/mcdafydd/go-azuredevops/branch/master/graph/badge.svg)](https://codecov.io/gh/mcdafydd/go-azuredevops)
 [![Go Report Card](https://goreportcard.com/badge/github.com/mcdafydd/go-azuredevops?style=flat-square)](https://goreportcard.com/report/github.com/mcdafydd/go-azuredevops)
 
-This is a fork of [go-azuredevops](https://github.com/benmatselby/go-azuredevops), a Go client library for accessing the [Azure DevOps API](https://docs.microsoft.com/en-gb/rest/api/vsts/). This fork adapts a lot of code and style from the [go-github](https://github.com/google/go-github/) library.
+This is a fork of [go-azuredevops](https://github.com/benmatselby/go-azuredevops), a Go client library for accessing the [Azure DevOps API](https://docs.microsoft.com/en-gb/rest/api/vsts/). 
 
 ## Services
 
