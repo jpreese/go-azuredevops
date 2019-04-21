@@ -12,6 +12,158 @@ import (
 	"time"
 )
 
+// GetAllowedMappings returns the AllowedMappings field if it's non-nil, zero value otherwise.
+func (b *Board) GetAllowedMappings() string {
+	if b == nil || b.AllowedMappings == nil {
+		return ""
+	}
+	return *b.AllowedMappings
+}
+
+// GetCanEdit returns the CanEdit field if it's non-nil, zero value otherwise.
+func (b *Board) GetCanEdit() bool {
+	if b == nil || b.CanEdit == nil {
+		return false
+	}
+	return *b.CanEdit
+}
+
+// GetFields returns the Fields field.
+func (b *Board) GetFields() *BoardFields {
+	if b == nil {
+		return nil
+	}
+	return b.Fields
+}
+
+// GetIsValid returns the IsValid field if it's non-nil, zero value otherwise.
+func (b *Board) GetIsValid() bool {
+	if b == nil || b.IsValid == nil {
+		return false
+	}
+	return *b.IsValid
+}
+
+// GetRevision returns the Revision field if it's non-nil, zero value otherwise.
+func (b *Board) GetRevision() int {
+	if b == nil || b.Revision == nil {
+		return 0
+	}
+	return *b.Revision
+}
+
+// GetColumnType returns the ColumnType field.
+func (b *BoardColumn) GetColumnType() *BoardColumnType {
+	if b == nil {
+		return nil
+	}
+	return b.ColumnType
+}
+
+// GetDescription returns the Description field if it's non-nil, zero value otherwise.
+func (b *BoardColumn) GetDescription() string {
+	if b == nil || b.Description == nil {
+		return ""
+	}
+	return *b.Description
+}
+
+// GetID returns the ID field if it's non-nil, zero value otherwise.
+func (b *BoardColumn) GetID() string {
+	if b == nil || b.ID == nil {
+		return ""
+	}
+	return *b.ID
+}
+
+// GetIsSplit returns the IsSplit field if it's non-nil, zero value otherwise.
+func (b *BoardColumn) GetIsSplit() bool {
+	if b == nil || b.IsSplit == nil {
+		return false
+	}
+	return *b.IsSplit
+}
+
+// GetItemLimit returns the ItemLimit field if it's non-nil, zero value otherwise.
+func (b *BoardColumn) GetItemLimit() int {
+	if b == nil || b.ItemLimit == nil {
+		return 0
+	}
+	return *b.ItemLimit
+}
+
+// GetName returns the Name field if it's non-nil, zero value otherwise.
+func (b *BoardColumn) GetName() string {
+	if b == nil || b.Name == nil {
+		return ""
+	}
+	return *b.Name
+}
+
+// GetColumnField returns the ColumnField field.
+func (b *BoardFields) GetColumnField() *FieldReference {
+	if b == nil {
+		return nil
+	}
+	return b.ColumnField
+}
+
+// GetDoneField returns the DoneField field.
+func (b *BoardFields) GetDoneField() *FieldReference {
+	if b == nil {
+		return nil
+	}
+	return b.DoneField
+}
+
+// GetRowField returns the RowField field.
+func (b *BoardFields) GetRowField() *FieldReference {
+	if b == nil {
+		return nil
+	}
+	return b.RowField
+}
+
+// GetID returns the ID field if it's non-nil, zero value otherwise.
+func (b *BoardReference) GetID() string {
+	if b == nil || b.ID == nil {
+		return ""
+	}
+	return *b.ID
+}
+
+// GetName returns the Name field if it's non-nil, zero value otherwise.
+func (b *BoardReference) GetName() string {
+	if b == nil || b.Name == nil {
+		return ""
+	}
+	return *b.Name
+}
+
+// GetURL returns the URL field if it's non-nil, zero value otherwise.
+func (b *BoardReference) GetURL() string {
+	if b == nil || b.URL == nil {
+		return ""
+	}
+	return *b.URL
+}
+
+// GetID returns the ID field if it's non-nil, zero value otherwise.
+func (b *BoardRow) GetID() string {
+	if b == nil || b.ID == nil {
+		return ""
+	}
+	return *b.ID
+}
+
+// GetName returns the Name field if it's non-nil, zero value otherwise.
+func (b *BoardRow) GetName() string {
+	if b == nil || b.Name == nil {
+		return ""
+	}
+	return *b.Name
+}
+
 // GetController returns the Controller field.
 func (b *Build) GetController() *BuildController {
 	if b == nil {
@@ -164,6 +316,14 @@ func (c *Comment) GetPublishedDate() time.Time {
 	return *c.PublishedDate
 }
 
+// GetUsersLiked returns the UsersLiked field if it's non-nil, zero value otherwise.
+func (c *Comment) GetUsersLiked() []IdentityRef {
+	if c == nil || c.UsersLiked == nil {
+		return nil
+	}
+	return *c.UsersLiked
+}
+
 // GetLine returns the Line field if it's non-nil, zero value otherwise.
 func (c *CommentPosition) GetLine() int {
 	if c == nil || c.Line == nil {
@@ -178,6 +338,30 @@ func (c *CommentPosition) GetOffset() int {
 		return 0
 	}
 	return *c.Offset
+}
+
+// GetCommentID returns the CommentID field if it's non-nil, zero value otherwise.
+func (c *CommentVersionRef) GetCommentID() int {
+	if c == nil || c.CommentID == nil {
+		return 0
+	}
+	return *c.CommentID
+}
+
+// GetURL returns the URL field if it's non-nil, zero value otherwise.
+func (c *CommentVersionRef) GetURL() string {
+	if c == nil || c.URL == nil {
+		return ""
+	}
+	return *c.URL
+}
+
+// GetVersion returns the Version field if it's non-nil, zero value otherwise.
+func (c *CommentVersionRef) GetVersion() int {
+	if c == nil || c.Version == nil {
+		return 0
+	}
+	return *c.Version
 }
 
 // GetCreatedDate returns the CreatedDate field if it's non-nil, zero value otherwise.
@@ -258,6 +442,78 @@ func (e *Event) GetSubscriptionID() string {
 		return ""
 	}
 	return *e.SubscriptionID
+}
+
+// GetReferenceName returns the ReferenceName field if it's non-nil, zero value otherwise.
+func (f *FieldReference) GetReferenceName() string {
+	if f == nil || f.ReferenceName == nil {
+		return ""
+	}
+	return *f.ReferenceName
+}
+
+// GetURL returns the URL field if it's non-nil, zero value otherwise.
+func (f *FieldReference) GetURL() string {
+	if f == nil || f.URL == nil {
+		return ""
+	}
+	return *f.URL
+}
+
+// GetContentType returns the ContentType field if it's non-nil, zero value otherwise.
+func (f *FileContentMetadata) GetContentType() string {
+	if f == nil || f.ContentType == nil {
+		return ""
+	}
+	return *f.ContentType
+}
+
+// GetEncoding returns the Encoding field if it's non-nil, zero value otherwise.
+func (f *FileContentMetadata) GetEncoding() int {
+	if f == nil || f.Encoding == nil {
+		return 0
+	}
+	return *f.Encoding
+}
+
+// GetExtension returns the Extension field if it's non-nil, zero value otherwise.
+func (f *FileContentMetadata) GetExtension() string {
+	if f == nil || f.Extension == nil {
+		return ""
+	}
+	return *f.Extension
+}
+
+// GetFileName returns the FileName field if it's non-nil, zero value otherwise.
+func (f *FileContentMetadata) GetFileName() string {
+	if f == nil || f.FileName == nil {
+		return ""
+	}
+	return *f.FileName
+}
+
+// GetIsBinary returns the IsBinary field if it's non-nil, zero value otherwise.
+func (f *FileContentMetadata) GetIsBinary() bool {
+	if f == nil || f.IsBinary == nil {
+		return false
+	}
+	return *f.IsBinary
+}
+
+// GetIsImage returns the IsImage field if it's non-nil, zero value otherwise.
+func (f *FileContentMetadata) GetIsImage() bool {
+	if f == nil || f.IsImage == nil {
+		return false
+	}
+	return *f.IsImage
+}
+
+// GetVSLink returns the VSLink field if it's non-nil, zero value otherwise.
+func (f *FileContentMetadata) GetVSLink() string {
+	if f == nil || f.VSLink == nil {
+		return ""
+	}
+	return *f.VSLink
 }
 
 // GetChangeID returns the ChangeID field if it's non-nil, zero value otherwise.
@@ -452,92 +708,28 @@ func (g *GitCommitRef) GetWorkItems() *ResourceRef {
 	return g.WorkItems
 }
 
-// GetCreator returns the Creator field.
-func (g *GitForkRef) GetCreator() *IdentityRef {
-	if g == nil {
-		return nil
-	}
-	return g.Creator
-}
-
-// GetIsLocked returns the IsLocked field if it's non-nil, zero value otherwise.
-func (g *GitForkRef) GetIsLocked() bool {
-	if g == nil || g.IsLocked == nil {
-		return false
-	}
-	return *g.IsLocked
-}
-
-// GetIsLockedBy returns the IsLockedBy field.
-func (g *GitForkRef) GetIsLockedBy() *IdentityRef {
-	if g == nil {
-		return nil
-	}
-	return g.IsLockedBy
-}
-
-// GetLinks returns the Links field if it's non-nil, zero value otherwise.
-func (g *GitForkRef) GetLinks() []ReferenceLinks {
-	if g == nil || g.Links == nil {
-		return nil
-	}
-	return *g.Links
-}
-
-// GetName returns the Name field if it's non-nil, zero value otherwise.
-func (g *GitForkRef) GetName() string {
-	if g == nil || g.Name == nil {
-		return ""
-	}
-	return *g.Name
-}
-
-// GetObjectID returns the ObjectID field if it's non-nil, zero value otherwise.
-func (g *GitForkRef) GetObjectID() string {
-	if g == nil || g.ObjectID == nil {
-		return ""
-	}
-	return *g.ObjectID
-}
-
-// GetPeeledObjectID returns the PeeledObjectID field if it's non-nil, zero value otherwise.
-func (g *GitForkRef) GetPeeledObjectID() string {
-	if g == nil || g.PeeledObjectID == nil {
-		return ""
-	}
-	return *g.PeeledObjectID
-}
-
-// GetRepository returns the Repository field.
-func (g *GitForkRef) GetRepository() *GitRepository {
-	if g == nil {
-		return nil
-	}
-	return g.Repository
-}
-
-// GetStatuses returns the Statuses field if it's non-nil, zero value otherwise.
-func (g *GitForkRef) GetStatuses() []GitStatus {
-	if g == nil || g.Statuses == nil {
-		return nil
-	}
-	return *g.Statuses
-}
-
-// GetURL returns the URL field if it's non-nil, zero value otherwise.
-func (g *GitForkRef) GetURL() string {
-	if g == nil || g.URL == nil {
-		return ""
-	}
-	return *g.URL
-}
-
 // GetCommitID returns the CommitID field if it's non-nil, zero value otherwise.
 func (g *GitItem) GetCommitID() string {
 	if g == nil || g.CommitID == nil {
 		return ""
 	}
 	return *g.CommitID
+}
+
+// GetContent returns the Content field if it's non-nil, zero value otherwise.
+func (g *GitItem) GetContent() string {
+	if g == nil || g.Content == nil {
+		return ""
+	}
+	return *g.Content
+}
+
+// GetContentMetadata returns the ContentMetadata field.
+func (g *GitItem) GetContentMetadata() *FileContentMetadata {
+	if g == nil {
+		return nil
+	}
+	return g.ContentMetadata
 }
 
 // GetGitObjectType returns the GitObjectType field.
@@ -548,12 +740,36 @@ func (g *GitItem) GetGitObjectType() *GitObjectType {
 	return g.GitObjectType
 }
 
+// GetIsFolder returns the IsFolder field if it's non-nil, zero value otherwise.
+func (g *GitItem) GetIsFolder() bool {
+	if g == nil || g.IsFolder == nil {
+		return false
+	}
+	return *g.IsFolder
+}
+
+// GetIsSymLink returns the IsSymLink field if it's non-nil, zero value otherwise.
+func (g *GitItem) GetIsSymLink() bool {
+	if g == nil || g.IsSymLink == nil {
+		return false
+	}
+	return *g.IsSymLink
+}
+
 // GetLatestProcessedChange returns the LatestProcessedChange field.
 func (g *GitItem) GetLatestProcessedChange() *GitCommitRef {
 	if g == nil {
 		return nil
 	}
 	return g.LatestProcessedChange
+}
+
+// GetLinks returns the Links field if it's non-nil, zero value otherwise.
+func (g *GitItem) GetLinks() []ReferenceLinks {
+	if g == nil || g.Links == nil {
+		return nil
+	}
+	return *g.Links
 }
 
 // GetObjectID returns the ObjectID field if it's non-nil, zero value otherwise.
@@ -570,6 +786,22 @@ func (g *GitItem) GetOriginalObjectID() string {
 		return ""
 	}
 	return *g.OriginalObjectID
+}
+
+// GetPath returns the Path field if it's non-nil, zero value otherwise.
+func (g *GitItem) GetPath() string {
+	if g == nil || g.Path == nil {
+		return ""
+	}
+	return *g.Path
+}
+
+// GetURL returns the URL field if it's non-nil, zero value otherwise.
+func (g *GitItem) GetURL() string {
+	if g == nil || g.URL == nil {
+		return ""
+	}
+	return *g.URL
 }
 
 // GetArtifactID returns the ArtifactID field if it's non-nil, zero value otherwise.
@@ -661,7 +893,7 @@ func (g *GitPullRequest) GetDescription() string {
 }
 
 // GetForkSource returns the ForkSource field.
-func (g *GitPullRequest) GetForkSource() *GitForkRef {
+func (g *GitPullRequest) GetForkSource() *GitRef {
 	if g == nil {
 		return nil
 	}
@@ -964,70 +1196,6 @@ func (g *GitPullRequestCommentThreadContext) GetRightFileStart() *CommentPositio
 	return g.RightFileStart
 }
 
-// GetBypassPolicy returns the BypassPolicy field if it's non-nil, zero value otherwise.
-func (g *GitPullRequestCompletionOptions) GetBypassPolicy() bool {
-	if g == nil || g.BypassPolicy == nil {
-		return false
-	}
-	return *g.BypassPolicy
-}
-
-// GetBypassReason returns the BypassReason field if it's non-nil, zero value otherwise.
-func (g *GitPullRequestCompletionOptions) GetBypassReason() string {
-	if g == nil || g.BypassReason == nil {
-		return ""
-	}
-	return *g.BypassReason
-}
-
-// GetDeleteSourceBranch returns the DeleteSourceBranch field if it's non-nil, zero value otherwise.
-func (g *GitPullRequestCompletionOptions) GetDeleteSourceBranch() bool {
-	if g == nil || g.DeleteSourceBranch == nil {
-		return false
-	}
-	return *g.DeleteSourceBranch
-}
-
-// GetMergeCommitMessage returns the MergeCommitMessage field if it's non-nil, zero value otherwise.
-func (g *GitPullRequestCompletionOptions) GetMergeCommitMessage() int {
-	if g == nil || g.MergeCommitMessage == nil {
-		return 0
-	}
-	return *g.MergeCommitMessage
-}
-
-// GetMergeStrategy returns the MergeStrategy field.
-func (g *GitPullRequestCompletionOptions) GetMergeStrategy() *GitPullRequestMergeStrategy {
-	if g == nil {
-		return nil
-	}
-	return g.MergeStrategy
-}
-
-// GetSquashMerge returns the SquashMerge field if it's non-nil, zero value otherwise.
-func (g *GitPullRequestCompletionOptions) GetSquashMerge() bool {
-	if g == nil || g.SquashMerge == nil {
-		return false
-	}
-	return *g.SquashMerge
-}
-
-// GetTransitionWorkItems returns the TransitionWorkItems field if it's non-nil, zero value otherwise.
-func (g *GitPullRequestCompletionOptions) GetTransitionWorkItems() bool {
-	if g == nil || g.TransitionWorkItems == nil {
-		return false
-	}
-	return *g.TransitionWorkItems
-}
-
-// GetTriggeredByAutoComplete returns the TriggeredByAutoComplete field if it's non-nil, zero value otherwise.
-func (g *GitPullRequestCompletionOptions) GetTriggeredByAutoComplete() bool {
-	if g == nil || g.TriggeredByAutoComplete == nil {
-		return false
-	}
-	return *g.TriggeredByAutoComplete
-}
-
 // GetDetectRenameFalsePositives returns the DetectRenameFalsePositives field if it's non-nil, zero value otherwise.
 func (g *GitPullRequestMergeOptions) GetDetectRenameFalsePositives() bool {
 	if g == nil || g.DetectRenameFalsePositives == nil {
@@ -1044,36 +1212,12 @@ func (g *GitPullRequestMergeOptions) GetDisableRenames() bool {
 	return *g.DisableRenames
 }
 
-// GetNoFastForward returns the NoFastForward field if it's non-nil, zero value otherwise.
-func (g *GitPullRequestMergeStrategy) GetNoFastForward() string {
-	if g == nil || g.NoFastForward == nil {
-		return ""
+// GetProperties returns the Properties field if it's non-nil, zero value otherwise.
+func (g *GitPullRequestStatus) GetProperties() time.Time {
+	if g == nil || g.Properties == nil {
+		return time.Time{}
 	}
-	return *g.NoFastForward
-}
-
-// GetRebase returns the Rebase field if it's non-nil, zero value otherwise.
-func (g *GitPullRequestMergeStrategy) GetRebase() string {
-	if g == nil || g.Rebase == nil {
-		return ""
-	}
-	return *g.Rebase
-}
-
-// GetRebaseMerge returns the RebaseMerge field if it's non-nil, zero value otherwise.
-func (g *GitPullRequestMergeStrategy) GetRebaseMerge() string {
-	if g == nil || g.RebaseMerge == nil {
-		return ""
-	}
-	return *g.RebaseMerge
-}
-
-// GetSquash returns the Squash field if it's non-nil, zero value otherwise.
-func (g *GitPullRequestMergeStrategy) GetSquash() string {
-	if g == nil || g.Squash == nil {
-		return ""
-	}
-	return *g.Squash
+	return *g.Properties
 }
 
 // GetCommits returns the Commits field if it's non-nil, zero value otherwise.
@@ -1162,6 +1306,86 @@ func (g *GitPushRef) GetRepository() *GitRepository {
 		return nil
 	}
 	return g.Repository
+}
+
+// GetCreator returns the Creator field.
+func (g *GitRef) GetCreator() *IdentityRef {
+	if g == nil {
+		return nil
+	}
+	return g.Creator
+}
+
+// GetIsLocked returns the IsLocked field if it's non-nil, zero value otherwise.
+func (g *GitRef) GetIsLocked() bool {
+	if g == nil || g.IsLocked == nil {
+		return false
+	}
+	return *g.IsLocked
+}
+
+// GetIsLockedBy returns the IsLockedBy field.
+func (g *GitRef) GetIsLockedBy() *IdentityRef {
+	if g == nil {
+		return nil
+	}
+	return g.IsLockedBy
+}
+
+// GetLinks returns the Links field if it's non-nil, zero value otherwise.
+func (g *GitRef) GetLinks() []ReferenceLinks {
+	if g == nil || g.Links == nil {
+		return nil
+	}
+	return *g.Links
+}
+
+// GetName returns the Name field if it's non-nil, zero value otherwise.
+func (g *GitRef) GetName() string {
+	if g == nil || g.Name == nil {
+		return ""
+	}
+	return *g.Name
+}
+
+// GetObjectID returns the ObjectID field if it's non-nil, zero value otherwise.
+func (g *GitRef) GetObjectID() string {
+	if g == nil || g.ObjectID == nil {
+		return ""
+	}
+	return *g.ObjectID
+}
+
+// GetPeeledObjectID returns the PeeledObjectID field if it's non-nil, zero value otherwise.
+func (g *GitRef) GetPeeledObjectID() string {
+	if g == nil || g.PeeledObjectID == nil {
+		return ""
+	}
+	return *g.PeeledObjectID
+}
+
+// GetRepository returns the Repository field.
+func (g *GitRef) GetRepository() *GitRepository {
+	if g == nil {
+		return nil
+	}
+	return g.Repository
+}
+
+// GetStatuses returns the Statuses field if it's non-nil, zero value otherwise.
+func (g *GitRef) GetStatuses() []GitStatus {
+	if g == nil || g.Statuses == nil {
+		return nil
+	}
+	return *g.Statuses
+}
+
+// GetURL returns the URL field if it's non-nil, zero value otherwise.
+func (g *GitRef) GetURL() string {
+	if g == nil || g.URL == nil {
+		return ""
+	}
+	return *g.URL
 }
 
 // GetIsLocked returns the IsLocked field if it's non-nil, zero value otherwise.
@@ -1412,6 +1636,14 @@ func (g *GitStatus) GetLinks() []ReferenceLinks {
 	return *g.Links
 }
 
+// GetState returns the State field.
+func (g *GitStatus) GetState() *GitStatusState {
+	if g == nil {
+		return nil
+	}
+	return g.State
+}
+
 // GetTargetURL returns the TargetURL field if it's non-nil, zero value otherwise.
 func (g *GitStatus) GetTargetURL() string {
 	if g == nil || g.TargetURL == nil {
@@ -1442,54 +1674,6 @@ func (g *GitStatusContext) GetName() string {
 		return ""
 	}
 	return *g.Name
-}
-
-// GetError returns the Error field if it's non-nil, zero value otherwise.
-func (g *GitStatusState) GetError() string {
-	if g == nil || g.Error == nil {
-		return ""
-	}
-	return *g.Error
-}
-
-// GetFailed returns the Failed field if it's non-nil, zero value otherwise.
-func (g *GitStatusState) GetFailed() string {
-	if g == nil || g.Failed == nil {
-		return ""
-	}
-	return *g.Failed
-}
-
-// GetNotApplicable returns the NotApplicable field if it's non-nil, zero value otherwise.
-func (g *GitStatusState) GetNotApplicable() string {
-	if g == nil || g.NotApplicable == nil {
-		return ""
-	}
-	return *g.NotApplicable
-}
-
-// GetNotSet returns the NotSet field if it's non-nil, zero value otherwise.
-func (g *GitStatusState) GetNotSet() string {
-	if g == nil || g.NotSet == nil {
-		return ""
-	}
-	return *g.NotSet
-}
-
-// GetPending returns the Pending field if it's non-nil, zero value otherwise.
-func (g *GitStatusState) GetPending() string {
-	if g == nil || g.Pending == nil {
-		return ""
-	}
-	return *g.Pending
-}
-
-// GetSucceeded returns the Succeeded field if it's non-nil, zero value otherwise.
-func (g *GitStatusState) GetSucceeded() string {
-	if g == nil || g.Succeeded == nil {
-		return ""
-	}
-	return *g.Succeeded
 }
 
 // GetName returns the Name field if it's non-nil, zero value otherwise.
@@ -1700,12 +1884,44 @@ func (i *ItemContentType) GetRawText() string {
 	return *i.RawText
 }
 
+// GetLinks returns the Links field.
+func (i *IterationWorkItems) GetLinks() *ReferenceLinks {
+	if i == nil {
+		return nil
+	}
+	return i.Links
+}
+
+// GetURL returns the URL field if it's non-nil, zero value otherwise.
+func (i *IterationWorkItems) GetURL() string {
+	if i == nil || i.URL == nil {
+		return ""
+	}
+	return *i.URL
+}
+
+// GetWorkItemRelations returns the WorkItemRelations field if it's non-nil, zero value otherwise.
+func (i *IterationWorkItems) GetWorkItemRelations() []WorkItemLink {
+	if i == nil || i.WorkItemRelations == nil {
+		return nil
+	}
+	return *i.WorkItemRelations
+}
+
 // GetHref returns the Href field if it's non-nil, zero value otherwise.
 func (l *Link) GetHref() string {
 	if l == nil || l.Href == nil {
 		return ""
 	}
 	return *l.Href
+}
+
+// GetCount returns the Count field if it's non-nil, zero value otherwise.
+func (l *ListBoardsResponse) GetCount() int {
+	if l == nil || l.Count == nil {
+		return 0
+	}
+	return *l.Count
 }
 
 // GetHTML returns the HTML field if it's non-nil, zero value otherwise.
@@ -1796,62 +2012,6 @@ func (p *Project) GetVisibility() string {
 	return *p.Visibility
 }
 
-// GetConflicts returns the Conflicts field if it's non-nil, zero value otherwise.
-func (p *PullRequestAsyncStatus) GetConflicts() string {
-	if p == nil || p.Conflicts == nil {
-		return ""
-	}
-	return *p.Conflicts
-}
-
-// GetFailure returns the Failure field if it's non-nil, zero value otherwise.
-func (p *PullRequestAsyncStatus) GetFailure() string {
-	if p == nil || p.Failure == nil {
-		return ""
-	}
-	return *p.Failure
-}
-
-// GetNotSet returns the NotSet field if it's non-nil, zero value otherwise.
-func (p *PullRequestAsyncStatus) GetNotSet() string {
-	if p == nil || p.NotSet == nil {
-		return ""
-	}
-	return *p.NotSet
-}
-
-// GetQueued returns the Queued field if it's non-nil, zero value otherwise.
-func (p *PullRequestAsyncStatus) GetQueued() string {
-	if p == nil || p.Queued == nil {
-		return ""
-	}
-	return *p.Queued
-}
-
-// GetRejectedByPolicy returns the RejectedByPolicy field if it's non-nil, zero value otherwise.
-func (p *PullRequestAsyncStatus) GetRejectedByPolicy() string {
-	if p == nil || p.RejectedByPolicy == nil {
-		return ""
-	}
-	return *p.RejectedByPolicy
-}
-
-// GetSucceeded returns the Succeeded field if it's non-nil, zero value otherwise.
-func (p *PullRequestAsyncStatus) GetSucceeded() string {
-	if p == nil || p.Succeeded == nil {
-		return ""
-	}
-	return *p.Succeeded
-}
-
-// GetLinks returns the Links field if it's non-nil, zero value otherwise.
-func (r *ReferenceLinks) GetLinks() map[string]Link {
-	if r == nil || r.Links == nil {
-		return map[string]Link{}
-	}
-	return *r.Links
-}
-
 // GetAccount returns the Account field.
 func (r *ResourceContainers) GetAccount() *ResourceRef {
 	if r == nil {
@@ -1932,12 +2092,12 @@ func (t *TeamProjectReference) GetAbbreviation() string {
 	return *t.Abbreviation
 }
 
-// GetDefaultTeamImageUrl returns the DefaultTeamImageUrl field if it's non-nil, zero value otherwise.
-func (t *TeamProjectReference) GetDefaultTeamImageUrl() string {
-	if t == nil || t.DefaultTeamImageUrl == nil {
+// GetDefaultTeamImageURL returns the DefaultTeamImageURL field if it's non-nil, zero value otherwise.
+func (t *TeamProjectReference) GetDefaultTeamImageURL() string {
+	if t == nil || t.DefaultTeamImageURL == nil {
 		return ""
 	}
-	return *t.DefaultTeamImageUrl
+	return *t.DefaultTeamImageURL
 }
 
 // GetDescription returns the Description field if it's non-nil, zero value otherwise.
@@ -2026,4 +2186,228 @@ func (w *WebAPITagDefinition) GetURL() string {
 		return ""
 	}
 	return *w.URL
+}
+
+// GetCommentVersionRef returns the CommentVersionRef field.
+func (w *WorkItem) GetCommentVersionRef() *CommentVersionRef {
+	if w == nil {
+		return nil
+	}
+	return w.CommentVersionRef
+}
+
+// GetFields returns the Fields field if it's non-nil, zero value otherwise.
+func (w *WorkItem) GetFields() map[string]WorkItemFieldUpdate {
+	if w == nil || w.Fields == nil {
+		return map[string]WorkItemFieldUpdate{}
+	}
+	return *w.Fields
+}
+
+// GetID returns the ID field if it's non-nil, zero value otherwise.
+func (w *WorkItem) GetID() int {
+	if w == nil || w.ID == nil {
+		return 0
+	}
+	return *w.ID
+}
+
+// GetLinks returns the Links field.
+func (w *WorkItem) GetLinks() *ReferenceLinks {
+	if w == nil {
+		return nil
+	}
+	return w.Links
+}
+
+// GetRelations returns the Relations field.
+func (w *WorkItem) GetRelations() *WorkItemRelation {
+	if w == nil {
+		return nil
+	}
+	return w.Relations
+}
+
+// GetRev returns the Rev field if it's non-nil, zero value otherwise.
+func (w *WorkItem) GetRev() int {
+	if w == nil || w.Rev == nil {
+		return 0
+	}
+	return *w.Rev
+}
+
+// GetURL returns the URL field if it's non-nil, zero value otherwise.
+func (w *WorkItem) GetURL() string {
+	if w == nil || w.URL == nil {
+		return ""
+	}
+	return *w.URL
+}
+
+// GetRel returns the Rel field if it's non-nil, zero value otherwise.
+func (w *WorkItemLink) GetRel() string {
+	if w == nil || w.Rel == nil {
+		return ""
+	}
+	return *w.Rel
+}
+
+// GetSource returns the Source field.
+func (w *WorkItemLink) GetSource() *WorkItemReference {
+	if w == nil {
+		return nil
+	}
+	return w.Source
+}
+
+// GetTarget returns the Target field.
+func (w *WorkItemLink) GetTarget() *WorkItemReference {
+	if w == nil {
+		return nil
+	}
+	return w.Target
+}
+
+// GetWorkItems returns the WorkItems field if it's non-nil, zero value otherwise.
+func (w *WorkItemListResponse) GetWorkItems() []WorkItem {
+	if w == nil || w.WorkItems == nil {
+		return nil
+	}
+	return *w.WorkItems
+}
+
+// GetID returns the ID field if it's non-nil, zero value otherwise.
+func (w *WorkItemReference) GetID() int {
+	if w == nil || w.ID == nil {
+		return 0
+	}
+	return *w.ID
+}
+
+// GetURL returns the URL field if it's non-nil, zero value otherwise.
+func (w *WorkItemReference) GetURL() string {
+	if w == nil || w.URL == nil {
+		return ""
+	}
+	return *w.URL
+}
+
+// GetAttributes returns the Attributes field.
+func (w *WorkItemRelation) GetAttributes() *ReferenceLinks {
+	if w == nil {
+		return nil
+	}
+	return w.Attributes
+}
+
+// GetRel returns the Rel field if it's non-nil, zero value otherwise.
+func (w *WorkItemRelation) GetRel() string {
+	if w == nil || w.Rel == nil {
+		return ""
+	}
+	return *w.Rel
+}
+
+// GetURL returns the URL field if it's non-nil, zero value otherwise.
+func (w *WorkItemRelation) GetURL() string {
+	if w == nil || w.URL == nil {
+		return ""
+	}
+	return *w.URL
+}
+
+// GetAdded returns the Added field.
+func (w *WorkItemRelationUpdates) GetAdded() *WorkItemRelation {
+	if w == nil {
+		return nil
+	}
+	return w.Added
+}
+
+// GetRemoved returns the Removed field.
+func (w *WorkItemRelationUpdates) GetRemoved() *WorkItemRelation {
+	if w == nil {
+		return nil
+	}
+	return w.Removed
+}
+
+// GetUpdated returns the Updated field.
+func (w *WorkItemRelationUpdates) GetUpdated() *WorkItemRelation {
+	if w == nil {
+		return nil
+	}
+	return w.Updated
+}
+
+// GetFields returns the Fields field if it's non-nil, zero value otherwise.
+func (w *WorkItemUpdate) GetFields() map[string]WorkItemFieldUpdate {
+	if w == nil || w.Fields == nil {
+		return map[string]WorkItemFieldUpdate{}
+	}
+	return *w.Fields
+}
+
+// GetID returns the ID field if it's non-nil, zero value otherwise.
+func (w *WorkItemUpdate) GetID() int {
+	if w == nil || w.ID == nil {
+		return 0
+	}
+	return *w.ID
+}
+
+// GetLinks returns the Links field.
+func (w *WorkItemUpdate) GetLinks() *ReferenceLinks {
+	if w == nil {
+		return nil
+	}
+	return w.Links
+}
+
+// GetRelations returns the Relations field.
+func (w *WorkItemUpdate) GetRelations() *WorkItemRelationUpdates {
+	if w == nil {
+		return nil
+	}
+	return w.Relations
+}
+
+// GetRev returns the Rev field if it's non-nil, zero value otherwise.
+func (w *WorkItemUpdate) GetRev() int {
+	if w == nil || w.Rev == nil {
+		return 0
+	}
+	return *w.Rev
+}
+
+// GetRevisedBy returns the RevisedBy field.
+func (w *WorkItemUpdate) GetRevisedBy() *IdentityRef {
+	if w == nil {
+		return nil
+	}
+	return w.RevisedBy
+}
+
+// GetRevisedDate returns the RevisedDate field if it's non-nil, zero value otherwise.
+func (w *WorkItemUpdate) GetRevisedDate() time.Time {
+	if w == nil || w.RevisedDate == nil {
+		return time.Time{}
+	}
+	return *w.RevisedDate
+}
+
+// GetURL returns the URL field if it's non-nil, zero value otherwise.
+func (w *WorkItemUpdate) GetURL() string {
+	if w == nil || w.URL == nil {
+		return ""
+	}
+	return *w.URL
+}
+
+// GetWorkItemID returns the WorkItemID field if it's non-nil, zero value otherwise.
+func (w *WorkItemUpdate) GetWorkItemID() int {
+	if w == nil || w.WorkItemID == nil {
+		return 0
+	}
+	return *w.WorkItemID
 }

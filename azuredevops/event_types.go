@@ -8,68 +8,8 @@
 
 package azuredevops
 
-import (
-	"time"
-)
-
-// VersionControlChangeType enum declaration
-type VersionControlChangeType int
-
-// VersionControlChangeType valid enum values
-const (
-	None VersionControlChangeType = iota
-	Add
-	Edit
-	Encoding
-	Rename
-	Delete
-	Undelete
-	Branch
-	Merge
-	Lock
-	Rollback
-	SourceRename
-	TargetRename
-	Property
-	All
-)
-
-func (d VersionControlChangeType) String() string {
-	return [...]string{"none", "add", "edit", "encoding", "rename", "delete", "undelete", "branch", "merge", "lock", "rollback", "sourceRename", "targetRename", "property", "all"}[d]
-}
-
-// GitObjectType enum declaration
-type GitObjectType int
-
-// GitObjectType enum declaration
-const (
-	Bad GitObjectType = iota
-	Commit
-	Tree
-	Blob
-	Tag
-	Ext2
-	OfsDelta
-	RefDelta
-)
-
-func (d GitObjectType) String() string {
-	return [...]string{"bad", "commit", "tree", "blob", "tag", "ext2", "ofsDelta", "refDelta"}[d]
-}
-
 // ChangeCountDictionary maps the number of changes to each type
 type ChangeCountDictionary *map[VersionControlChangeType]int
-
-// FileContentMetadata Describes files referenced by a GitItem
-type FileContentMetadata struct {
-	ContentType *string `json:"contentType,omitempty"`
-	Encoding    *int    `json:"encoding,omitempty"`
-	Extension   *string `json:"extension,omitempty"`
-	FileName    *string `json:"fileName,omitempty"`
-	IsBinary    *bool   `json:"isBinary,omitempty"`
-	IsImage     *bool   `json:"isImage,omitempty"`
-	VSLink      *string `json:"vsLink,omitempty"`
-}
 
 // ItemContent
 type ItemContent struct {
@@ -81,17 +21,6 @@ type ItemContent struct {
 type ItemContentType struct {
 	Base64Encoded *string `json:"base64Encoded,omitempty"`
 	RawText       *string `json:"rawText,omitempty"`
-}
-
-type Project struct {
-	ID             *string    `json:"id,omitempty"`
-	Name           *string    `json:"name,omitempty"`
-	Description    *string    `json:"description,omitempty"`
-	URL            *string    `json:"url,omitempty"`
-	State          *string    `json:"state,omitempty"`
-	Revision       *int       `json:"revision,omitempty"`
-	Visibility     *string    `json:"visibility,omitempty"`
-	LastUpdateTime *time.Time `json:"lastUpdateTime,omitempty"`
 }
 
 // PullRequestAsyncStatus The current status of a pull request merge.
@@ -144,7 +73,7 @@ func (d PullRequestStatus) String() string {
 
 // ReferenceLinks The class to represent a collection of REST reference links.
 type ReferenceLinks struct {
-	Links *map[string]Link `json:",omitempty"`
+	Links map[string]Link `json:",omitempty"`
 }
 
 // Link A single item in a collection of ReferenceLinks.
@@ -164,26 +93,6 @@ type ResourceRef struct {
 	ID      *string `json:"id,omitempty"`
 	BaseURL *string `json:"baseUrl,omitempty"`
 	URL     *string `json:"url,omitempty"`
-}
-
-// TeamProjectCollectionReference Reference object for a TeamProjectCollection.
-type TeamProjectCollectionReference struct {
-	ID   *string `json:"id,omitempty"`
-	Name *string `json:"name,omitempty"`
-	URL  *string `json:"url,omitempty"`
-}
-
-// TeamProjectReference Represents a shallow reference to a TeamProject.
-type TeamProjectReference struct {
-	Abbreviation        *string `json:"abbreviation,omitempty"`
-	DefaultTeamImageUrl *string `json:"defaultTeamImageUrl,omitempty"`
-	Description         *string `json:"description,omitempty"`
-	ID                  *string `json:"id,omitempty"`
-	Name                *string `json:"name,omitempty"`
-	Revision            *string `json:"revision,omitempty"`
-	State               *string `json:"state,omitempty"`
-	URL                 *string `json:"url,omitempty"`
-	Visibility          *string `json:"visibility,omitempty"`
 }
 
 // WebAPITagDefinition The representation of a tag definition which is sent across

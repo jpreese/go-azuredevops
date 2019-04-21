@@ -13,25 +13,77 @@ type BoardsService struct {
 
 // ListBoardsResponse describes the boards response
 type ListBoardsResponse struct {
-	Boards []Board `json:"value"`
+	Count *int              `json:"count,omitempty"`
+	Value []*BoardReference `json:"value,omitempty"`
 }
 
 // Board describes a board
 type Board struct {
-	ID      string        `json:"id"`
-	Name    string        `json:"name"`
-	Columns []BoardColumn `json:"columns,omitempty"`
+	BoardReference
+	Links           []*ReferenceLinks `json:"_links,omitempty"`
+	AllowedMappings *string           `json:"allowedMappings,omitempty"`
+	CanEdit         *bool             `json:"canEdit,omitempty"`
+	Columns         []*BoardColumn    `json:"columns,omitempty"`
+	Fields          *BoardFields      `json:"fields,omitempty"`
+	IsValid         *bool             `json:"isvalid,omitempty"`
+	Revision        *int              `json:"revision,omitempty"`
+	Rows            []*BoardRow       `json:"rows,omitempty"`
 }
 
 // BoardColumn describes a column on the board
 type BoardColumn struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
+	ColumnType    *BoardColumnType  `json:"columnType,omitempty"`
+	Description   *string           `json:"description,omitempty"`
+	ID            *string           `json:"id,omitempty"`
+	IsSplit       *bool             `json:"isSplit,omitempty"`
+	ItemLimit     *int              `json:"itemLimit,omitempty"`
+	Name          *string           `json:"name,omitempty"`
+	StateMappings map[string]string `json:"stateMappings,omitempty"`
+}
+
+// BoardColumnType describes a column on the board
+type BoardColumnType int
+
+// BoardColumnType Enum values
+const (
+	Incoming BoardColumnType = iota
+	InProgress
+	Outgoing
+)
+
+func (d BoardColumnType) String() string {
+	return [...]string{"Incoming", "InProgress", "Outgoing"}[d]
+}
+
+// BoardFields describes a column on the board
+type BoardFields struct {
+	ColumnField *FieldReference `json:"columnField,omitempty"`
+	DoneField   *FieldReference `json:"doneField,omitempty"`
+	RowField    *FieldReference `json:"rowField,omitempty"`
+}
+
+// BoardReference Base object a board
+type BoardReference struct {
+	ID   *string `json:"id,omitempty"`
+	Name *string `json:"name,omitempty"`
+	URL  *string `json:"URL,omitempty"`
+}
+
+// BoardRow describes a row on the board
+type BoardRow struct {
+	ID   *string `json:"id,omitempty"`
+	Name *string `json:"name,omitempty"`
+}
+
+// FieldReference describes a row on the board
+type FieldReference struct {
+	ReferenceName *string `json:"referenceName,omitempty"`
+	URL           *string `json:"url,omitempty"`
 }
 
 // List returns list of the boards
 // utilising https://docs.microsoft.com/en-gb/rest/api/vsts/work/boards/list
-func (s *BoardsService) List(team string) ([]Board, error) {
+func (s *BoardsService) List(team string) ([]*BoardReference, error) {
 	URL := fmt.Sprintf(
 		"/%s/_apis/work/boards?api-version=%s",
 		url.PathEscape(team),
@@ -45,7 +97,7 @@ func (s *BoardsService) List(team string) ([]Board, error) {
 	var response ListBoardsResponse
 	_, err = s.client.Execute(request, &response)
 
-	return response.Boards, err
+	return response.Value, err
 }
 
 // Get returns a single board utilising https://docs.microsoft.com/en-gb/rest/api/vsts/work/boards/get

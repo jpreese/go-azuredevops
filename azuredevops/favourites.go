@@ -27,11 +27,12 @@ type Favourite struct {
 // List returns a list of the favourite items from for the user
 func (s *FavouritesService) List() ([]Favourite, int, error) {
 	URL := fmt.Sprintf(
-		"/_apis/Favorite/Favorites?artifactType=%s",
+		"_apis/Favorite/Favorites?artifactType=%s",
 		"Microsoft.TeamFoundation.Git.Repository", // @todo This needs fixing
 	)
 
-	request, err := s.client.NewBaseRequest("GET", URL, nil)
+	u, _ := s.client.BaseURL.Parse(URL)
+	request, err := s.client.NewRequest("GET", u.String(), nil)
 	if err != nil {
 		return nil, 0, err
 	}

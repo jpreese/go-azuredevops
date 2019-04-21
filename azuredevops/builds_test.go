@@ -90,6 +90,7 @@ func TestBuildsService_Queue(t *testing.T) {
 		c, mux, _, teardown := setup()
 		defer teardown()
 
+		// *** test invalid enums too
 		requestBuild := &azuredevops.Build{
 			Status: "completed",
 			Definition: azuredevops.BuildDefinition{

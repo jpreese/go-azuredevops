@@ -6,22 +6,78 @@ import (
 	"time"
 )
 
+// VersionControlChangeType enum declaration
+type VersionControlChangeType int
+
+// VersionControlChangeType valid enum values
+const (
+	None VersionControlChangeType = iota
+	Add
+	Edit
+	Encoding
+	Rename
+	Delete
+	Undelete
+	Branch
+	Merge
+	Lock
+	Rollback
+	SourceRename
+	TargetRename
+	Property
+	All
+)
+
+func (d VersionControlChangeType) String() string {
+	return [...]string{"none", "add", "edit", "encoding", "rename", "delete", "undelete", "branch", "merge", "lock", "rollback", "sourceRename", "targetRename", "property", "all"}[d]
+}
+
+// GitObjectType enum declaration
+type GitObjectType int
+
+// GitObjectType enum declaration
+const (
+	Bad GitObjectType = iota
+	Commit
+	Tree
+	Blob
+	Tag
+	Ext2
+	OfsDelta
+	RefDelta
+)
+
+func (d GitObjectType) String() string {
+	return [...]string{"bad", "commit", "tree", "blob", "tag", "ext2", "ofsDelta", "refDelta"}[d]
+}
+
 // GitService handles communication with the git methods on the API
 // See: https://docs.microsoft.com/en-us/rest/api/vsts/git/
 type GitService struct {
 	client *Client
 }
 
-// GitRefsResponse describes the git refs list response
+// FileContentMetadata Describes files referenced by a GitItem
+type FileContentMetadata struct {
+	ContentType *string `json:"contentType,omitempty"`
+	Encoding    *int    `json:"encoding,omitempty"`
+	Extension   *string `json:"extension,omitempty"`
+	FileName    *string `json:"fileName,omitempty"`
+	IsBinary    *bool   `json:"isBinary,omitempty"`
+	IsImage     *bool   `json:"isImage,omitempty"`
+	VSLink      *string `json:"vsLink,omitempty"`
+}
+
+// GitRefsResponse describes the git list refs response
 type GitRefsResponse struct {
-	Count int      `json:"count"`
-	Refs  []GitRef `json:"value"`
+	Count int       `json:"count"`
+	Value []*GitRef `json:"value"`
 }
 
 // GitStatusesResponse describes the git statuses response
 type GitStatusesResponse struct {
-	Count int         `json:"count"`
-	Refs  []GitStatus `json:"value"`
+	Count int          `json:"count"`
+	Value []*GitStatus `json:"value"`
 }
 
 // GitChange describes file path and content changes
@@ -290,9 +346,9 @@ type GitUserDate struct {
 }
 
 // ListRefs returns a list of the references for a git repo
-func (s *GitService) ListRefs(repo, refType string, opts *GitRefListOptions) ([]GitRef, int, error) {
+func (s *GitService) ListRefs(repo, refType string, opts *GitRefListOptions) ([]*GitRef, int, error) {
 	URL := fmt.Sprintf(
-		"/_apis/git/repositories/%s/refs/%s?api-version=%s",
+		"_apis/git/repositories/%s/refs/%s?api-version=%s",
 		repo,
 		refType,
 		APIVersion,
@@ -307,14 +363,14 @@ func (s *GitService) ListRefs(repo, refType string, opts *GitRefListOptions) ([]
 	var response GitRefsResponse
 	_, err = s.client.Execute(request, &response)
 
-	return response.Refs, response.Count, err
+	return response.Value, response.Count, err
 }
 
-// Get Return a single GitRepository
+// GetRepository Return a single GitRepository
 // https://docs.microsoft.com/en-us/rest/api/azure/devops/git/repositories/get%20repository?view=azure-devops-rest-5.1
-func (s *GitService) Get(repoName string) (*GitRepository, int, error) {
+func (s *GitService) GetRepository(repoName string) (*GitRepository, int, error) {
 	URL := fmt.Sprintf(
-		"/_apis/git/repositories/%s?api-version=%s",
+		"_apis/git/repositories/%s?api-version=%s",
 		repoName,
 		APIVersion,
 	)
@@ -333,9 +389,9 @@ func (s *GitService) Get(repoName string) (*GitRepository, int, error) {
 // CreateStatus creates a new status for a repository at the specified
 // reference. Ref can be a SHA, a branch name, or a tag name.
 // https://docs.microsoft.com/en-us/rest/api/azure/devops/git/statuses/create?view=azure-devops-rest-5.0
-func (s *GitService) CreateStatus(owner, repoName, ref string, status *GitStatus) (*[]GitStatus, int, error) {
+func (s *GitService) CreateStatus(repoName, ref string, status GitStatus) (*GitStatus, int, error) {
 	URL := fmt.Sprintf(
-		"/_apis/git/repositories/%s/commits/%s/statuses?api-version=%s",
+		"_apis/git/repositories/%s/commits/%s/statuses?api-version=%s",
 		url.QueryEscape(ref),
 		ref,
 		APIVersion,
@@ -345,8 +401,8 @@ func (s *GitService) CreateStatus(owner, repoName, ref string, status *GitStatus
 	if err != nil {
 		return nil, 0, err
 	}
-	var response GitStatusesResponse
+	var response GitStatus
 	_, err = s.client.Execute(request, &response)
 
-	return &response.Refs, response.Count, err
+	return &response, 1, err
 }

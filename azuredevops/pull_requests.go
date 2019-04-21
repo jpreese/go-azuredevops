@@ -44,10 +44,16 @@ type PullRequestsService struct {
 	client *Client
 }
 
-// PullRequestsResponse describes the pull requests response
-type PullRequestsResponse struct {
-	GitPullRequests []GitPullRequest `json:"value"`
-	Count           int              `json:"count"`
+// PullRequestsCommitsResponse describes a pull requests commits response
+type PullRequestsCommitsResponse struct {
+	Value []*GitCommitRef `json:"value"`
+	Count int             `json:"count"`
+}
+
+// PullRequestsListResponse describes a pull requests list response
+type PullRequestsListResponse struct {
+	Value []*GitPullRequest `json:"value"`
+	Count int               `json:"count"`
 }
 
 // PullRequestListOptions describes what the request to the API should look like
@@ -58,24 +64,24 @@ type PullRequestListOptions struct {
 
 // List returns list of the pull requests
 // utilising https://docs.microsoft.com/en-us/rest/api/vsts/git/pull%20requests/get%20pull%20requests%20by%20project
-func (s *PullRequestsService) List(opts *PullRequestListOptions) ([]GitPullRequest, int, error) {
-	URL := fmt.Sprintf("/_apis/git/pullrequests?api-version=%s", APIVersion)
+func (s *PullRequestsService) List(opts *PullRequestListOptions) ([]*GitPullRequest, int, error) {
+	URL := fmt.Sprintf("_apis/git/pullrequests?api-version=%s", APIVersion)
 	URL, err := addOptions(URL, opts)
 
-	request, err := s.client.NewRequest("GET", URL, nil)
+	req, err := s.client.NewRequest("GET", URL, nil)
 	if err != nil {
 		return nil, 0, err
 	}
-	var response PullRequestsResponse
-	_, err = s.client.Execute(request, &response)
+	var resp PullRequestsListResponse
+	_, err = s.client.Execute(req, &resp)
 
-	return response.GitPullRequests, response.Count, err
+	return resp.Value, resp.Count, err
 }
 
 // List returns list of the pull requests
 // utilising https://docs.microsoft.com/en-us/rest/api/vsts/git/pull%20requests/get%20pull%20requests%20by%20project
 func (s *PullRequestsService) ListOne(pullNum int, opts *PullRequestListOptions) (*GitPullRequest, int, error) {
-	URL := fmt.Sprintf("/_apis/git/pullrequests/%d?api-version=%s",
+	URL := fmt.Sprintf("_apis/git/pullrequests/%d?api-version=%s",
 		pullNum,
 		APIVersion,
 	)
@@ -96,55 +102,47 @@ func (s *PullRequestsService) ListOne(pullNum int, opts *PullRequestListOptions)
 // Merge Completes a pull request
 // https://docs.microsoft.com/en-us/rest/api/azure/devops/git/pull%20requests/update?view=azure-devops-rest-5.1
 // pullRequest = EnableAutoCompleteOnAnExistingPullRequest(gitHttpClient, pullRequest, mergeCommitMessage);
-func (s *PullRequestsService) Merge(opts *PullRequestListOptions) (*GitPullRequest, int, error) {
-	URL := fmt.Sprintf("/_apis/git/pullrequests?api-version=5.1-preview.1")
-	URL, err := addOptions(URL, opts)
+func (s *PullRequestsService) Merge(repoName string, pullNum int, id *IdentityRef, commitMsg string) (*GitPullRequest, int, error) {
+	URL := fmt.Sprintf("_apis/git/repositories/%s/pullrequests?api-version=%s",
+		repoName,
+		APIVersion,
+	)
 
-	var autoCompleteSetBy = IdentityRef{}
+	mergeStrategy := NoFastForward
 
-	mergeStrategy := GitPullRequestMergeStrategy{
-		noFastForward: "true",
-		//	rebase:        "false",
-		//	rebaseMerge:   "false",
-		//	squash:        "true",
-	}
-
-	pr := GitPullRequest{
-		AutoCompleteSetBy: autoCompleteSetBy,
-		CompletionOptions: prOptions,
-		Status:            &PullRequestStatus{},
-	}
+	//	GitPullRequestMergeStrategy{
+	//	NoFastForward: "true",
+	//	rebase:        "false",
+	//	rebaseMerge:   "false",
+	//	squash:        "true",
+	//}
 
 	prOptions := GitPullRequestCompletionOptions{
 		BypassPolicy:            false,
 		BypassReason:            "",
 		DeleteSourceBranch:      false,
-		MergeCommitMessage:      "",
+		MergeCommitMessage:      commitMsg,
 		MergeStrategy:           mergeStrategy,
 		SquashMerge:             false,
 		TransitionWorkItems:     true,
 		TriggeredByAutoComplete: false,
 	}
 
+	pr := GitPullRequest{
+		AutoCompleteSetBy: id,
+		CompletionOptions: &prOptions,
+		PullRequestID:     &pullNum,
+	}
+
 	// Now we're ready to make our API call to merge the pull request.
-	options := &azuredevops.PullRequestOptions{
-		MergeMethod: method,
-	}
-
-	var prOpts = GitPullRequestCompletionOptions{
-		SquashMerge:        true,
-		DeleteSourceBranch: true, // false if prefered otherwise
-		MergeCommitMessage: mergeCommitMessages,
-	}
-
-	request, err := s.client.NewRequest("PATCH", URL, nil)
+	request, err := s.client.NewRequest("PATCH", URL, pr)
 	if err != nil {
 		return nil, 0, err
 	}
 	var response GitPullRequest
 	_, err = s.client.Execute(request, &response)
 
-	return response.GitPullRequest, response.Count, err
+	return &response, 1, err
 }
 
 // Comment Represents a comment which is one of potentially many in a comment thread.
@@ -192,4 +190,25 @@ type GitPullRequestCommentThreadContext struct {
 	LeftFileStart  *CommentPosition `json:"leftFileStart,omitempty"`
 	RightFileEnd   *CommentPosition `json:"rightFileEnd,omitempty"`
 	RightFileStart *CommentPosition `json:"rightFileStart,omitempty"`
+}
+
+// ListCommits lists the commits in a pull request.
+// Azure Devops API docs: https://docs.microsoft.com/en-us/rest/api/azure/devops/git/pull%20request%20commits/get%20pull%20request%20commits
+//
+func (s *PullRequestsService) ListCommits(repo string, pullNum int) ([]*GitCommitRef, int, error) {
+	URL := fmt.Sprintf("_apis/git/repositories/%s/pullRequests/%d/commits?api-version=%s",
+		repo,
+		pullNum,
+		APIVersion,
+	)
+
+	req, err := s.client.NewRequest("GET", URL, nil)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	var resp = new(PullRequestsCommitsResponse)
+	_, err = s.client.Execute(req, resp)
+
+	return resp.Value, resp.Count, nil
 }

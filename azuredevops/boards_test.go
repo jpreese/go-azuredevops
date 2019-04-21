@@ -66,8 +66,8 @@ func TestBoardsService_List(t *testing.T) {
 			}
 
 			if tc.index > -1 {
-				if boards[tc.index].Name != tc.boardName {
-					t.Fatalf("expected board name: %s, got %s", tc.boardName, boards[tc.index].Name)
+				if *boards[tc.index].Name != tc.boardName {
+					t.Fatalf("expected board name: %s, got %s", tc.boardName, *boards[tc.index].Name)
 				}
 			}
 
@@ -149,20 +149,20 @@ func TestBuildsService_Get(t *testing.T) {
 				t.Fatalf("returned error: %v", err)
 			}
 
-			if board.Name != tc.boardName {
-				t.Fatalf("expected board name: %s, got %s", tc.boardName, board.Name)
+			if *board.Name != tc.boardName {
+				t.Fatalf("expected board name: %s, got %s", tc.boardName, *board.Name)
 			}
 
 			if len(board.Columns) != tc.columnCount {
 				t.Fatalf("expected board column count: %d, got %d", tc.columnCount, len(board.Columns))
 			}
 
-			if board.Columns[0].ID != tc.columnId {
-				t.Fatalf("expected column id: %s, got %s", tc.columnId, board.Columns[0].ID)
+			if *board.Columns[0].ID != tc.columnId {
+				t.Fatalf("expected column id: %s, got %s", tc.columnId, *board.Columns[0].ID)
 			}
 
-			if board.Columns[0].Name != tc.columnName {
-				t.Fatalf("expected column name: %s, got %s", tc.columnName, board.Columns[0].Name)
+			if *board.Columns[0].Name != tc.columnName {
+				t.Fatalf("expected column name: %s, got %s", tc.columnName, *board.Columns[0].Name)
 			}
 		})
 	}

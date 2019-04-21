@@ -135,7 +135,7 @@ type BuildsListOptions struct {
 // List returns list of the builds
 // utilising https://docs.microsoft.com/en-gb/rest/api/vsts/build/builds/list
 func (s *BuildsService) List(opts *BuildsListOptions) ([]Build, error) {
-	URL := fmt.Sprintf("/_apis/build/builds?api-version=%s", APIVersion)
+	URL := fmt.Sprintf("_apis/build/builds?api-version=%s", APIVersion)
 	URL, err := addOptions(URL, opts)
 
 	request, err := s.client.NewRequest("GET", URL, nil)
@@ -155,9 +155,9 @@ type QueueBuildOptions struct {
 }
 
 // Queue inserts new build creation to queue
-// utilising https://docs.microsoft.com/en-us/rest/api/vsts/build/builds/queue?view=vsts-rest-4.1
+// utilising https://docs.microsoft.com/en-us/rest/api/azure/devops/build/Builds/Queue
 func (s *BuildsService) Queue(build *Build, opts *QueueBuildOptions) error {
-	URL := fmt.Sprintf("/_apis/build/builds?api-version=%s", APIVersion)
+	URL := fmt.Sprintf("_apis/build/builds?api-version=api-version=5.1-preview.5")
 	URL, err := addOptions(URL, opts)
 
 	if err != nil {
@@ -170,7 +170,7 @@ func (s *BuildsService) Queue(build *Build, opts *QueueBuildOptions) error {
 		return err
 	}
 
-	_, err = s.client.Execute(request, &build)
+	_, err = s.client.Execute(request, build)
 
 	return err
 }

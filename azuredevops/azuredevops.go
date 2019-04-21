@@ -8,14 +8,15 @@ import (
 	"net/http"
 	"net/url"
 	"reflect"
+	"strings"
 
 	"github.com/google/go-querystring/query"
 )
 
 const (
-	APIVersion = "5.1-preview.1"
-	baseURL    = "https://dev.azure.com"
-	userAgent  = "go-azuredevops"
+	APIVersion     = "5.1-preview.1"
+	defaultBaseURL = "https://dev.azure.com"
+	userAgent      = "go-azuredevops"
 )
 
 // Client for interacting with the Azure DevOps API
@@ -23,7 +24,7 @@ type Client struct {
 	client *http.Client
 
 	// BaseURL Comprised of baseURL and account
-	BaseURL   string
+	BaseURL   url.URL
 	UserAgent string
 
 	// Account Required part of BaseURL
@@ -45,15 +46,40 @@ type Client struct {
 	WorkItems        *WorkItemsService
 }
 
-// NewClient gets a new Azure DevOps Client
-func NewClient(account string, project string, token string) *Client {
+// NewClient returns a new Azure DevOps API client. If a nil httpClient is
+// provided, http.DefaultClient will be used. To use API methods which require
+// authentication, provide an http.Client that will perform the authentication
+// for you (such as that provided by the golang.org/x/oauth2 library).
+// The client's base URL is constructed from the supplied account and project.
+// Token is a personal access token.
+func NewClient(account string, project string, token string, httpClient *http.Client) (*Client, error) {
+	if account == "" {
+		return nil, fmt.Errorf("Missing valid account in call to NewClient(): account = %s", account)
+	}
+
+	if project == "" {
+		return nil, fmt.Errorf("Missing valid project in call to NewClient(): project = %s", project)
+	}
+
+	if token == "" {
+		return nil, fmt.Errorf("Missing personal access token in call to NewClient(): token = %s", token)
+	}
+
+	if httpClient == nil {
+		httpClient = http.DefaultClient
+	}
+
+	// BaseURL
+	baseURLstr := fmt.Sprintf("%s/%s/", defaultBaseURL, account)
+	baseURL, _ := url.Parse(baseURLstr)
+
 	c := &Client{
+		client:    httpClient,
+		BaseURL:   *baseURL,
 		Account:   account,
 		Project:   project,
 		AuthToken: token,
 	}
-	// BaseURL
-	c.BaseURL = fmt.Sprintf("%s/%s", baseURL, account)
 
 	c.Boards = &BoardsService{client: c}
 	c.BuildDefinitions = &BuildDefinitionsService{client: c}
@@ -66,23 +92,27 @@ func NewClient(account string, project string, token string) *Client {
 	c.Teams = &TeamsService{client: c}
 	c.DeliveryPlans = &DeliveryPlansService{client: c}
 
-	return c
+	return c, nil
 }
 
-// NewRequest creates an API request where the URL is relative from baseURL
-// Basically this includes the project which is most requests to the API
-func (c *Client) NewRequest(method, URL string, body interface{}) (*http.Request, error) {
-	request, err := c.NewBaseRequest(
-		method,
-		fmt.Sprintf("/%s/%s", url.PathEscape(c.Project), URL),
-		body,
-	)
-	return request, err
-}
+// NewRequest creates an API request. A relative URL can be provided in urlStr,
+// in which case it is resolved relative to the BaseURL of the Client.
+// Relative URLs should always be specified without a preceding slash. If
+// specified, the value pointed to by body is JSON encoded and included as the
+// request body.
+func (c *Client) NewRequest(method, urlStr string, body interface{}) (*http.Request, error) {
+	if !strings.HasSuffix(c.BaseURL.Path, "/") {
+		return nil, fmt.Errorf("BaseURL must have a trailing slash, but %q does not", c.BaseURL.String())
+	}
 
-// NewBaseRequest does not take into consideration the default project
-// and simply uses the baseURL
-func (c *Client) NewBaseRequest(method, URL string, body interface{}) (*http.Request, error) {
+	// Prepend client project name to supplied URL
+	urlStr = fmt.Sprintf("%s/%s", url.PathEscape(c.Project), urlStr)
+
+	u, err := c.BaseURL.Parse(urlStr)
+	if err != nil {
+		return nil, err
+	}
+
 	var buf io.ReadWriter
 	if body != nil {
 		buf = new(bytes.Buffer)
@@ -94,25 +124,26 @@ func (c *Client) NewBaseRequest(method, URL string, body interface{}) (*http.Req
 		}
 	}
 
-	request, err := http.NewRequest(method, c.BaseURL+URL, buf)
+	req, err := http.NewRequest(method, u.String(), buf)
+	if err != nil {
+		return nil, err
+	}
 
 	if body != nil {
-		request.Header.Set("Content-Type", "application/json")
+		req.Header.Set("Content-Type", "application/json")
 	}
-
-	if c.UserAgent == "" {
-		c.UserAgent = userAgent
+	if c.UserAgent != "" {
+		req.Header.Set("User-Agent", c.UserAgent)
 	}
-	request.Header.Set("User-Agent", c.UserAgent)
-	return request, err
+	return req, nil
 }
 
 // Execute runs all the http requests on the API
 func (c *Client) Execute(request *http.Request, r interface{}) (*http.Response, error) {
 	request.SetBasicAuth("", c.AuthToken)
 
-	client := &http.Client{}
-	response, err := client.Do(request)
+	//client := &http.Client{}
+	response, err := c.client.Do(request)
 	if err != nil {
 		return nil, err
 	}

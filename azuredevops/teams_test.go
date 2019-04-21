@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	teamsListURL      = "/_apis/teams"
+	teamsListURL      = "_apis/teams"
 	teamsListResponse = `{
 		"value": [
 		  {

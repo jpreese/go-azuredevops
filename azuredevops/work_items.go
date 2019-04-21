@@ -128,7 +128,7 @@ func (s *WorkItemsService) GetForIteration(team string, iteration Iteration) ([]
 
 	// Now we want to pad out the fields for the work items
 	URL := fmt.Sprintf(
-		"/_apis/wit/workitems?ids=%s&fields=%s&api-version=%s",
+		"_apis/wit/workitems?ids=%s&fields=%s&api-version=%s",
 		strings.Join(workIds, ","),
 		strings.Join(fields, ","),
 		APIVersion,

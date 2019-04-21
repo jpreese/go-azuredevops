@@ -78,10 +78,10 @@ func TestPullRequestsService_List(t *testing.T) {
 		URL      string
 		title    string
 		response string
-		count    int
 	}{
-		{name: "happy", URL: pullrequestsListURL, response: pullrequestsResponse, count: 1, title: "A new feature"},
-		{name: "there are no items in the response", URL: pullrequestsListURL, response: "{}", count: 0},
+		{name: "happy", URL: pullrequestsListURL, response: pullrequestsResponse,
+			title: "A new feature"},
+		{name: "there are no items in the response", URL: pullrequestsListURL, response: "{}"},
 	}
 
 	for _, tc := range tt {
@@ -101,17 +101,62 @@ func TestPullRequestsService_List(t *testing.T) {
 				t.Fatalf("returned error: %v", err)
 			}
 
-			if count != tc.count {
-				t.Fatalf("expected count in response to be %d; got %d", tc.count, count)
+			if count != len(tt) {
+				t.Fatalf("expected count in response to be %d; got %d", len(tt), count)
 			}
 
-			if len(response) != tc.count {
+			if len(response) != len(tt) {
 				t.Fatalf("expected length of response to be 0; got %d", len(response))
 			}
 
 			if count > 0 {
-				if tc.title != response[0].Title {
-					t.Fatalf("expected title to be %s; got %s", tc.title, response[0].Title)
+				if tc.title != *response[0].Title {
+					t.Fatalf("expected title to be %s; got %s", tc.title, *response[0].Title)
+				}
+			}
+		})
+	}
+}
+
+func TestPullRequestsService_ListCommits(t *testing.T) {
+	tt := []struct {
+		name     string
+		URL      string
+		comment  string
+		response string
+	}{
+		{name: "happy", URL: pullrequestsListURL, response: pullrequestsResponse,
+			comment: "A new feature"},
+		{name: "there are no items in the response", URL: pullrequestsListURL, response: "{}"},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.name, func(t *testing.T) {
+			c, mux, _, teardown := setup()
+			defer teardown()
+
+			mux.HandleFunc(tc.URL, func(w http.ResponseWriter, r *http.Request) {
+				testMethod(t, r, "GET")
+				json := tc.response
+				fmt.Fprint(w, json)
+			})
+
+			response, count, err := c.PullRequests.ListCommits("test", 1)
+			if err != nil {
+				t.Fatalf("returned error: %v", err)
+			}
+
+			if count != len(tt) {
+				t.Fatalf("expected count in response to be %d; got %d", len(tt), count)
+			}
+
+			if len(response) != len(tt) {
+				t.Fatalf("expected length of response to be 0; got %d", len(response))
+			}
+
+			if count > 0 {
+				if tc.comment != *response[0].Comment {
+					t.Fatalf("expected title to be %s; got %s", tc.comment, *response[0].Comment)
 				}
 			}
 		})
@@ -151,14 +196,61 @@ func TestPullRequestsService_ListOne(t *testing.T) {
 			if count != tc.count {
 				t.Fatalf("expected count in response to be %d; got %d", tc.count, count)
 			}
+			/*
+				if len(response) != tc.count {
+					t.Fatalf("expected length of response to be 0; got %d", len(response))
+				}
+			*/
+			if count > 0 {
+				if tc.title != *response.Title {
+					t.Fatalf("expected title to be %s; got %s", tc.title, *response.Title)
+				}
+			}
+		})
+	}
+}
 
-			if len(response) != tc.count {
-				t.Fatalf("expected length of response to be 0; got %d", len(response))
+func TestPullRequestsService_Merge(t *testing.T) {
+	tt := []struct {
+		name     string
+		URL      string
+		title    string
+		response string
+		count    int
+	}{
+		{name: "happy", URL: pullrequestsListURL, response: pullrequestsResponse, count: 1, title: "A new feature"},
+		{name: "there are no items in the response", URL: pullrequestsListURL, response: "{}", count: 0},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.name, func(t *testing.T) {
+			c, mux, _, teardown := setup()
+			defer teardown()
+
+			mux.HandleFunc(tc.URL, func(w http.ResponseWriter, r *http.Request) {
+				testMethod(t, r, "GET")
+				json := tc.response
+				fmt.Fprint(w, json)
+			})
+
+			opt := &azuredevops.PullRequestListOptions{}
+			num := 1
+			response, count, err := c.PullRequests.ListOne(num, opt)
+			if err != nil {
+				t.Fatalf("returned error: %v", err)
 			}
 
+			if count != tc.count {
+				t.Fatalf("expected count in response to be %d; got %d", tc.count, count)
+			}
+			/*
+				if len(response) != tc.count {
+					t.Fatalf("expected length of response to be 0; got %d", len(response))
+				}
+			*/
 			if count > 0 {
-				if tc.title != response[0].Title {
-					t.Fatalf("expected title to be %s; got %s", tc.title, response[0].Title)
+				if tc.title != *response.Title {
+					t.Fatalf("expected title to be %s; got %s", tc.title, *response.Title)
 				}
 			}
 		})

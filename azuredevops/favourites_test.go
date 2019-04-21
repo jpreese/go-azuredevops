@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	favouritesListURL      = "/_apis/Favorite/Favorites"
+	favouritesListURL      = "_apis/Favorite/Favorites"
 	favouritesListResponse = `{
 		"value": [
 			{

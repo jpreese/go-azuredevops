@@ -41,10 +41,14 @@ func setup() (client *azuredevops.Client, mux *http.ServeMux, serverURL string, 
 	server := httptest.NewServer(apiHandler)
 
 	// The client being tested and is configured to use test server.
-	client = azuredevops.NewClient("AZURE_DEVOPS_Account", "AZURE_DEVOPS_Project", "AZURE_DEVOPS_TOKEN")
+	client, err := azuredevops.NewClient("AZURE_DEVOPS_Account", "AZURE_DEVOPS_Project", "AZURE_DEVOPS_TOKEN", nil)
 
-	url, _ := url.Parse(server.URL + baseURLPath)
-	client.BaseURL = url.String()
+	if err != nil {
+		fmt.Errorf("Error requesting NewClient(): %v", err)
+	}
+
+	url, _ := url.Parse(server.URL + baseURLPath + "/")
+	client.BaseURL = *url
 	return client, mux, server.URL, server.Close
 }
 
@@ -71,7 +75,7 @@ func testURL(t *testing.T, r *http.Request, want string) {
 }
 
 func Test_NewClient(t *testing.T) {
-	c := azuredevops.NewClient("AZURE_DEVOPS_ACCOUNT", "AZURE_DEVOPS_Project", "AZURE_DEVOPS_TOKEN")
+	c, _ := azuredevops.NewClient("AZURE_DEVOPS_ACCOUNT", "AZURE_DEVOPS_Project", "AZURE_DEVOPS_TOKEN", nil)
 
 	if c.Account != "AZURE_DEVOPS_ACCOUNT" {
 		t.Errorf("Client.Account = %s; expected %s", c.Account, "AZURE_DEVOPS_ACCOUNT")

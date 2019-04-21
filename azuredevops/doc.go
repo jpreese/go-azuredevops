@@ -7,7 +7,7 @@ Installation
 Usage
 Interaction with the Azure DevOps API is done through a Client instance.
 	import "github.com/mcdafydd/go-azuredevops/azuredevops
-	v := azuredevops.NewClient(account, project, token)
+	v := azuredevops.NewClient(account, project, token, nil)
 Services
 The client has services that you can use to access resources from the API:
 	iterations, error := v.Iterations.List(team)

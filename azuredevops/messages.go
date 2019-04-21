@@ -16,25 +16,36 @@ import (
 )
 
 const (
-	activityIdHeader     = "X-VSS-ActivityId"
-	subscriptionIdHeader = "X-VSS-SubscriptionId"
+	activityIDHeader     = "X-VSS-ActivityId"
+	subscriptionIDHeader = "X-VSS-SubscriptionId"
+	// requestIDHeader is the Azure Devops header key used to pass the unique ID for the webhook event.
+	requestIDHeader = "Request-Id"
 )
 
-// GetActivityID returns the value of the X-VSS-ActivityId webhook header r.
+// GetActivityID returns the value of the activityIDHeader webhook header.
 //
 // Haven't found vendor documentation yet.  This could be a GUID that identifies
 // the webhook request ID.  A different GUID is also present in the body of
 // webhook requests.
 func GetActivityID(r *http.Request) string {
-	return r.Header.Get(activityIdHeader)
+	return r.Header.Get(activityIDHeader)
 }
 
-// GetSubscriptionId returns the value of the X-VSS-SubscriptionId webhook header r.
+// GetRequestID returns the value of the requestIDHeader webhook header.
+//
+// Haven't found vendor documentation yet.  This could be a GUID that identifies
+// the webhook request ID.  A different GUID is also present in the body of
+// webhook requests.
+func GetRequestID(r *http.Request) string {
+	return r.Header.Get(requestIDHeader)
+}
+
+// GetSubscriptionID returns the value of the subscriptionIDHeader webhook header.
 //
 // Haven't found vendor documentation yet.  This could be a GUID that identifies
 // the webhook event type and settings in the Azure Devops tenant
 func GetSubscriptionID(r *http.Request) string {
-	return r.Header.Get(subscriptionIdHeader)
+	return r.Header.Get(subscriptionIDHeader)
 }
 
 // ParseWebHook parses the event payload into a corresponding struct.
