@@ -1,11 +1,11 @@
 # go-azuredevops
 
-[![GoDoc](https://godoc.org/github.com/benmatselby/go-azuredevops/azuredevops?status.svg)](https://godoc.org/github.com/benmatselby/go-azuredevops/azuredevops)
-[![Build Status](https://travis-ci.org/benmatselby/go-azuredevops.png?branch=master)](https://travis-ci.org/benmatselby/go-azuredevops)
-[![codecov](https://codecov.io/gh/benmatselby/go-azuredevops/branch/master/graph/badge.svg)](https://codecov.io/gh/benmatselby/go-azuredevops)
-[![Go Report Card](https://goreportcard.com/badge/github.com/benmatselby/go-azuredevops?style=flat-square)](https://goreportcard.com/report/github.com/benmatselby/go-azuredevops)
+[![GoDoc](https://godoc.org/github.com/mcdafydd/go-azuredevops/azuredevops?status.svg)](https://godoc.org/github.com/mcdafydd/go-azuredevops/azuredevops)
+[![Build Status](https://travis-ci.org/mcdafydd/go-azuredevops.png?branch=master)](https://travis-ci.org/mcdafydd/go-azuredevops)
+[![codecov](https://codecov.io/gh/mcdafydd/go-azuredevops/branch/master/graph/badge.svg)](https://codecov.io/gh/mcdafydd/go-azuredevops)
+[![Go Report Card](https://goreportcard.com/badge/github.com/mcdafydd/go-azuredevops?style=flat-square)](https://goreportcard.com/report/github.com/mcdafydd/go-azuredevops)
 
-This is a fork of [go-azuredevops](https://github.com/benmatselby/go-azuredevops), a Go client library for accessing the [Azure DevOps API](https://docs.microsoft.com/en-gb/rest/api/vsts/). This fork adapts a lot of code and style from the [go-github](https://github.com/google/go-github/) library.
+This is a fork of [go-azuredevops](https://github.com/mcdafydd/go-azuredevops), a Go client library for accessing the [Azure DevOps API](https://docs.microsoft.com/en-gb/rest/api/vsts/). This fork adapts a lot of code and style from the [go-github](https://github.com/google/go-github/) library.
 
 ## Services
 
@@ -22,7 +22,7 @@ There is partial implementation for the following services
 ## Usage
 
 ```go
-import "github.com/benmatselby/go-azuredevops/azuredevops
+import "github.com/mcdafydd/go-azuredevops/azuredevops
 ```
 
 Construct a new Azure DevOps Client
@@ -43,6 +43,15 @@ for index := 0; index < len(iterations); index++ {
     fmt.Println(iterations[index].Name)
 }
 ```
+
+## Contributing
+This library is re-using a lot of the code and style from the [go-github](https://github.com/google/go-github/) library:
+
+* Receiving struct members should be pointers (google/go-github#19)
+* Debate on whether nillable fields are important for receiving structs, especially when also using separate request structs.  Other popular libraries also use pointers approach, but it is often viewed as a big ugly.  (google/go-github#537)
+* Large receiving struct types should return []*Type, not []Type (google/go-github#375)
+
+May add separate request structs soon.
 
 ## References 
 * [Microsoft Azure Devops Rest API](https://github.com/MicrosoftDocs/vsts-rest-api-specs)
