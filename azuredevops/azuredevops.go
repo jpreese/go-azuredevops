@@ -107,12 +107,22 @@ func (c *Client) NewRequest(method, urlStr string, body interface{}) (*http.Requ
 		return nil, fmt.Errorf("BaseURL must have a trailing slash, but %q does not", c.BaseURL.String())
 	}
 
-	// Prepend client project name to supplied URL
-	urlStr = fmt.Sprintf("%s/%s", url.PathEscape(c.Project), urlStr)
-
-	u, err := c.BaseURL.Parse(urlStr)
+	parsed, err := url.Parse(urlStr)
 	if err != nil {
 		return nil, err
+	}
+
+	u := new(url.URL)
+	// If caller supplies an absolute urlStr, pass it unmodified to http.NewRequest
+	if parsed.IsAbs() {
+		u = parsed
+	} else {
+		// If caller supplies a relative URI in urlStr, prepend client project name
+		s := fmt.Sprintf("%s/%s", url.PathEscape(c.Project), urlStr)
+		u, err = c.BaseURL.Parse(s)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	var buf io.ReadWriter
