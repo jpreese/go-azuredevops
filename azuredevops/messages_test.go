@@ -8,6 +8,7 @@
 package azuredevops_test
 
 import (
+	"bytes"
 	"encoding/json"
 	"net/http"
 	"reflect"
@@ -46,6 +47,21 @@ func TestActivityID(t *testing.T) {
 	}
 }
 
+func TestRequestID(t *testing.T) {
+	id := "|2c08c6334570ae4bb625b27e533afd00.1fc0bd4d_1fc0bd50_791563."
+
+	req, err := http.NewRequest("POST", "http://localhost", nil)
+	if err != nil {
+		t.Fatalf("ActivityID: %v", err)
+	}
+	req.Header.Set("X-VSS-ActivityID", id)
+
+	got := azuredevops.GetRequestID(req)
+	if got != id {
+		t.Errorf("ActivityID(%#v) = %q, want %q", req, got, id)
+	}
+}
+
 func TestSubscriptionID(t *testing.T) {
 	id := "6b9490e4-940d-4d16-8dae-d36580e7e2b4"
 
@@ -58,5 +74,22 @@ func TestSubscriptionID(t *testing.T) {
 	got := azuredevops.GetSubscriptionID(req)
 	if got != id {
 		t.Errorf("SubscriptionID(%#v) = %q, want %q", req, got, id)
+	}
+}
+
+func TestValidatePayload(t *testing.T) {
+	user := "testuser"
+	pass := "testpass"
+	want := []byte("testpayload")
+
+	req, err := http.NewRequest("POST", "http://localhost", nil)
+	if err != nil {
+		t.Fatalf("ValidatePayload: %v", err)
+	}
+	req.SetBasicAuth(user, pass)
+	got, _ := azuredevops.ValidatePayload(req, []byte(user), []byte(pass))
+
+	if !bytes.Equal(got, want) {
+		t.Fatalf("ValidatePayload: %v", err)
 	}
 }

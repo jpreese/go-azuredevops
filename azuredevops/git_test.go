@@ -221,7 +221,7 @@ func TestGitService_CreateStatus(t *testing.T) {
 			status := azuredevops.GitStatus{
 				Context:     &context,
 				Description: &s,
-				State:       &state,
+				State:       state,
 				TargetURL:   &target,
 			}
 			resp, count, err := c.Git.CreateStatus("repo", "67cae2b029dff7eb3dc062b49403aaedca5bad8d", status)
@@ -236,8 +236,8 @@ func TestGitService_CreateStatus(t *testing.T) {
 				if !reflect.DeepEqual(resp.Context, tc.context) {
 					t.Errorf("Git.GetRef returned %+v, want %+v", tc.context, resp.Context)
 				}
-				if *resp.State != tc.state {
-					t.Fatalf("expected git ref name %s, got %s", tc.state, *resp.State)
+				if resp.State != tc.state {
+					t.Fatalf("expected git ref name %s, got %s", tc.state, resp.State)
 				}
 				if *resp.TargetURL != tc.targetUrl {
 					t.Fatalf("expected git ref object id %s, got %s", tc.targetUrl, *resp.TargetURL)

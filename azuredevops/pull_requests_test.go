@@ -163,7 +163,7 @@ func TestPullRequestsService_ListCommits(t *testing.T) {
 	}
 }
 
-func TestPullRequestsService_ListOne(t *testing.T) {
+func TestPullRequestsService_Get(t *testing.T) {
 	tt := []struct {
 		name     string
 		URL      string
@@ -188,7 +188,7 @@ func TestPullRequestsService_ListOne(t *testing.T) {
 
 			opt := &azuredevops.PullRequestListOptions{}
 			num := 1
-			response, count, err := c.PullRequests.ListOne(num, opt)
+			response, count, err := c.PullRequests.Get(num, opt)
 			if err != nil {
 				t.Fatalf("returned error: %v", err)
 			}
@@ -235,7 +235,7 @@ func TestPullRequestsService_Merge(t *testing.T) {
 
 			opt := &azuredevops.PullRequestListOptions{}
 			num := 1
-			response, count, err := c.PullRequests.ListOne(num, opt)
+			response, count, err := c.PullRequests.Get(num, opt)
 			if err != nil {
 				t.Fatalf("returned error: %v", err)
 			}

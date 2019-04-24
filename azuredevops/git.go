@@ -83,7 +83,7 @@ type GitStatusesResponse struct {
 // GitChange describes file path and content changes
 type GitChange struct {
 	ChangeID           *int                      `json:"changeId,omitempty"`
-	ChangeType         *VersionControlChangeType `json:"changeType,omitempty"`
+	ChangeType         VersionControlChangeType `json:"changeType,omitempty"`
 	Item               *GitItem                  `json:"item,omitempty"`
 	NewContent         *ItemContent              `json:"newContent,omitempty"`
 	NewContentTemplate *GitTemplate              `json:"newContentTemplate,omitempty"`
@@ -137,7 +137,7 @@ type GitItem struct {
 	CommitID              *string              `json:"commitId,omitempty"`
 	Content               *string              `json:"content,omitempty"`
 	ContentMetadata       *FileContentMetadata `json:"contentMetadata,omitempty"`
-	GitObjectType         *GitObjectType       `json:"gitObjectType,omitempty"`
+	GitObjectType         GitObjectType       `json:"gitObjectType,omitempty"`
 	IsFolder              *bool                `json:"isFolder,omitempty"`
 	IsSymLink             *bool                `json:"isSymLink,omitempty"`
 	LatestProcessedChange *GitCommitRef        `json:"latestProcessedChange,omitempty"`
@@ -168,16 +168,16 @@ type GitPullRequest struct {
 	LastMergeSourceCommit *GitCommitRef                    `json:"lastMergeSourceCommit,omitempty"`
 	LastMergeTargetCommit *GitCommitRef                    `json:"lastMergeTargetCommit,omitempty"`
 	MergeFailureMessage   *string                          `json:"mergeFailureMessage,omitempty"`
-	MergeFailureType      *PullRequestMergeFailureType     `json:"mergeFailureType,omitempty"`
+	MergeFailureType      PullRequestMergeFailureType     `json:"mergeFailureType,omitempty"`
 	MergeID               *string                          `json:"mergeId,omitempty"`
-	MergeOptions          *GitPullRequestMergeOptions      `json:"mergeOptions,omitempty"`
-	MergeStatus           *PullRequestAsyncStatus          `json:"mergeStatus,omitempty"`
+	MergeOptions          GitPullRequestMergeOptions      `json:"mergeOptions,omitempty"`
+	MergeStatus           PullRequestAsyncStatus          `json:"mergeStatus,omitempty"`
 	PullRequestID         *int                             `json:"pullRequestId,omitempty"`
 	Repository            *GitRepository                   `json:"repository,omitempty"`
 	Reviewers             *[]IdentityRefWithVote           `json:"reviewers,omitempty"`
 	RemoteURL             *string                          `json:"remoteUrl,omitempty"`
 	SourceRefName         *string                          `json:"sourceRefName,omitempty"`
-	Status                *PullRequestStatus               `json:"status,omitempty"`
+	Status                PullRequestStatus               `json:"status,omitempty"`
 	SupportsIterations    *bool                            `json:"supportsIterations,omitempty"`
 	TargetRefName         *string                          `json:"targetRefName,omitempty"`
 	Title                 *string                          `json:"title,omitempty"`
@@ -305,7 +305,7 @@ type GitStatus struct {
 	CreationDate *time.Time        `json:"creationDate,omitempty"`
 	Description  *string           `json:"description,omitempty"`
 	ID           *int              `json:"id,omitempty"`
-	State        *GitStatusState   `json:"state,omitempty"`
+	State        GitStatusState   `json:"state,omitempty"`
 	TargetURL    *string           `json:"targetUrl,omitempty"`
 	UpdatedDate  *time.Time        `json:"updatedDate,omitempty"`
 }

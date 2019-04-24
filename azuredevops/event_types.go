@@ -23,54 +23,6 @@ type ItemContentType struct {
 	RawText       *string `json:"rawText,omitempty"`
 }
 
-// PullRequestAsyncStatus The current status of a pull request merge.
-type PullRequestAsyncStatus int
-
-// PullRequestAsyncStatus enum values
-const (
-	MergeConflicts PullRequestAsyncStatus = iota
-	MergeFailure
-	MergeNotSet
-	MergeQueued
-	MergeRejectedByPolicy
-	MergeSucceeded
-)
-
-func (d PullRequestAsyncStatus) String() string {
-	return [...]string{"conflicts", "failure", "notSet", "queued", "rejectedByPolicy", "succeeded"}[d]
-}
-
-// PullRequestMergeFailureType The specific type of merge request failure
-type PullRequestMergeFailureType int
-
-// PullRequestMergeFailureType enum values
-const (
-	NoFailure PullRequestMergeFailureType = iota
-	UnknownFailure
-	CaseSensitive
-	ObjectTooLarge
-)
-
-func (d PullRequestMergeFailureType) String() string {
-	return [...]string{"none", "unknown", "caseSensitive", "objectTooLarge"}[d]
-}
-
-// PullRequestStatus The current status of a pull request merge.
-type PullRequestStatus int
-
-// PullRequestStatus enum values
-const (
-	PullAbandoned PullRequestStatus = iota
-	PullActive
-	PullIncludeAll
-	PullCompleted
-	PullNotSet
-)
-
-func (d PullRequestStatus) String() string {
-	return [...]string{"abandoned", "active", "all", "completed", "notSet"}[d]
-}
-
 // ReferenceLinks The class to represent a collection of REST reference links.
 type ReferenceLinks struct {
 	Links map[string]Link `json:",omitempty"`

@@ -11,7 +11,10 @@
 package azuredevops
 
 import (
+	"crypto/subtle"
 	"encoding/json"
+	"fmt"
+	"io/ioutil"
 	"net/http"
 )
 
@@ -20,6 +23,19 @@ const (
 	subscriptionIDHeader = "X-VSS-SubscriptionId"
 	// requestIDHeader is the Azure Devops header key used to pass the unique ID for the webhook event.
 	requestIDHeader = "Request-Id"
+)
+
+var (
+	// eventTypeMapping maps webhooks types to their corresponding go-azuredevops
+	// resource struct types.
+	eventTypeMapping = map[string]string{
+		"git.pullrequest.created": "PullRequestEvent",
+		"git.pullrequest.merged":  "PullRequestEvent",
+		"git.pullrequest.updated": "PullRequestEvent",
+		"git.push":                "PushEvent",
+		"workitem.commented":      "WorkItemEvent",
+		"workitem.updated":        "WorkItemEvent",
+	}
 )
 
 // GetActivityID returns the value of the activityIDHeader webhook header.
@@ -46,6 +62,58 @@ func GetRequestID(r *http.Request) string {
 // the webhook event type and settings in the Azure Devops tenant
 func GetSubscriptionID(r *http.Request) string {
 	return r.Header.Get(subscriptionIDHeader)
+}
+
+// ValidatePayload validates an incoming Azure Devops Webhook event request
+// and returns the (JSON) payload.
+// The Content-Type header of the payload must be "application/json" or
+// an error is returned.
+// user is the supplied username for Basic authentication
+// pass is the supplied password for Basic authentication
+// If your webhook does not contain a username or password, you can pass nil or an empty slice.
+// This is intended for local development purposes only as all webhooks should ideally
+// set up a secret token.
+//
+// Example usage:
+//
+//     func (s *Event) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+//       payload, err := azuredevops.ValidatePayload(r, s.user, s.pass)
+//       if err != nil { ... }
+//       // Process payload...
+//     }
+//
+func ValidatePayload(r *http.Request, user, pass []byte) (payload []byte, err error) {
+	var body []byte // Raw body that GitHub uses to calculate the signature.
+
+	switch ct := r.Header.Get("Content-Type"); ct {
+	case "application/json":
+		var err error
+		if body, err = ioutil.ReadAll(r.Body); err != nil {
+			return nil, err
+		}
+
+		// If the content type is application/json,
+		// the JSON payload is just the original body.
+		payload = body
+	default:
+		return nil, fmt.Errorf("Webhook request has unsupported Content-Type %q", ct)
+	}
+
+	// Only validate the authentication if a username and password exist. This is
+	// intended for local development only and all webhooks should ideally set up
+	// a Basic authentication username and password.
+	username, password, ok := r.BasicAuth()
+
+	if !ok || subtle.ConstantTimeCompare([]byte(user), []byte(username)) != 1 || subtle.ConstantTimeCompare([]byte(pass), []byte(password)) != 1 {
+		/*
+			w.Header().Set("WWW-Authenticate", `Basic realm="`+realm+`"`)
+			w.WriteHeader(401)
+			w.Write([]byte("Unauthorised.\n"))
+		*/
+		return nil, err
+	}
+	//Authorization: Basic <credentials>
+	return payload, nil
 }
 
 // ParseWebHook parses the event payload into a corresponding struct.

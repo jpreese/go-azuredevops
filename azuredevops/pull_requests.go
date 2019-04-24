@@ -5,15 +5,28 @@ import (
 	"time"
 )
 
+// Vote identifiers
+const (
+	VoteApproved                = 10
+	VoteApprovedWithSuggestions = 5
+	VoteNone                    = 0
+	VoteWaitingForAuthor        = -5
+	VoteRejected                = -10
+)
+
 // CommentType enum declaration
 type CommentType int
 
 // CommentType enum declaration
 const (
-	Unknown CommentType = iota
-	Text
-	CodeChange
-	System
+	// The comment type is not known.
+	CommentTypeUnknown CommentType = iota
+	// This is a regular user comment.
+	CommentTypeText
+	// The comment comes as a result of a code change.
+	CommentTypeCodeChange
+	// The comment represents a system message.
+	CommentTypeSystem
 )
 
 func (d CommentType) String() string {
@@ -36,6 +49,54 @@ const (
 
 func (d CommentThreadStatus) String() string {
 	return [...]string{"unknown", "active", "fixed", "wontfix", "closed", "byDesign", "pending"}[d]
+}
+
+// PullRequestAsyncStatus The current status of a pull request merge.
+type PullRequestAsyncStatus int
+
+// PullRequestAsyncStatus enum values
+const (
+	MergeConflicts PullRequestAsyncStatus = iota
+	MergeFailure
+	MergeNotSet
+	MergeQueued
+	MergeRejectedByPolicy
+	MergeSucceeded
+)
+
+func (d PullRequestAsyncStatus) String() string {
+	return [...]string{"conflicts", "failure", "notSet", "queued", "rejectedByPolicy", "succeeded"}[d]
+}
+
+// PullRequestMergeFailureType The specific type of merge request failure
+type PullRequestMergeFailureType int
+
+// PullRequestMergeFailureType enum values
+const (
+	NoFailure PullRequestMergeFailureType = iota
+	UnknownFailure
+	CaseSensitive
+	ObjectTooLarge
+)
+
+func (d PullRequestMergeFailureType) String() string {
+	return [...]string{"none", "unknown", "caseSensitive", "objectTooLarge"}[d]
+}
+
+// PullRequestStatus The current status of a pull request merge.
+type PullRequestStatus int
+
+// PullRequestStatus enum values
+const (
+	PullAbandoned PullRequestStatus = iota
+	PullActive
+	PullIncludeAll
+	PullCompleted
+	PullNotSet
+)
+
+func (d PullRequestStatus) String() string {
+	return [...]string{"abandoned", "active", "all", "completed", "notSet"}[d]
 }
 
 // PullRequestsService handles communication with the pull requests methods on the API
@@ -78,16 +139,14 @@ func (s *PullRequestsService) List(opts *PullRequestListOptions) ([]*GitPullRequ
 	return resp.GitPullRequests, resp.Count, err
 }
 
-// List returns list of the pull requests
+// Get returns a single pull request
 // utilising https://docs.microsoft.com/en-us/rest/api/vsts/git/pull%20requests/get%20pull%20requests%20by%20project
-func (s *PullRequestsService) ListOne(pullNum int, opts *PullRequestListOptions) (*GitPullRequest, int, error) {
+func (s *PullRequestsService) Get(pullNum int, opts *PullRequestListOptions) (*GitPullRequest, int, error) {
 	URL := fmt.Sprintf("_apis/git/pullrequests/%d?api-version=%s",
 		pullNum,
 		APIVersion,
 	)
 	URL, err := addOptions(URL, opts)
-
-	//opt := &RepositoryListByOrgOptions{"forks", ListOptions{Page: 2}}
 
 	request, err := s.client.NewRequest("GET", URL, nil)
 	if err != nil {
@@ -149,7 +208,7 @@ func (s *PullRequestsService) Merge(repoName string, pullNum int, id *IdentityRe
 type Comment struct {
 	Links                  *[]ReferenceLinks `json:"_links,omitempty"`
 	Author                 *IdentityRef      `json:"author,omitempty"`
-	CommentType            *CommentType      `json:"commentType,omitempty"`
+	CommentType            CommentType       `json:"commentType,omitempty"`
 	Content                *string           `json:"content,omitempty"`
 	ID                     *int              `json:"id,omitempty"`
 	IsDeleted              *bool             `json:"isDeleted,omitempty"`
@@ -177,7 +236,7 @@ type GitPullRequestCommentThread struct {
 	LastUpdatedDate          *time.Time                          `json:"lastUpdatedDate,omitempty"`
 	Properties               *[]int                              `json:"properties,omitempty"`
 	PublishedDate            *time.Time                          `json:"publishedDate,omitempty"`
-	Status                   *CommentThreadStatus                `json:"status,omitempty"`
+	Status                   CommentThreadStatus                 `json:"status,omitempty"`
 	PullRequestThreadContext *GitPullRequestCommentThreadContext `json:"pullRequestThreadContext,omitempty"`
 }
 

@@ -32,7 +32,7 @@ type Board struct {
 
 // BoardColumn describes a column on the board
 type BoardColumn struct {
-	ColumnType    *BoardColumnType  `json:"columnType,omitempty"`
+	ColumnType    BoardColumnType  `json:"columnType,omitempty"`
 	Description   *string           `json:"description,omitempty"`
 	ID            *string           `json:"id,omitempty"`
 	IsSplit       *bool             `json:"isSplit,omitempty"`
