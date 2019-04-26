@@ -20,44 +20,66 @@ type Message struct {
 }
 
 // Event - Describes an Azure Devops webhook payload parent
-// For now, delay parsing Resource using *json.RawMessage
-// until we know EventType
+// Delay parsing Resource using *json.RawMessage
+// until we know EventType.  The contents of Resource change
+// depending on EventType.
+// PayloadType is filled with an enum that describes the type of resource
+// payload.
 type Event struct {
-	SubscriptionID     *string             `json:"subscriptionId,omitempty"`
-	NotificationID     *int                `json:"notificationId,omitempty"`
-	ID                 *string             `json:"id,omitempty"`
-	EventType          *string             `json:"eventType,omitempty"`
-	Message            *Message            `json:"message,omitempty"`
-	DetailedMessage    *Message            `json:"detailedMessage,omitempty"`
-	RawPayload         *json.RawMessage    `json:"resource,omitempty"`
-	ResourceVersion    *string             `json:"resourceVersion,omitempty"`
-	ResourceContainers *ResourceContainers `json:"resourceContainers,omitempty"`
-	CreatedDate        *time.Time          `json:"createdDate,omitempty"`
-	Resource           *interface{}
+	SubscriptionID     string             `json:"subscriptionId,omitempty"`
+	NotificationID     int                `json:"notificationId,omitempty"`
+	ID                 string             `json:"id,omitempty"`
+	EventType          string             `json:"eventType,omitempty"`
+	Message            Message            `json:"message,omitempty"`
+	DetailedMessage    Message            `json:"detailedMessage,omitempty"`
+	RawPayload         json.RawMessage    `json:"resource,omitempty"`
+	ResourceVersion    string             `json:"resourceVersion,omitempty"`
+	ResourceContainers ResourceContainers `json:"resourceContainers,omitempty"`
+	CreatedDate        time.Time          `json:"createdDate,omitempty"`
+	Resource           interface{}
+	PayloadType        PayloadType
 }
+
+// PayloadType Used to describe the event area
+type PayloadType int
+
+const (
+	// PullRequestEvent Resource field is parsed as a pull request event
+	PullRequestEvent PayloadType = iota
+	// PushEvent Git push service event
+	PushEvent
+	// WorkItemEvent Resource field is parsed as a work item event
+	WorkItemEvent
+)
 
 // ParsePayload parses the event payload. For recognized event types,
 // it returns the webhook payload with a parsed struct in the
-// Event.Resource field
+// Event.Resource field.
 func (e *Event) ParsePayload() (payload interface{}, err error) {
-	switch *e.EventType {
+	switch e.EventType {
 	case "git.pullrequest.created":
-		payload = &GitPullRequest{}
+		e.PayloadType = PullRequestEvent
+		payload = GitPullRequest{}
 	case "git.pullrequest.merged":
-		payload = &GitPullRequest{}
+		e.PayloadType = PullRequestEvent
+		payload = GitPullRequest{}
 	case "git.pullrequest.updated":
-		payload = &GitPullRequest{}
+		e.PayloadType = PullRequestEvent
+		payload = GitPullRequest{}
 	case "git.push":
-		payload = &GitPush{}
+		e.PayloadType = PushEvent
+		payload = GitPush{}
 	case "workitem.commented":
-		payload = &WorkItem{}
+		e.PayloadType = WorkItemEvent
+		payload = WorkItem{}
 	case "workitem.updated":
-		payload = &WorkItemUpdate{}
+		e.PayloadType = WorkItemEvent
+		payload = WorkItemUpdate{}
 	default:
 		return payload, errors.New("Unknown EventType in webhook payload")
 	}
 
-	err = json.Unmarshal(*e.RawPayload, &payload)
+	err = json.Unmarshal(e.RawPayload, &payload)
 	if err != nil {
 		return payload, err
 	}

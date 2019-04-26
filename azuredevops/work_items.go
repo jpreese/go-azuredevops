@@ -17,7 +17,7 @@ type WorkItemsService struct {
 // IterationWorkItems Represents work items in an iteration backlog
 type IterationWorkItems struct {
 	Links             *ReferenceLinks `json:"_links,omitempty"`
-	WorkItemRelations *[]WorkItemLink `json:"workItemRelations"`
+	WorkItemRelations []*WorkItemLink `json:"workItemRelations"`
 	URL               *string         `json:"url,omitempty"`
 }
 
@@ -36,13 +36,13 @@ type WorkItemListResponse struct {
 
 // WorkItem describes an individual work item in TFS
 type WorkItem struct {
-	Links             *ReferenceLinks                 `json:"_links,omitempty"`
-	CommentVersionRef *CommentVersionRef              `json:"commentVersionRef,omitempty"`
-	Fields            *map[string]WorkItemFieldUpdate `json:"fields,omitempty"`
-	ID                *int                            `json:"id,omitempty"`
-	Relations         *WorkItemRelation               `json:"relations,omitempty"`
-	Rev               *int                            `json:"rev,omitempty"`
-	URL               *string                         `json:"url,omitempty"`
+	Links             *ReferenceLinks     `json:"_links,omitempty"`
+	CommentVersionRef *CommentVersionRef  `json:"commentVersionRef,omitempty"`
+	Fields            *map[string]string  `json:"fields,omitempty"`
+	ID                *int                `json:"id,omitempty"`
+	Relations         []*WorkItemRelation `json:"relations,omitempty"`
+	Rev               *int                `json:"rev,omitempty"`
+	URL               *string             `json:"url,omitempty"`
 }
 
 /*
@@ -99,7 +99,7 @@ type WorkItemUpdate struct {
 	Links       *ReferenceLinks                 `json:"attributes,omitempty"`
 	Fields      *map[string]WorkItemFieldUpdate `json:"fields,omitempty"`
 	ID          *int                            `json:"id,omitempty"`
-	Relations   *WorkItemRelationUpdates        `json:"relations,omitempty"`
+	Relations   []*WorkItemRelationUpdates      `json:"relations,omitempty"`
 	Rev         *int                            `json:"rev,omitempty"`
 	RevisedBy   *IdentityRef                    `json:"revisedBy,omitempty"`
 	RevisedDate *time.Time                      `json:"revisedDate,omitempty"`
@@ -166,8 +166,8 @@ func (s *WorkItemsService) GetIdsForIteration(team string, iteration Iteration) 
 	_, err = s.client.Execute(request, &response)
 
 	var queryIds []int
-	for index := 0; index < len(*response.WorkItemRelations); index++ {
-		relationship := (*response.WorkItemRelations)[index]
+	for index := 0; index < len(response.WorkItemRelations); index++ {
+		relationship := (response.WorkItemRelations)[index]
 		queryIds = append(queryIds, *relationship.Target.ID)
 	}
 

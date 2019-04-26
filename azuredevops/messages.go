@@ -73,6 +73,13 @@ func GetSubscriptionID(r *http.Request) string {
 // If your webhook does not contain a username or password, you can pass nil or an empty slice.
 // This is intended for local development purposes only as all webhooks should ideally
 // set up a secret token.
+// It is up to the caller to process failed validation and return a proper 401 response
+// to the user, such as:
+//
+// w.Header().Set("WWW-Authenticate", `Basic realm="`+realm+`"`)
+// w.WriteHeader(401)
+// w.Write([]byte("Unauthorized.\n"))
+//
 //
 // Example usage:
 //
@@ -105,11 +112,6 @@ func ValidatePayload(r *http.Request, user, pass []byte) (payload []byte, err er
 	username, password, ok := r.BasicAuth()
 
 	if !ok || subtle.ConstantTimeCompare([]byte(user), []byte(username)) != 1 || subtle.ConstantTimeCompare([]byte(pass), []byte(password)) != 1 {
-		/*
-			w.Header().Set("WWW-Authenticate", `Basic realm="`+realm+`"`)
-			w.WriteHeader(401)
-			w.Write([]byte("Unauthorised.\n"))
-		*/
 		return nil, err
 	}
 	//Authorization: Basic <credentials>
@@ -119,17 +121,34 @@ func ValidatePayload(r *http.Request, user, pass []byte) (payload []byte, err er
 // ParseWebHook parses the event payload into a corresponding struct.
 // An error will be returned for unrecognized event types.
 //
-// https://docs.microsoft.com/en-us/azure/devops/service-hooks/events?toc=/azure/devops/integrate/toc.json&bc=/azure/devops/integrate/breadcrumb/toc.json&view=azure-devops
+// Example usage:
 //
-func ParseWebHook(payload []byte) (*Event, error) {
+//     func (s *EventMonitor) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+//       payload, err := azuredevops.ValidatePayload(r, s.user, s.pass)
+//       if err != nil { ... }
+//       webhook, err := azuredevops.ParseWebHook(payload)
+//       if err != nil { ... }
+//       event := webhook.(azuredevops.Event)
+//       switch event.PayloadType {
+//	 case azuredevops.WorkItemEvent:
+//		processWorkItemEvent(&event)
+//	 case azuredevops.PullRequestEvent:
+//              processPullRequestEvent(&event)
+//       ...
+//       }
+//     }
+//
+// https://docs.microsoft.com/en-us/azure/devops/service-hooks/events?view=azure-devops
+func ParseWebHook(payload []byte) (interface{}, error) {
 	event := new(Event)
 	err := json.Unmarshal(payload, &event)
 	if err != nil {
 		return nil, err
 	}
-	if event.EventType != nil {
+	if event.EventType != "" {
 		_, err = event.ParsePayload()
 	}
 
 	return event, err
 }
+

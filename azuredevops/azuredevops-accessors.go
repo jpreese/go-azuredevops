@@ -8,7 +8,6 @@
 package azuredevops
 
 import (
-	"encoding/json"
 	"time"
 )
 
@@ -50,14 +49,6 @@ func (b *Board) GetRevision() int {
 		return 0
 	}
 	return *b.Revision
-}
-
-// GetColumnType returns the ColumnType field.
-func (b *BoardColumn) GetColumnType() *BoardColumnType {
-	if b == nil {
-		return nil
-	}
-	return b.ColumnType
 }
 
 // GetDescription returns the Description field if it's non-nil, zero value otherwise.
@@ -164,12 +155,36 @@ func (b *BoardRow) GetName() string {
 	return *b.Name
 }
 
+// GetBranch returns the Branch field if it's non-nil, zero value otherwise.
+func (b *Build) GetBranch() string {
+	if b == nil || b.Branch == nil {
+		return ""
+	}
+	return *b.Branch
+}
+
+// GetBuildNumber returns the BuildNumber field if it's non-nil, zero value otherwise.
+func (b *Build) GetBuildNumber() string {
+	if b == nil || b.BuildNumber == nil {
+		return ""
+	}
+	return *b.BuildNumber
+}
+
 // GetController returns the Controller field.
 func (b *Build) GetController() *BuildController {
 	if b == nil {
 		return nil
 	}
 	return b.Controller
+}
+
+// GetDefinition returns the Definition field.
+func (b *Build) GetDefinition() *BuildDefinition {
+	if b == nil {
+		return nil
+	}
+	return b.Definition
 }
 
 // GetDeleted returns the Deleted field if it's non-nil, zero value otherwise.
@@ -188,6 +203,14 @@ func (b *Build) GetDeletedBy() *IdentityRef {
 	return b.DeletedBy
 }
 
+// GetFinishTime returns the FinishTime field if it's non-nil, zero value otherwise.
+func (b *Build) GetFinishTime() string {
+	if b == nil || b.FinishTime == nil {
+		return ""
+	}
+	return *b.FinishTime
+}
+
 // GetLastChangedBy returns the LastChangedBy field.
 func (b *Build) GetLastChangedBy() *IdentityRef {
 	if b == nil {
@@ -204,12 +227,28 @@ func (b *Build) GetOrchestrationPlan() *buildOrchestrationPlanSchema {
 	return b.OrchestrationPlan
 }
 
+// GetProject returns the Project field.
+func (b *Build) GetProject() *TeamProjectReference {
+	if b == nil {
+		return nil
+	}
+	return b.Project
+}
+
 // GetQueuePosition returns the QueuePosition field if it's non-nil, zero value otherwise.
 func (b *Build) GetQueuePosition() int {
 	if b == nil || b.QueuePosition == nil {
 		return 0
 	}
 	return *b.QueuePosition
+}
+
+// GetRepository returns the Repository field.
+func (b *Build) GetRepository() *Repository {
+	if b == nil {
+		return nil
+	}
+	return b.Repository
 }
 
 // GetRetainedByRelease returns the RetainedByRelease field if it's non-nil, zero value otherwise.
@@ -242,14 +281,6 @@ func (c *Comment) GetAuthor() *IdentityRef {
 		return nil
 	}
 	return c.Author
-}
-
-// GetCommentType returns the CommentType field.
-func (c *Comment) GetCommentType() *CommentType {
-	if c == nil {
-		return nil
-	}
-	return c.CommentType
 }
 
 // GetContent returns the Content field if it's non-nil, zero value otherwise.
@@ -364,84 +395,124 @@ func (c *CommentVersionRef) GetVersion() int {
 	return *c.Version
 }
 
-// GetCreatedDate returns the CreatedDate field if it's non-nil, zero value otherwise.
-func (e *Event) GetCreatedDate() time.Time {
-	if e == nil || e.CreatedDate == nil {
-		return time.Time{}
-	}
-	return *e.CreatedDate
-}
-
-// GetDetailedMessage returns the DetailedMessage field.
-func (e *Event) GetDetailedMessage() *Message {
-	if e == nil {
-		return nil
-	}
-	return e.DetailedMessage
-}
-
-// GetEventType returns the EventType field if it's non-nil, zero value otherwise.
-func (e *Event) GetEventType() string {
-	if e == nil || e.EventType == nil {
+// GetCreated returns the Created field if it's non-nil, zero value otherwise.
+func (d *DeliveryPlan) GetCreated() string {
+	if d == nil || d.Created == nil {
 		return ""
 	}
-	return *e.EventType
+	return *d.Created
 }
 
 // GetID returns the ID field if it's non-nil, zero value otherwise.
-func (e *Event) GetID() string {
-	if e == nil || e.ID == nil {
+func (d *DeliveryPlan) GetID() string {
+	if d == nil || d.ID == nil {
 		return ""
 	}
-	return *e.ID
+	return *d.ID
 }
 
-// GetMessage returns the Message field.
-func (e *Event) GetMessage() *Message {
-	if e == nil {
-		return nil
+// GetName returns the Name field if it's non-nil, zero value otherwise.
+func (d *DeliveryPlan) GetName() string {
+	if d == nil || d.Name == nil {
+		return ""
 	}
-	return e.Message
+	return *d.Name
 }
 
-// GetNotificationID returns the NotificationID field if it's non-nil, zero value otherwise.
-func (e *Event) GetNotificationID() int {
-	if e == nil || e.NotificationID == nil {
+// GetType returns the Type field if it's non-nil, zero value otherwise.
+func (d *DeliveryPlan) GetType() string {
+	if d == nil || d.Type == nil {
+		return ""
+	}
+	return *d.Type
+}
+
+// GetURL returns the URL field if it's non-nil, zero value otherwise.
+func (d *DeliveryPlan) GetURL() string {
+	if d == nil || d.URL == nil {
+		return ""
+	}
+	return *d.URL
+}
+
+// GetEndDate returns the EndDate field if it's non-nil, zero value otherwise.
+func (d *DeliveryPlanTimeLine) GetEndDate() string {
+	if d == nil || d.EndDate == nil {
+		return ""
+	}
+	return *d.EndDate
+}
+
+// GetID returns the ID field if it's non-nil, zero value otherwise.
+func (d *DeliveryPlanTimeLine) GetID() string {
+	if d == nil || d.ID == nil {
+		return ""
+	}
+	return *d.ID
+}
+
+// GetRevision returns the Revision field if it's non-nil, zero value otherwise.
+func (d *DeliveryPlanTimeLine) GetRevision() int {
+	if d == nil || d.Revision == nil {
 		return 0
 	}
-	return *e.NotificationID
+	return *d.Revision
 }
 
-// GetRawPayload returns the RawPayload field if it's non-nil, zero value otherwise.
-func (e *Event) GetRawPayload() json.RawMessage {
-	if e == nil || e.RawPayload == nil {
-		return json.RawMessage{}
-	}
-	return *e.RawPayload
-}
-
-// GetResourceContainers returns the ResourceContainers field.
-func (e *Event) GetResourceContainers() *ResourceContainers {
-	if e == nil {
-		return nil
-	}
-	return e.ResourceContainers
-}
-
-// GetResourceVersion returns the ResourceVersion field if it's non-nil, zero value otherwise.
-func (e *Event) GetResourceVersion() string {
-	if e == nil || e.ResourceVersion == nil {
+// GetStartDate returns the StartDate field if it's non-nil, zero value otherwise.
+func (d *DeliveryPlanTimeLine) GetStartDate() string {
+	if d == nil || d.StartDate == nil {
 		return ""
 	}
-	return *e.ResourceVersion
+	return *d.StartDate
 }
 
-// GetSubscriptionID returns the SubscriptionID field if it's non-nil, zero value otherwise.
-func (e *Event) GetSubscriptionID() string {
-	if e == nil || e.SubscriptionID == nil {
+// GetID returns the ID field if it's non-nil, zero value otherwise.
+func (d *DeliveryTeam) GetID() string {
+	if d == nil || d.ID == nil {
 		return ""
 	}
-	return *e.SubscriptionID
+	return *d.ID
+}
+
+// GetName returns the Name field if it's non-nil, zero value otherwise.
+func (d *DeliveryTeam) GetName() string {
+	if d == nil || d.Name == nil {
+		return ""
+	}
+	return *d.Name
+}
+
+// GetArtifactID returns the ArtifactID field if it's non-nil, zero value otherwise.
+func (f *Favourite) GetArtifactID() string {
+	if f == nil || f.ArtifactID == nil {
+		return ""
+	}
+	return *f.ArtifactID
+}
+
+// GetArtifactName returns the ArtifactName field if it's non-nil, zero value otherwise.
+func (f *Favourite) GetArtifactName() string {
+	if f == nil || f.ArtifactName == nil {
+		return ""
+	}
+	return *f.ArtifactName
+}
+
+// GetArtifactType returns the ArtifactType field if it's non-nil, zero value otherwise.
+func (f *Favourite) GetArtifactType() string {
+	if f == nil || f.ArtifactType == nil {
+		return ""
+	}
+	return *f.ArtifactType
+}
+
+// GetID returns the ID field if it's non-nil, zero value otherwise.
+func (f *Favourite) GetID() string {
+	if f == nil || f.ID == nil {
+		return ""
+	}
+	return *f.ID
 }
 
 // GetReferenceName returns the ReferenceName field if it's non-nil, zero value otherwise.
@@ -522,14 +593,6 @@ func (g *GitChange) GetChangeID() int {
 		return 0
 	}
 	return *g.ChangeID
-}
-
-// GetChangeType returns the ChangeType field.
-func (g *GitChange) GetChangeType() *VersionControlChangeType {
-	if g == nil {
-		return nil
-	}
-	return g.ChangeType
 }
 
 // GetItem returns the Item field.
@@ -730,14 +793,6 @@ func (g *GitItem) GetContentMetadata() *FileContentMetadata {
 		return nil
 	}
 	return g.ContentMetadata
-}
-
-// GetGitObjectType returns the GitObjectType field.
-func (g *GitItem) GetGitObjectType() *GitObjectType {
-	if g == nil {
-		return nil
-	}
-	return g.GitObjectType
 }
 
 // GetIsFolder returns the IsFolder field if it's non-nil, zero value otherwise.
@@ -956,36 +1011,12 @@ func (g *GitPullRequest) GetMergeFailureMessage() string {
 	return *g.MergeFailureMessage
 }
 
-// GetMergeFailureType returns the MergeFailureType field.
-func (g *GitPullRequest) GetMergeFailureType() *PullRequestMergeFailureType {
-	if g == nil {
-		return nil
-	}
-	return g.MergeFailureType
-}
-
 // GetMergeID returns the MergeID field if it's non-nil, zero value otherwise.
 func (g *GitPullRequest) GetMergeID() string {
 	if g == nil || g.MergeID == nil {
 		return ""
 	}
 	return *g.MergeID
-}
-
-// GetMergeOptions returns the MergeOptions field.
-func (g *GitPullRequest) GetMergeOptions() *GitPullRequestMergeOptions {
-	if g == nil {
-		return nil
-	}
-	return g.MergeOptions
-}
-
-// GetMergeStatus returns the MergeStatus field.
-func (g *GitPullRequest) GetMergeStatus() *PullRequestAsyncStatus {
-	if g == nil {
-		return nil
-	}
-	return g.MergeStatus
 }
 
 // GetPullRequestID returns the PullRequestID field if it's non-nil, zero value otherwise.
@@ -1026,14 +1057,6 @@ func (g *GitPullRequest) GetSourceRefName() string {
 		return ""
 	}
 	return *g.SourceRefName
-}
-
-// GetStatus returns the Status field.
-func (g *GitPullRequest) GetStatus() *PullRequestStatus {
-	if g == nil {
-		return nil
-	}
-	return g.Status
 }
 
 // GetSupportsIterations returns the SupportsIterations field if it's non-nil, zero value otherwise.
@@ -1146,14 +1169,6 @@ func (g *GitPullRequestCommentThread) GetPullRequestThreadContext() *GitPullRequ
 		return nil
 	}
 	return g.PullRequestThreadContext
-}
-
-// GetStatus returns the Status field.
-func (g *GitPullRequestCommentThread) GetStatus() *CommentThreadStatus {
-	if g == nil {
-		return nil
-	}
-	return g.Status
 }
 
 // GetFilePath returns the FilePath field if it's non-nil, zero value otherwise.
@@ -1636,14 +1651,6 @@ func (g *GitStatus) GetLinks() []ReferenceLinks {
 	return *g.Links
 }
 
-// GetState returns the State field.
-func (g *GitStatus) GetState() *GitStatusState {
-	if g == nil {
-		return nil
-	}
-	return g.State
-}
-
 // GetTargetURL returns the TargetURL field if it's non-nil, zero value otherwise.
 func (g *GitStatus) GetTargetURL() string {
 	if g == nil || g.TargetURL == nil {
@@ -1898,14 +1905,6 @@ func (i *IterationWorkItems) GetURL() string {
 		return ""
 	}
 	return *i.URL
-}
-
-// GetWorkItemRelations returns the WorkItemRelations field if it's non-nil, zero value otherwise.
-func (i *IterationWorkItems) GetWorkItemRelations() []WorkItemLink {
-	if i == nil || i.WorkItemRelations == nil {
-		return nil
-	}
-	return *i.WorkItemRelations
 }
 
 // GetHref returns the Href field if it's non-nil, zero value otherwise.
@@ -2197,9 +2196,9 @@ func (w *WorkItem) GetCommentVersionRef() *CommentVersionRef {
 }
 
 // GetFields returns the Fields field if it's non-nil, zero value otherwise.
-func (w *WorkItem) GetFields() map[string]WorkItemFieldUpdate {
+func (w *WorkItem) GetFields() map[string]string {
 	if w == nil || w.Fields == nil {
-		return map[string]WorkItemFieldUpdate{}
+		return map[string]string{}
 	}
 	return *w.Fields
 }
@@ -2218,14 +2217,6 @@ func (w *WorkItem) GetLinks() *ReferenceLinks {
 		return nil
 	}
 	return w.Links
-}
-
-// GetRelations returns the Relations field.
-func (w *WorkItem) GetRelations() *WorkItemRelation {
-	if w == nil {
-		return nil
-	}
-	return w.Relations
 }
 
 // GetRev returns the Rev field if it's non-nil, zero value otherwise.
@@ -2266,14 +2257,6 @@ func (w *WorkItemLink) GetTarget() *WorkItemReference {
 		return nil
 	}
 	return w.Target
-}
-
-// GetWorkItems returns the WorkItems field if it's non-nil, zero value otherwise.
-func (w *WorkItemListResponse) GetWorkItems() []WorkItem {
-	if w == nil || w.WorkItems == nil {
-		return nil
-	}
-	return *w.WorkItems
 }
 
 // GetID returns the ID field if it's non-nil, zero value otherwise.
@@ -2362,14 +2345,6 @@ func (w *WorkItemUpdate) GetLinks() *ReferenceLinks {
 		return nil
 	}
 	return w.Links
-}
-
-// GetRelations returns the Relations field.
-func (w *WorkItemUpdate) GetRelations() *WorkItemRelationUpdates {
-	if w == nil {
-		return nil
-	}
-	return w.Relations
 }
 
 // GetRev returns the Rev field if it's non-nil, zero value otherwise.

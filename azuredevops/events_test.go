@@ -48,9 +48,9 @@ func TestParsePayload(t *testing.T) {
 
 	for _, test := range tests {
 		event := new(azuredevops.Event)
-		event.EventType = &test.eventType
+		event.EventType = test.eventType
 		payload, err := json.Marshal(test.payload)
-		event.RawPayload = (*json.RawMessage)(&payload)
+		event.RawPayload = (json.RawMessage)(payload)
 		if err != nil {
 			t.Fatalf("Marshal(%#v): %v", test.payload, err)
 		}
