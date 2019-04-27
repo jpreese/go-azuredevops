@@ -59,7 +59,7 @@ func TestParsePayload(t *testing.T) {
 			t.Fatalf("ParsePayload: %v", err)
 		}
 		if want := test.payload; !reflect.DeepEqual(got, want) {
-			t.Errorf("ParsePayload(%#v, %#v) = %#v, want %#v", test.eventType, test.payload, got, want)
+			t.Errorf("ParsePayload(%#v, %#v) = got %#v, want %#v", test.eventType, test.payload, got, want)
 		}
 	}
 }

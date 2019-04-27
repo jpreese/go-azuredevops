@@ -67,7 +67,7 @@ func GetSubscriptionID(r *http.Request) string {
 // ValidatePayload validates an incoming Azure Devops Webhook event request
 // and returns the (JSON) payload.
 // The Content-Type header of the payload must be "application/json" or
-// an error is returned.
+// an error is returned.  A charset may be included with the content type.
 // user is the supplied username for Basic authentication
 // pass is the supplied password for Basic authentication
 // If your webhook does not contain a username or password, you can pass nil or an empty slice.
@@ -94,6 +94,15 @@ func ValidatePayload(r *http.Request, user, pass []byte) (payload []byte, err er
 
 	switch ct := r.Header.Get("Content-Type"); ct {
 	case "application/json":
+		var err error
+		if body, err = ioutil.ReadAll(r.Body); err != nil {
+			return nil, err
+		}
+
+		// If the content type is application/json,
+		// the JSON payload is just the original body.
+		payload = body
+	case "application/json; charset=utf-8":
 		var err error
 		if body, err = ioutil.ReadAll(r.Body); err != nil {
 			return nil, err
@@ -140,15 +149,11 @@ func ValidatePayload(r *http.Request, user, pass []byte) (payload []byte, err er
 //
 // https://docs.microsoft.com/en-us/azure/devops/service-hooks/events?view=azure-devops
 func ParseWebHook(payload []byte) (interface{}, error) {
-	event := new(Event)
-	err := json.Unmarshal(payload, &event)
+	event := new(Event) // returns pointer
+	err := json.Unmarshal(payload, event)
 	if err != nil {
 		return nil, err
 	}
-	if event.EventType != "" {
-		_, err = event.ParsePayload()
-	}
 
-	return event, err
+	return event.ParsePayload()
 }
-

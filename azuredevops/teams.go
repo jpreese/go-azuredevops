@@ -58,7 +58,7 @@ type TeamProjectReference struct {
 	Description         *string `json:"description,omitempty"`
 	ID                  *string `json:"id,omitempty"`
 	Name                *string `json:"name,omitempty"`
-	Revision            *string `json:"revision,omitempty"`
+	Revision            *int    `json:"revision,omitempty"`
 	State               *string `json:"state,omitempty"`
 	URL                 *string `json:"url,omitempty"`
 	Visibility          *string `json:"visibility,omitempty"`

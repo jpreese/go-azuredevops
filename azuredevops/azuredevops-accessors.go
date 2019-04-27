@@ -2124,9 +2124,9 @@ func (t *TeamProjectReference) GetName() string {
 }
 
 // GetRevision returns the Revision field if it's non-nil, zero value otherwise.
-func (t *TeamProjectReference) GetRevision() string {
+func (t *TeamProjectReference) GetRevision() int {
 	if t == nil || t.Revision == nil {
-		return ""
+		return 0
 	}
 	return *t.Revision
 }

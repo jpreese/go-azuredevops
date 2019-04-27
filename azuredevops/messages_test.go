@@ -93,3 +93,5 @@ func TestValidatePayload(t *testing.T) {
 		t.Fatalf("ValidatePayload: %v", err)
 	}
 }
+
+// *** add tests for all supported content-types
