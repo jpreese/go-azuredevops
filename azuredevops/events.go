@@ -79,7 +79,7 @@ func (e *Event) ParsePayload() (payload interface{}, err error) {
 		return payload, errors.New("Unknown EventType in webhook payload")
 	}
 
-	err = json.Unmarshal(e.RawPayload, payload)
+	err = json.Unmarshal(e.RawPayload, &payload)
 	if err != nil {
 		return payload, err
 	}
