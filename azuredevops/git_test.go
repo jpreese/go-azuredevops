@@ -195,11 +195,11 @@ func TestGitService_CreateStatus(t *testing.T) {
 		count       int
 		description string
 		targetUrl   string
-		state       azuredevops.GitStatusState
+		state       string
 		context     *azuredevops.GitStatusContext
 	}{
-		{name: "CreateStatus() success", URL: gitCreateStatusURL, response: gitCreateStatusResponse, count: 1, description: "some", targetUrl: "", state: azuredevops.GitSucceeded, context: &context},
-		{name: "CreateStatus() failed", URL: gitCreateStatusURL, response: "{}", count: 0, description: "some", targetUrl: "", state: azuredevops.GitSucceeded, context: &context},
+		{name: "CreateStatus() success", URL: gitCreateStatusURL, response: gitCreateStatusResponse, count: 1, description: "some", targetUrl: "", state: "succeeded", context: &context},
+		{name: "CreateStatus() failed", URL: gitCreateStatusURL, response: "{}", count: 0, description: "some", targetUrl: "", state: "succeeded", context: &context},
 	}
 
 	for _, tc := range tt {
@@ -216,12 +216,12 @@ func TestGitService_CreateStatus(t *testing.T) {
 			// Build the example request payload
 			// https://docs.microsoft.com/en-us/rest/api/azure/devops/git/statuses/create?view#examples
 			s := "The build is successful"
-			state := azuredevops.GitSucceeded
+			state := "succeeded"
 			target := "https://ci.fabrikam.com/my-project/build/123"
 			status := azuredevops.GitStatus{
 				Context:     &context,
 				Description: &s,
-				State:       state,
+				State:       &state,
 				TargetURL:   &target,
 			}
 			resp, count, err := c.Git.CreateStatus("repo", "67cae2b029dff7eb3dc062b49403aaedca5bad8d", status)
@@ -236,8 +236,8 @@ func TestGitService_CreateStatus(t *testing.T) {
 				if !reflect.DeepEqual(resp.Context, tc.context) {
 					t.Errorf("Git.GetRef returned %+v, want %+v", tc.context, resp.Context)
 				}
-				if resp.State != tc.state {
-					t.Fatalf("expected git ref name %s, got %s", tc.state, resp.State)
+				if *resp.State != tc.state {
+					t.Fatalf("expected git ref name %s, got %s", tc.state, *resp.State)
 				}
 				if *resp.TargetURL != tc.targetUrl {
 					t.Fatalf("expected git ref object id %s, got %s", tc.targetUrl, *resp.TargetURL)
