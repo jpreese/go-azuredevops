@@ -30,7 +30,7 @@ type ReferenceLinks struct {
 
 // Link A single item in a collection of ReferenceLinks.
 type Link struct {
-	Href *string `json:"href,omitempty"`
+	Href map[string]string `json:"href,omitempty"`
 }
 
 // ResourceContainers provides information related to the Resources in a payload

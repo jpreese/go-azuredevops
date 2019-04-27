@@ -209,17 +209,17 @@ func (s *PullRequestsService) Merge(repoName string, pullNum int, id *IdentityRe
 
 // Comment Represents a comment which is one of potentially many in a comment thread.
 type Comment struct {
-	Links                  *[]ReferenceLinks `json:"_links,omitempty"`
-	Author                 *IdentityRef      `json:"author,omitempty"`
-	CommentType            *string           `json:"commentType,omitempty"`
-	Content                *string           `json:"content,omitempty"`
-	ID                     *int              `json:"id,omitempty"`
-	IsDeleted              *bool             `json:"isDeleted,omitempty"`
-	LastContentUpdatedDate *time.Time        `json:"lastContentUpdatedDate,omitempty"`
-	LastUpdatedDate        *time.Time        `json:"lastUpdatedDate,omitempty"`
-	ParentCommentID        *int              `json:"parentCommentId,omitempty"`
-	PublishedDate          *time.Time        `json:"publishedDate,omitempty"`
-	UsersLiked             *[]IdentityRef    `json:"usersLiked,omitempty"`
+	Links                  *ReferenceLinks `json:"_links,omitempty"`
+	Author                 *IdentityRef    `json:"author,omitempty"`
+	CommentType            *string         `json:"commentType,omitempty"`
+	Content                *string         `json:"content,omitempty"`
+	ID                     *int            `json:"id,omitempty"`
+	IsDeleted              *bool           `json:"isDeleted,omitempty"`
+	LastContentUpdatedDate *time.Time      `json:"lastContentUpdatedDate,omitempty"`
+	LastUpdatedDate        *time.Time      `json:"lastUpdatedDate,omitempty"`
+	ParentCommentID        *int            `json:"parentCommentId,omitempty"`
+	PublishedDate          *time.Time      `json:"publishedDate,omitempty"`
+	UsersLiked             *[]IdentityRef  `json:"usersLiked,omitempty"`
 }
 
 type CommentPosition struct {
@@ -231,7 +231,7 @@ type CommentPosition struct {
 // A thread contains meta data about the file it was left on along with one or
 // more comments (an initial comment and the subsequent replies).
 type GitPullRequestCommentThread struct {
-	Links                    *[]ReferenceLinks                   `json:"_links,omitempty"`
+	Links                    *ReferenceLinks                     `json:"_links,omitempty"`
 	Comments                 *[]Comment                          `json:"comments,omitempty"`
 	ID                       *int                                `json:"id,omitempty"`
 	Identities               *[]IdentityRef                      `json:"identities,omitempty"`

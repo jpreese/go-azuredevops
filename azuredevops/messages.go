@@ -148,12 +148,14 @@ func ValidatePayload(r *http.Request, user, pass []byte) (payload []byte, err er
 //     }
 //
 // https://docs.microsoft.com/en-us/azure/devops/service-hooks/events?view=azure-devops
-func ParseWebHook(payload []byte) (interface{}, error) {
+func ParseWebHook(payload []byte) (*Event, error) {
 	event := new(Event) // returns pointer
 	err := json.Unmarshal(payload, event)
 	if err != nil {
 		return nil, err
 	}
 
-	return event.ParsePayload()
+	_, err = event.ParsePayload()
+
+	return event, err
 }

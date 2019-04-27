@@ -43,6 +43,14 @@ func (b *Board) GetIsValid() bool {
 	return *b.IsValid
 }
 
+// GetLinks returns the Links field.
+func (b *Board) GetLinks() *ReferenceLinks {
+	if b == nil {
+		return nil
+	}
+	return b.Links
+}
+
 // GetRevision returns the Revision field if it's non-nil, zero value otherwise.
 func (b *Board) GetRevision() int {
 	if b == nil || b.Revision == nil {
@@ -292,9 +300,9 @@ func (c *Comment) GetAuthor() *IdentityRef {
 }
 
 // GetCommentType returns the CommentType field if it's non-nil, zero value otherwise.
-func (c *Comment) GetCommentType() int {
+func (c *Comment) GetCommentType() string {
 	if c == nil || c.CommentType == nil {
-		return 0
+		return ""
 	}
 	return *c.CommentType
 }
@@ -339,12 +347,12 @@ func (c *Comment) GetLastUpdatedDate() time.Time {
 	return *c.LastUpdatedDate
 }
 
-// GetLinks returns the Links field if it's non-nil, zero value otherwise.
-func (c *Comment) GetLinks() []ReferenceLinks {
-	if c == nil || c.Links == nil {
+// GetLinks returns the Links field.
+func (c *Comment) GetLinks() *ReferenceLinks {
+	if c == nil {
 		return nil
 	}
-	return *c.Links
+	return c.Links
 }
 
 // GetParentCommentID returns the ParentCommentID field if it's non-nil, zero value otherwise.
@@ -739,12 +747,12 @@ func (g *GitCommitRef) GetCommitter() *GitUserDate {
 	return g.Committer
 }
 
-// GetLinks returns the Links field if it's non-nil, zero value otherwise.
-func (g *GitCommitRef) GetLinks() []ReferenceLinks {
-	if g == nil || g.Links == nil {
+// GetLinks returns the Links field.
+func (g *GitCommitRef) GetLinks() *ReferenceLinks {
+	if g == nil {
 		return nil
 	}
-	return *g.Links
+	return g.Links
 }
 
 // GetParents returns the Parents field if it's non-nil, zero value otherwise.
@@ -851,12 +859,12 @@ func (g *GitItem) GetLatestProcessedChange() *GitCommitRef {
 	return g.LatestProcessedChange
 }
 
-// GetLinks returns the Links field if it's non-nil, zero value otherwise.
-func (g *GitItem) GetLinks() []ReferenceLinks {
-	if g == nil || g.Links == nil {
+// GetLinks returns the Links field.
+func (g *GitItem) GetLinks() *ReferenceLinks {
+	if g == nil {
 		return nil
 	}
-	return *g.Links
+	return g.Links
 }
 
 // GetObjectID returns the ObjectID field if it's non-nil, zero value otherwise.
@@ -1027,12 +1035,12 @@ func (g *GitPullRequest) GetLastMergeTargetCommit() *GitCommitRef {
 	return g.LastMergeTargetCommit
 }
 
-// GetLinks returns the Links field if it's non-nil, zero value otherwise.
-func (g *GitPullRequest) GetLinks() []ReferenceLinks {
-	if g == nil || g.Links == nil {
+// GetLinks returns the Links field.
+func (g *GitPullRequest) GetLinks() *ReferenceLinks {
+	if g == nil {
 		return nil
 	}
-	return *g.Links
+	return g.Links
 }
 
 // GetMergeFailureMessage returns the MergeFailureMessage field if it's non-nil, zero value otherwise.
@@ -1203,12 +1211,12 @@ func (g *GitPullRequestCommentThread) GetLastUpdatedDate() time.Time {
 	return *g.LastUpdatedDate
 }
 
-// GetLinks returns the Links field if it's non-nil, zero value otherwise.
-func (g *GitPullRequestCommentThread) GetLinks() []ReferenceLinks {
-	if g == nil || g.Links == nil {
+// GetLinks returns the Links field.
+func (g *GitPullRequestCommentThread) GetLinks() *ReferenceLinks {
+	if g == nil {
 		return nil
 	}
-	return *g.Links
+	return g.Links
 }
 
 // GetProperties returns the Properties field if it's non-nil, zero value otherwise.
@@ -1387,12 +1395,12 @@ func (g *GitPush) GetDate() time.Time {
 	return *g.Date
 }
 
-// GetLinks returns the Links field if it's non-nil, zero value otherwise.
-func (g *GitPush) GetLinks() []ReferenceLinks {
-	if g == nil || g.Links == nil {
+// GetLinks returns the Links field.
+func (g *GitPush) GetLinks() *ReferenceLinks {
+	if g == nil {
 		return nil
 	}
-	return *g.Links
+	return g.Links
 }
 
 // GetPushedBy returns the PushedBy field.
@@ -1483,12 +1491,12 @@ func (g *GitRef) GetIsLockedBy() *IdentityRef {
 	return g.IsLockedBy
 }
 
-// GetLinks returns the Links field if it's non-nil, zero value otherwise.
-func (g *GitRef) GetLinks() []ReferenceLinks {
-	if g == nil || g.Links == nil {
+// GetLinks returns the Links field.
+func (g *GitRef) GetLinks() *ReferenceLinks {
+	if g == nil {
 		return nil
 	}
-	return *g.Links
+	return g.Links
 }
 
 // GetName returns the Name field if it's non-nil, zero value otherwise.
@@ -1603,12 +1611,12 @@ func (g *GitRepository) GetIsFork() bool {
 	return *g.IsFork
 }
 
-// GetLinks returns the Links field if it's non-nil, zero value otherwise.
-func (g *GitRepository) GetLinks() []ReferenceLinks {
-	if g == nil || g.Links == nil {
+// GetLinks returns the Links field.
+func (g *GitRepository) GetLinks() *ReferenceLinks {
+	if g == nil {
 		return nil
 	}
-	return *g.Links
+	return g.Links
 }
 
 // GetName returns the Name field if it's non-nil, zero value otherwise.
@@ -1779,12 +1787,12 @@ func (g *GitStatus) GetID() int {
 	return *g.ID
 }
 
-// GetLinks returns the Links field if it's non-nil, zero value otherwise.
-func (g *GitStatus) GetLinks() []ReferenceLinks {
-	if g == nil || g.Links == nil {
+// GetLinks returns the Links field.
+func (g *GitStatus) GetLinks() *ReferenceLinks {
+	if g == nil {
 		return nil
 	}
-	return *g.Links
+	return g.Links
 }
 
 // GetState returns the State field if it's non-nil, zero value otherwise.
@@ -1939,12 +1947,12 @@ func (i *IdentityRef) GetIsDeletedInOrigin() bool {
 	return *i.IsDeletedInOrigin
 }
 
-// GetLinks returns the Links field if it's non-nil, zero value otherwise.
-func (i *IdentityRef) GetLinks() []ReferenceLinks {
-	if i == nil || i.Links == nil {
+// GetLinks returns the Links field.
+func (i *IdentityRef) GetLinks() *ReferenceLinks {
+	if i == nil {
 		return nil
 	}
-	return *i.Links
+	return i.Links
 }
 
 // GetProfileURL returns the ProfileURL field if it's non-nil, zero value otherwise.
@@ -2049,14 +2057,6 @@ func (i *IterationWorkItems) GetURL() string {
 		return ""
 	}
 	return *i.URL
-}
-
-// GetHref returns the Href field if it's non-nil, zero value otherwise.
-func (l *Link) GetHref() string {
-	if l == nil || l.Href == nil {
-		return ""
-	}
-	return *l.Href
 }
 
 // GetCount returns the Count field if it's non-nil, zero value otherwise.

@@ -20,14 +20,14 @@ type ListBoardsResponse struct {
 // Board describes a board
 type Board struct {
 	BoardReference
-	Links           []*ReferenceLinks `json:"_links,omitempty"`
-	AllowedMappings *string           `json:"allowedMappings,omitempty"`
-	CanEdit         *bool             `json:"canEdit,omitempty"`
-	Columns         []*BoardColumn    `json:"columns,omitempty"`
-	Fields          *BoardFields      `json:"fields,omitempty"`
-	IsValid         *bool             `json:"isvalid,omitempty"`
-	Revision        *int              `json:"revision,omitempty"`
-	Rows            []*BoardRow       `json:"rows,omitempty"`
+	Links           *ReferenceLinks `json:"_links,omitempty"`
+	AllowedMappings *string         `json:"allowedMappings,omitempty"`
+	CanEdit         *bool           `json:"canEdit,omitempty"`
+	Columns         []*BoardColumn  `json:"columns,omitempty"`
+	Fields          *BoardFields    `json:"fields,omitempty"`
+	IsValid         *bool           `json:"isvalid,omitempty"`
+	Revision        *int            `json:"revision,omitempty"`
+	Rows            []*BoardRow     `json:"rows,omitempty"`
 }
 
 // BoardColumn describes a column on the board
