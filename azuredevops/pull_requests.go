@@ -33,10 +33,10 @@ func (d CommentType) String() string {
 	return [...]string{"unknown", "text", "codechange", "system"}[d]
 }
 
-// CommentType enum declaration
+// CommentThreadStatus enum declaration
 type CommentThreadStatus int
 
-// CommentType enum declaration
+// CommentThreadStatus enum declaration
 const (
 	StatusUnknown CommentThreadStatus = iota
 	StatusActive
@@ -208,7 +208,7 @@ func (s *PullRequestsService) Merge(repoName string, pullNum int, id *IdentityRe
 type Comment struct {
 	Links                  *[]ReferenceLinks `json:"_links,omitempty"`
 	Author                 *IdentityRef      `json:"author,omitempty"`
-	CommentType            CommentType       `json:"commentType,omitempty"`
+	CommentType            *int              `json:"commentType,omitempty"`
 	Content                *string           `json:"content,omitempty"`
 	ID                     *int              `json:"id,omitempty"`
 	IsDeleted              *bool             `json:"isDeleted,omitempty"`
@@ -236,7 +236,7 @@ type GitPullRequestCommentThread struct {
 	LastUpdatedDate          *time.Time                          `json:"lastUpdatedDate,omitempty"`
 	Properties               *[]int                              `json:"properties,omitempty"`
 	PublishedDate            *time.Time                          `json:"publishedDate,omitempty"`
-	Status                   CommentThreadStatus                 `json:"status,omitempty"`
+	Status                   *string                             `json:"status,omitempty"`
 	PullRequestThreadContext *GitPullRequestCommentThreadContext `json:"pullRequestThreadContext,omitempty"`
 }
 
