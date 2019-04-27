@@ -83,6 +83,6 @@ func (e *Event) ParsePayload() (payload interface{}, err error) {
 	if err != nil {
 		return payload, err
 	}
-	e.Resource = *payload
+	e.Resource = payload
 	return payload, nil
 }
