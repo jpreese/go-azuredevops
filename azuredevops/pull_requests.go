@@ -211,7 +211,7 @@ func (s *PullRequestsService) Merge(repoName string, pullNum int, id *IdentityRe
 type Comment struct {
 	Links                  *[]ReferenceLinks `json:"_links,omitempty"`
 	Author                 *IdentityRef      `json:"author,omitempty"`
-	CommentType            *int              `json:"commentType,omitempty"`
+	CommentType            *string           `json:"commentType,omitempty"`
 	Content                *string           `json:"content,omitempty"`
 	ID                     *int              `json:"id,omitempty"`
 	IsDeleted              *bool             `json:"isDeleted,omitempty"`
