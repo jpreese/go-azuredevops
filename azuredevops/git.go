@@ -82,14 +82,14 @@ type GitStatusesResponse struct {
 
 // GitChange describes file path and content changes
 type GitChange struct {
-	ChangeID           *int                      `json:"changeId,omitempty"`
-	ChangeType         VersionControlChangeType `json:"changeType,omitempty"`
-	Item               *GitItem                  `json:"item,omitempty"`
-	NewContent         *ItemContent              `json:"newContent,omitempty"`
-	NewContentTemplate *GitTemplate              `json:"newContentTemplate,omitempty"`
-	OriginalPath       *string                   `json:"originalPath,omitempty"`
-	SourceServerItem   *string                   `json:"sourceServerItem,omitempty"`
-	URL                *string                   `json:"url,omitempty"`
+	ChangeID           *int         `json:"changeId,omitempty"`
+	ChangeType         *string      `json:"changeType,omitempty"`
+	Item               *GitItem     `json:"item,omitempty"`
+	NewContent         *ItemContent `json:"newContent,omitempty"`
+	NewContentTemplate *GitTemplate `json:"newContentTemplate,omitempty"`
+	OriginalPath       *string      `json:"originalPath,omitempty"`
+	SourceServerItem   *string      `json:"sourceServerItem,omitempty"`
+	URL                *string      `json:"url,omitempty"`
 }
 
 // GitCommitChanges is a list of GitCommitRefs and count of all changes describes in
@@ -137,7 +137,7 @@ type GitItem struct {
 	CommitID              *string              `json:"commitId,omitempty"`
 	Content               *string              `json:"content,omitempty"`
 	ContentMetadata       *FileContentMetadata `json:"contentMetadata,omitempty"`
-	GitObjectType         GitObjectType       `json:"gitObjectType,omitempty"`
+	GitObjectType         *string              `json:"gitObjectType,omitempty"`
 	IsFolder              *bool                `json:"isFolder,omitempty"`
 	IsSymLink             *bool                `json:"isSymLink,omitempty"`
 	LatestProcessedChange *GitCommitRef        `json:"latestProcessedChange,omitempty"`
@@ -168,16 +168,16 @@ type GitPullRequest struct {
 	LastMergeSourceCommit *GitCommitRef                    `json:"lastMergeSourceCommit,omitempty"`
 	LastMergeTargetCommit *GitCommitRef                    `json:"lastMergeTargetCommit,omitempty"`
 	MergeFailureMessage   *string                          `json:"mergeFailureMessage,omitempty"`
-	MergeFailureType      PullRequestMergeFailureType     `json:"mergeFailureType,omitempty"`
+	MergeFailureType      *string                          `json:"mergeFailureType,omitempty"`
 	MergeID               *string                          `json:"mergeId,omitempty"`
-	MergeOptions          GitPullRequestMergeOptions      `json:"mergeOptions,omitempty"`
-	MergeStatus           PullRequestAsyncStatus          `json:"mergeStatus,omitempty"`
+	MergeOptions          *string                          `json:"mergeOptions,omitempty"`
+	MergeStatus           *string                          `json:"mergeStatus,omitempty"`
 	PullRequestID         *int                             `json:"pullRequestId,omitempty"`
 	Repository            *GitRepository                   `json:"repository,omitempty"`
 	Reviewers             *[]IdentityRefWithVote           `json:"reviewers,omitempty"`
 	RemoteURL             *string                          `json:"remoteUrl,omitempty"`
 	SourceRefName         *string                          `json:"sourceRefName,omitempty"`
-	Status                PullRequestStatus               `json:"status,omitempty"`
+	Status                *string                          `json:"status,omitempty"`
 	SupportsIterations    *bool                            `json:"supportsIterations,omitempty"`
 	TargetRefName         *string                          `json:"targetRefName,omitempty"`
 	Title                 *string                          `json:"title,omitempty"`
@@ -192,14 +192,14 @@ type GitPullRequest struct {
 // MergeStrategy is not set, the merge strategy will be no-fast-forward if this flag is false, or squash if true.
 // https://docs.microsoft.com/en-us/rest/api/azure/devops/git/pull%20requests/update?view=azure-devops-rest-5.1#pullrequeststatus
 type GitPullRequestCompletionOptions struct {
-	BypassPolicy            bool                        `json:"bypassPolicy,omitempty"`
-	BypassReason            string                      `json:"bypassReason,omitempty"`
-	DeleteSourceBranch      bool                        `json:"deleteSourceBranch,omitempty"`
-	MergeCommitMessage      string                      `json:"mergeCommitMessage,omitempty"`
-	MergeStrategy           GitPullRequestMergeStrategy `json:"mergeStrategy,omitempty"`
-	SquashMerge             bool                        `json:"squashMerge,omitempty"`
-	TransitionWorkItems     bool                        `json:"transitionWorkItems,omitempty"`
-	TriggeredByAutoComplete bool                        `json:"triggeredByAutoComplete,omitempty"`
+	BypassPolicy            *bool   `json:"bypassPolicy,omitempty"`
+	BypassReason            *string `json:"bypassReason,omitempty"`
+	DeleteSourceBranch      *bool   `json:"deleteSourceBranch,omitempty"`
+	MergeCommitMessage      *string `json:"mergeCommitMessage,omitempty"`
+	MergeStrategy           *string `json:"mergeStrategy,omitempty"`
+	SquashMerge             *bool   `json:"squashMerge,omitempty"`
+	TransitionWorkItems     *bool   `json:"transitionWorkItems,omitempty"`
+	TriggeredByAutoComplete *bool   `json:"triggeredByAutoComplete,omitempty"`
 }
 
 // GitPullRequestMergeOptions describes the options which are used when a pull
@@ -305,7 +305,7 @@ type GitStatus struct {
 	CreationDate *time.Time        `json:"creationDate,omitempty"`
 	Description  *string           `json:"description,omitempty"`
 	ID           *int              `json:"id,omitempty"`
-	State        GitStatusState   `json:"state,omitempty"`
+	State        *string           `json:"state,omitempty"`
 	TargetURL    *string           `json:"targetUrl,omitempty"`
 	UpdatedDate  *time.Time        `json:"updatedDate,omitempty"`
 }

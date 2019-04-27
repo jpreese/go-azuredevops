@@ -33,10 +33,10 @@ func (d CommentType) String() string {
 	return [...]string{"unknown", "text", "codechange", "system"}[d]
 }
 
-// CommentType enum declaration
+// CommentThreadStatus enum declaration
 type CommentThreadStatus int
 
-// CommentType enum declaration
+// CommentThreadStatus enum declaration
 const (
 	StatusUnknown CommentThreadStatus = iota
 	StatusActive
@@ -167,8 +167,6 @@ func (s *PullRequestsService) Merge(repoName string, pullNum int, id *IdentityRe
 		APIVersion,
 	)
 
-	mergeStrategy := NoFastForward
-
 	//	GitPullRequestMergeStrategy{
 	//	NoFastForward: "true",
 	//	rebase:        "false",
@@ -176,15 +174,20 @@ func (s *PullRequestsService) Merge(repoName string, pullNum int, id *IdentityRe
 	//	squash:        "true",
 	//}
 
+	// Set default pull request completion options
+	empty := ""
+	mcm := NoFastForward.String()
+	var twi *bool
+	*twi = true
 	prOptions := GitPullRequestCompletionOptions{
-		BypassPolicy:            false,
-		BypassReason:            "",
-		DeleteSourceBranch:      false,
-		MergeCommitMessage:      commitMsg,
-		MergeStrategy:           mergeStrategy,
-		SquashMerge:             false,
-		TransitionWorkItems:     true,
-		TriggeredByAutoComplete: false,
+		BypassPolicy:            new(bool),
+		BypassReason:            &empty,
+		DeleteSourceBranch:      new(bool),
+		MergeCommitMessage:      &commitMsg,
+		MergeStrategy:           &mcm,
+		SquashMerge:             new(bool),
+		TransitionWorkItems:     twi,
+		TriggeredByAutoComplete: new(bool),
 	}
 
 	pr := GitPullRequest{
@@ -208,7 +211,7 @@ func (s *PullRequestsService) Merge(repoName string, pullNum int, id *IdentityRe
 type Comment struct {
 	Links                  *[]ReferenceLinks `json:"_links,omitempty"`
 	Author                 *IdentityRef      `json:"author,omitempty"`
-	CommentType            CommentType       `json:"commentType,omitempty"`
+	CommentType            *int              `json:"commentType,omitempty"`
 	Content                *string           `json:"content,omitempty"`
 	ID                     *int              `json:"id,omitempty"`
 	IsDeleted              *bool             `json:"isDeleted,omitempty"`
@@ -236,7 +239,7 @@ type GitPullRequestCommentThread struct {
 	LastUpdatedDate          *time.Time                          `json:"lastUpdatedDate,omitempty"`
 	Properties               *[]int                              `json:"properties,omitempty"`
 	PublishedDate            *time.Time                          `json:"publishedDate,omitempty"`
-	Status                   CommentThreadStatus                 `json:"status,omitempty"`
+	Status                   *string                             `json:"status,omitempty"`
 	PullRequestThreadContext *GitPullRequestCommentThreadContext `json:"pullRequestThreadContext,omitempty"`
 }
 

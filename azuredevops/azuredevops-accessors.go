@@ -51,6 +51,14 @@ func (b *Board) GetRevision() int {
 	return *b.Revision
 }
 
+// GetColumnType returns the ColumnType field if it's non-nil, zero value otherwise.
+func (b *BoardColumn) GetColumnType() string {
+	if b == nil || b.ColumnType == nil {
+		return ""
+	}
+	return *b.ColumnType
+}
+
 // GetDescription returns the Description field if it's non-nil, zero value otherwise.
 func (b *BoardColumn) GetDescription() string {
 	if b == nil || b.Description == nil {
@@ -281,6 +289,14 @@ func (c *Comment) GetAuthor() *IdentityRef {
 		return nil
 	}
 	return c.Author
+}
+
+// GetCommentType returns the CommentType field if it's non-nil, zero value otherwise.
+func (c *Comment) GetCommentType() int {
+	if c == nil || c.CommentType == nil {
+		return 0
+	}
+	return *c.CommentType
 }
 
 // GetContent returns the Content field if it's non-nil, zero value otherwise.
@@ -595,6 +611,14 @@ func (g *GitChange) GetChangeID() int {
 	return *g.ChangeID
 }
 
+// GetChangeType returns the ChangeType field if it's non-nil, zero value otherwise.
+func (g *GitChange) GetChangeType() string {
+	if g == nil || g.ChangeType == nil {
+		return ""
+	}
+	return *g.ChangeType
+}
+
 // GetItem returns the Item field.
 func (g *GitChange) GetItem() *GitItem {
 	if g == nil {
@@ -793,6 +817,14 @@ func (g *GitItem) GetContentMetadata() *FileContentMetadata {
 		return nil
 	}
 	return g.ContentMetadata
+}
+
+// GetGitObjectType returns the GitObjectType field if it's non-nil, zero value otherwise.
+func (g *GitItem) GetGitObjectType() string {
+	if g == nil || g.GitObjectType == nil {
+		return ""
+	}
+	return *g.GitObjectType
 }
 
 // GetIsFolder returns the IsFolder field if it's non-nil, zero value otherwise.
@@ -1011,12 +1043,36 @@ func (g *GitPullRequest) GetMergeFailureMessage() string {
 	return *g.MergeFailureMessage
 }
 
+// GetMergeFailureType returns the MergeFailureType field if it's non-nil, zero value otherwise.
+func (g *GitPullRequest) GetMergeFailureType() string {
+	if g == nil || g.MergeFailureType == nil {
+		return ""
+	}
+	return *g.MergeFailureType
+}
+
 // GetMergeID returns the MergeID field if it's non-nil, zero value otherwise.
 func (g *GitPullRequest) GetMergeID() string {
 	if g == nil || g.MergeID == nil {
 		return ""
 	}
 	return *g.MergeID
+}
+
+// GetMergeOptions returns the MergeOptions field if it's non-nil, zero value otherwise.
+func (g *GitPullRequest) GetMergeOptions() string {
+	if g == nil || g.MergeOptions == nil {
+		return ""
+	}
+	return *g.MergeOptions
+}
+
+// GetMergeStatus returns the MergeStatus field if it's non-nil, zero value otherwise.
+func (g *GitPullRequest) GetMergeStatus() string {
+	if g == nil || g.MergeStatus == nil {
+		return ""
+	}
+	return *g.MergeStatus
 }
 
 // GetPullRequestID returns the PullRequestID field if it's non-nil, zero value otherwise.
@@ -1057,6 +1113,14 @@ func (g *GitPullRequest) GetSourceRefName() string {
 		return ""
 	}
 	return *g.SourceRefName
+}
+
+// GetStatus returns the Status field if it's non-nil, zero value otherwise.
+func (g *GitPullRequest) GetStatus() string {
+	if g == nil || g.Status == nil {
+		return ""
+	}
+	return *g.Status
 }
 
 // GetSupportsIterations returns the SupportsIterations field if it's non-nil, zero value otherwise.
@@ -1171,6 +1235,14 @@ func (g *GitPullRequestCommentThread) GetPullRequestThreadContext() *GitPullRequ
 	return g.PullRequestThreadContext
 }
 
+// GetStatus returns the Status field if it's non-nil, zero value otherwise.
+func (g *GitPullRequestCommentThread) GetStatus() string {
+	if g == nil || g.Status == nil {
+		return ""
+	}
+	return *g.Status
+}
+
 // GetFilePath returns the FilePath field if it's non-nil, zero value otherwise.
 func (g *GitPullRequestCommentThreadContext) GetFilePath() string {
 	if g == nil || g.FilePath == nil {
@@ -1209,6 +1281,70 @@ func (g *GitPullRequestCommentThreadContext) GetRightFileStart() *CommentPositio
 		return nil
 	}
 	return g.RightFileStart
+}
+
+// GetBypassPolicy returns the BypassPolicy field if it's non-nil, zero value otherwise.
+func (g *GitPullRequestCompletionOptions) GetBypassPolicy() bool {
+	if g == nil || g.BypassPolicy == nil {
+		return false
+	}
+	return *g.BypassPolicy
+}
+
+// GetBypassReason returns the BypassReason field if it's non-nil, zero value otherwise.
+func (g *GitPullRequestCompletionOptions) GetBypassReason() string {
+	if g == nil || g.BypassReason == nil {
+		return ""
+	}
+	return *g.BypassReason
+}
+
+// GetDeleteSourceBranch returns the DeleteSourceBranch field if it's non-nil, zero value otherwise.
+func (g *GitPullRequestCompletionOptions) GetDeleteSourceBranch() bool {
+	if g == nil || g.DeleteSourceBranch == nil {
+		return false
+	}
+	return *g.DeleteSourceBranch
+}
+
+// GetMergeCommitMessage returns the MergeCommitMessage field if it's non-nil, zero value otherwise.
+func (g *GitPullRequestCompletionOptions) GetMergeCommitMessage() string {
+	if g == nil || g.MergeCommitMessage == nil {
+		return ""
+	}
+	return *g.MergeCommitMessage
+}
+
+// GetMergeStrategy returns the MergeStrategy field if it's non-nil, zero value otherwise.
+func (g *GitPullRequestCompletionOptions) GetMergeStrategy() string {
+	if g == nil || g.MergeStrategy == nil {
+		return ""
+	}
+	return *g.MergeStrategy
+}
+
+// GetSquashMerge returns the SquashMerge field if it's non-nil, zero value otherwise.
+func (g *GitPullRequestCompletionOptions) GetSquashMerge() bool {
+	if g == nil || g.SquashMerge == nil {
+		return false
+	}
+	return *g.SquashMerge
+}
+
+// GetTransitionWorkItems returns the TransitionWorkItems field if it's non-nil, zero value otherwise.
+func (g *GitPullRequestCompletionOptions) GetTransitionWorkItems() bool {
+	if g == nil || g.TransitionWorkItems == nil {
+		return false
+	}
+	return *g.TransitionWorkItems
+}
+
+// GetTriggeredByAutoComplete returns the TriggeredByAutoComplete field if it's non-nil, zero value otherwise.
+func (g *GitPullRequestCompletionOptions) GetTriggeredByAutoComplete() bool {
+	if g == nil || g.TriggeredByAutoComplete == nil {
+		return false
+	}
+	return *g.TriggeredByAutoComplete
 }
 
 // GetDetectRenameFalsePositives returns the DetectRenameFalsePositives field if it's non-nil, zero value otherwise.
@@ -1649,6 +1785,14 @@ func (g *GitStatus) GetLinks() []ReferenceLinks {
 		return nil
 	}
 	return *g.Links
+}
+
+// GetState returns the State field if it's non-nil, zero value otherwise.
+func (g *GitStatus) GetState() string {
+	if g == nil || g.State == nil {
+		return ""
+	}
+	return *g.State
 }
 
 // GetTargetURL returns the TargetURL field if it's non-nil, zero value otherwise.
