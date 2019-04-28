@@ -161,7 +161,7 @@ func (c *Client) Execute(request *http.Request, r interface{}) (*http.Response, 
 	}
 	defer response.Body.Close()
 
-	if response.StatusCode != 200 {
+	if response.StatusCode != 200 && response.StatusCode != 201 {
 		return nil, fmt.Errorf("Request to %s responded with status %d", request.URL, response.StatusCode)
 	}
 

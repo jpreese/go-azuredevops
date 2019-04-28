@@ -397,7 +397,7 @@ func (s *GitService) CreateStatus(repoName, ref string, status GitStatus) (*GitS
 		APIVersion,
 	)
 
-	request, err := s.client.NewRequest("POST", URL, nil)
+	request, err := s.client.NewRequest("POST", URL, status)
 	if err != nil {
 		return nil, 0, err
 	}

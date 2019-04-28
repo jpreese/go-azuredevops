@@ -50,6 +50,9 @@ const (
 	PushEvent
 	// WorkItemEvent Resource field is parsed as a work item event
 	WorkItemEvent
+	// WorkItemUpdatedEvent Resource field is parsed as a work item
+	// updated event
+	WorkItemUpdatedEvent
 )
 
 // ParsePayload parses the event payload. For recognized event types,
@@ -73,7 +76,7 @@ func (e *Event) ParsePayload() (payload interface{}, err error) {
 		e.PayloadType = WorkItemEvent
 		payload = &WorkItem{}
 	case "workitem.updated":
-		e.PayloadType = WorkItemEvent
+		e.PayloadType = WorkItemUpdatedEvent
 		payload = &WorkItemUpdate{}
 	default:
 		return payload, errors.New("Unknown EventType in webhook payload")
@@ -83,6 +86,7 @@ func (e *Event) ParsePayload() (payload interface{}, err error) {
 	if err != nil {
 		return payload, err
 	}
+
 	e.Resource = payload
 	return payload, nil
 }

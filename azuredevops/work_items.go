@@ -63,8 +63,8 @@ type WorkItemFields struct {
 
 // Describes an update to a work item field.
 type WorkItemFieldUpdate struct {
-	NewValue map[string]interface{} `json:"newValue,omitempty"`
-	OldValue map[string]interface{} `json:"oldValue,omitempty"`
+	NewValue interface{} `json:"newValue,omitempty"`
+	OldValue interface{} `json:"oldValue,omitempty"`
 }
 
 // WorkItemRelationUpdates Describes updates to a work item's relations.
