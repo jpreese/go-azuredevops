@@ -2443,30 +2443,6 @@ func (w *WorkItemRelation) GetURL() string {
 	return *w.URL
 }
 
-// GetAdded returns the Added field.
-func (w *WorkItemRelationUpdates) GetAdded() *WorkItemRelation {
-	if w == nil {
-		return nil
-	}
-	return w.Added
-}
-
-// GetRemoved returns the Removed field.
-func (w *WorkItemRelationUpdates) GetRemoved() *WorkItemRelation {
-	if w == nil {
-		return nil
-	}
-	return w.Removed
-}
-
-// GetUpdated returns the Updated field.
-func (w *WorkItemRelationUpdates) GetUpdated() *WorkItemRelation {
-	if w == nil {
-		return nil
-	}
-	return w.Updated
-}
-
 // GetFields returns the Fields field if it's non-nil, zero value otherwise.
 func (w *WorkItemUpdate) GetFields() map[string]WorkItemFieldUpdate {
 	if w == nil || w.Fields == nil {
@@ -2489,6 +2465,14 @@ func (w *WorkItemUpdate) GetLinks() *ReferenceLinks {
 		return nil
 	}
 	return w.Links
+}
+
+// GetRelations returns the Relations field.
+func (w *WorkItemUpdate) GetRelations() *WorkItemRelationUpdates {
+	if w == nil {
+		return nil
+	}
+	return w.Relations
 }
 
 // GetRev returns the Rev field if it's non-nil, zero value otherwise.

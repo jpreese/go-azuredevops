@@ -69,9 +69,9 @@ type WorkItemFieldUpdate struct {
 
 // WorkItemRelationUpdates Describes updates to a work item's relations.
 type WorkItemRelationUpdates struct {
-	Added   *WorkItemRelation `json:"added,omitempty"`
-	Removed *WorkItemRelation `json:"removed,omitempty"`
-	Updated *WorkItemRelation `json:"updated,omitempty"`
+	Added   []*WorkItemRelation `json:"added,omitempty"`
+	Removed []*WorkItemRelation `json:"removed,omitempty"`
+	Updated []*WorkItemRelation `json:"updated,omitempty"`
 }
 
 // CommentVersionRef refers to the specific version of a comment
@@ -99,7 +99,7 @@ type WorkItemUpdate struct {
 	Links       *ReferenceLinks                 `json:"attributes,omitempty"`
 	Fields      *map[string]WorkItemFieldUpdate `json:"fields,omitempty"`
 	ID          *int                            `json:"id,omitempty"`
-	Relations   []*WorkItemRelationUpdates      `json:"relations,omitempty"`
+	Relations   *WorkItemRelationUpdates        `json:"relations,omitempty"`
 	Rev         *int                            `json:"rev,omitempty"`
 	RevisedBy   *IdentityRef                    `json:"revisedBy,omitempty"`
 	RevisedDate *time.Time                      `json:"revisedDate,omitempty"`
