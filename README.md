@@ -24,6 +24,12 @@ There is partial implementation for the following services
 
 ## Usage
 
+For usage with a personal access token, create a token using the process described here:
+
+https://docs.microsoft.com/en-us/azure/devops/integrate/get-started/authentication/pats?view=azure-devops
+
+Supply this token in calls to NewClient().
+
 ```go
 import "github.com/mcdafydd/go-azuredevops/azuredevops
 ```
@@ -46,6 +52,13 @@ for index := 0; index < len(iterations); index++ {
     fmt.Println(iterations[index].Name)
 }
 ```
+
+### OAuth
+Instead of using a personal access token related to your personal user account, consider registering your app in Azure Devops:
+
+https://docs.microsoft.com/en-us/azure/devops/integrate/get-started/authentication/oauth?view=azure-devops
+
+Supply a token generated from this process when you call NewClient().
 
 ## Contributing
 This library is re-using a lot of the code and style from the [go-github](https://github.com/google/go-github/) library:

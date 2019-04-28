@@ -392,8 +392,8 @@ func (s *GitService) GetRepository(repoName string) (*GitRepository, int, error)
 func (s *GitService) CreateStatus(repoName, ref string, status GitStatus) (*GitStatus, int, error) {
 	URL := fmt.Sprintf(
 		"_apis/git/repositories/%s/commits/%s/statuses?api-version=%s",
+		repoName,
 		url.QueryEscape(ref),
-		ref,
 		APIVersion,
 	)
 
