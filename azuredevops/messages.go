@@ -33,8 +33,8 @@ var (
 		"git.pullrequest.merged":  "PullRequestEvent",
 		"git.pullrequest.updated": "PullRequestEvent",
 		"git.push":                "PushEvent",
-		"workitem.commented":      "WorkItemEvent",
-		"workitem.updated":        "WorkItemEvent",
+		"workitem.commented":      "WorkItemCommentedEvent",
+		"workitem.updated":        "WorkItemUpdatedEvent",
 	}
 )
 
