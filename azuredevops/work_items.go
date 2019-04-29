@@ -36,13 +36,13 @@ type WorkItemListResponse struct {
 
 // WorkItem describes an individual work item in TFS
 type WorkItem struct {
-	Links             *ReferenceLinks     `json:"_links,omitempty"`
-	CommentVersionRef *CommentVersionRef  `json:"commentVersionRef,omitempty"`
-	Fields            *map[string]string  `json:"fields,omitempty"`
-	ID                *int                `json:"id,omitempty"`
-	Relations         []*WorkItemRelation `json:"relations,omitempty"`
-	Rev               *int                `json:"rev,omitempty"`
-	URL               *string             `json:"url,omitempty"`
+	Links             *ReferenceLinks         `json:"_links,omitempty"`
+	CommentVersionRef *CommentVersionRef      `json:"commentVersionRef,omitempty"`
+	Fields            *map[string]interface{} `json:"fields,omitempty"`
+	ID                *int                    `json:"id,omitempty"`
+	Relations         []*WorkItemRelation     `json:"relations,omitempty"`
+	Rev               *int                    `json:"rev,omitempty"`
+	URL               *string                 `json:"url,omitempty"`
 }
 
 /*
