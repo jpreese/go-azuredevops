@@ -48,8 +48,9 @@ const (
 	PullRequestEvent PayloadType = iota
 	// PushEvent Git push service event
 	PushEvent
-	// WorkItemEvent Resource field is parsed as a work item event
-	WorkItemEvent
+	// WorkItemCommentedEvent Resource field is parsed as a work item
+	// comment event
+	WorkItemCommentedEvent
 	// WorkItemUpdatedEvent Resource field is parsed as a work item
 	// updated event
 	WorkItemUpdatedEvent
@@ -73,7 +74,7 @@ func (e *Event) ParsePayload() (payload interface{}, err error) {
 		e.PayloadType = PushEvent
 		payload = &GitPush{}
 	case "workitem.commented":
-		e.PayloadType = WorkItemEvent
+		e.PayloadType = WorkItemCommentedEvent
 		payload = &WorkItem{}
 	case "workitem.updated":
 		e.PayloadType = WorkItemUpdatedEvent

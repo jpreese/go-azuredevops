@@ -2339,14 +2339,6 @@ func (w *WorkItem) GetCommentVersionRef() *CommentVersionRef {
 	return w.CommentVersionRef
 }
 
-// GetFields returns the Fields field if it's non-nil, zero value otherwise.
-func (w *WorkItem) GetFields() map[string]string {
-	if w == nil || w.Fields == nil {
-		return map[string]string{}
-	}
-	return *w.Fields
-}
-
 // GetID returns the ID field if it's non-nil, zero value otherwise.
 func (w *WorkItem) GetID() int {
 	if w == nil || w.ID == nil {
