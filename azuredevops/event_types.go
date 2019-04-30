@@ -23,14 +23,9 @@ type ItemContentType struct {
 	RawText       *string `json:"rawText,omitempty"`
 }
 
-// ReferenceLinks The class to represent a collection of REST reference links.
-type ReferenceLinks struct {
-	Links map[string]Link `json:",omitempty"`
-}
-
-// Link A single item in a collection of ReferenceLinks.
+// Link A single item in a collection of Links.
 type Link struct {
-	Href map[string]string `json:"href,omitempty"`
+	Href *string `json:"href,omitempty"`
 }
 
 // ResourceContainers provides information related to the Resources in a payload

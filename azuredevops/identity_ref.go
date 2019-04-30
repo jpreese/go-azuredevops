@@ -2,7 +2,7 @@ package azuredevops
 
 // IdentityRef describes an Azure Devops identity
 type IdentityRef struct {
-	Links             *ReferenceLinks `json:"_links,omitempty"`
+	Links             *map[string]Link `json:"_links,omitempty"`
 	Descriptor        *string         `json:"descriptor,omitempty"`
 	DirectoryAlias    *string         `json:"directoryAlias,omitempty"`
 	DisplayName       *string         `json:"displayName,omitempty"`

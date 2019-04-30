@@ -101,7 +101,7 @@ type GitCommitChanges struct {
 
 // GitCommitRef describes a single git commit reference
 type GitCommitRef struct {
-	Links            *ReferenceLinks        `json:"_links,omitempty"`
+	Links            *map[string]Link        `json:"_links,omitempty"`
 	CommitID         *string                `json:"commitId,omitempty"`
 	Author           *GitUserDate           `json:"author,omitempty"`
 	Committer        *GitUserDate           `json:"committer,omitempty"`
@@ -119,7 +119,7 @@ type GitCommitRef struct {
 
 // GitRef provides information about a git/fork ref.
 type GitRef struct {
-	Links          *ReferenceLinks `json:"_links,omitempty"`
+	Links          *map[string]Link `json:"_links,omitempty"`
 	Creator        *IdentityRef    `json:"creator,omitempty"`
 	IsLocked       *bool           `json:"isLocked,omitempty"`
 	IsLockedBy     *IdentityRef    `json:"isLockedBy,omitempty"`
@@ -133,7 +133,7 @@ type GitRef struct {
 
 // GitItem describes a single git item
 type GitItem struct {
-	Links                 *ReferenceLinks      `json:"_links,omitempty"`
+	Links                 *map[string]Link      `json:"_links,omitempty"`
 	CommitID              *string              `json:"commitId,omitempty"`
 	Content               *string              `json:"content,omitempty"`
 	ContentMetadata       *FileContentMetadata `json:"contentMetadata,omitempty"`
@@ -149,7 +149,7 @@ type GitItem struct {
 
 // GitPullRequest represents all the data associated with a pull request.
 type GitPullRequest struct {
-	Links                 *ReferenceLinks                  `json:"_links,omitempty"`
+	Links                 *map[string]Link                  `json:"_links,omitempty"`
 	ArtifactID            *string                          `json:"artifactId,omitempty"`
 	AutoCompleteSetBy     *IdentityRef                     `json:"autoCompleteSetBy,omitempty"`
 	ClosedBy              *IdentityRef                     `json:"closedBy,omitempty"`
@@ -227,7 +227,7 @@ func (d GitPullRequestMergeStrategy) String() string {
 
 // GitPush describes a code push request event.
 type GitPush struct {
-	Links      *ReferenceLinks `json:"_links,omitempty"`
+	Links      *map[string]Link `json:"_links,omitempty"`
 	Commits    *[]GitCommitRef `json:"commits,omitempty"`
 	Date       *time.Time      `json:"date,omitempty"`
 	PushID     *int            `json:"pushId,omitempty"`
@@ -255,7 +255,7 @@ type GitRefUpdate struct {
 
 // GitRepository describes an Azure Devops Git repository.
 type GitRepository struct {
-	Links            *ReferenceLinks       `json:"_links,omitempty"`
+	Links            *map[string]Link       `json:"_links,omitempty"`
 	DefaultBranch    *string               `json:"defaultBranch,omitempty"`
 	ID               *string               `json:"id,omitempty"`
 	IsFork           *bool                 `json:"isFork,omitempty"`
@@ -300,7 +300,7 @@ func (d GitStatusState) String() string {
 }
 
 type GitStatus struct {
-	Links        *ReferenceLinks   `json:"_links,omitempty"`
+	Links        *map[string]Link   `json:"_links,omitempty"`
 	Context      *GitStatusContext `json:"context,omitempty"`
 	CreatedBy    *IdentityRef      `json:"createdBy,omitempty"`
 	CreationDate *time.Time        `json:"creationDate,omitempty"`

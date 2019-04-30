@@ -43,12 +43,12 @@ func (b *Board) GetIsValid() bool {
 	return *b.IsValid
 }
 
-// GetLinks returns the Links field.
-func (b *Board) GetLinks() *ReferenceLinks {
-	if b == nil {
-		return nil
+// GetLinks returns the Links field if it's non-nil, zero value otherwise.
+func (b *Board) GetLinks() map[string]Link {
+	if b == nil || b.Links == nil {
+		return map[string]Link{}
 	}
-	return b.Links
+	return *b.Links
 }
 
 // GetRevision returns the Revision field if it's non-nil, zero value otherwise.
@@ -347,12 +347,12 @@ func (c *Comment) GetLastUpdatedDate() time.Time {
 	return *c.LastUpdatedDate
 }
 
-// GetLinks returns the Links field.
-func (c *Comment) GetLinks() *ReferenceLinks {
-	if c == nil {
-		return nil
+// GetLinks returns the Links field if it's non-nil, zero value otherwise.
+func (c *Comment) GetLinks() map[string]Link {
+	if c == nil || c.Links == nil {
+		return map[string]Link{}
 	}
-	return c.Links
+	return *c.Links
 }
 
 // GetParentCommentID returns the ParentCommentID field if it's non-nil, zero value otherwise.
@@ -747,12 +747,12 @@ func (g *GitCommitRef) GetCommitter() *GitUserDate {
 	return g.Committer
 }
 
-// GetLinks returns the Links field.
-func (g *GitCommitRef) GetLinks() *ReferenceLinks {
-	if g == nil {
-		return nil
+// GetLinks returns the Links field if it's non-nil, zero value otherwise.
+func (g *GitCommitRef) GetLinks() map[string]Link {
+	if g == nil || g.Links == nil {
+		return map[string]Link{}
 	}
-	return g.Links
+	return *g.Links
 }
 
 // GetParents returns the Parents field if it's non-nil, zero value otherwise.
@@ -859,12 +859,12 @@ func (g *GitItem) GetLatestProcessedChange() *GitCommitRef {
 	return g.LatestProcessedChange
 }
 
-// GetLinks returns the Links field.
-func (g *GitItem) GetLinks() *ReferenceLinks {
-	if g == nil {
-		return nil
+// GetLinks returns the Links field if it's non-nil, zero value otherwise.
+func (g *GitItem) GetLinks() map[string]Link {
+	if g == nil || g.Links == nil {
+		return map[string]Link{}
 	}
-	return g.Links
+	return *g.Links
 }
 
 // GetObjectID returns the ObjectID field if it's non-nil, zero value otherwise.
@@ -1035,12 +1035,12 @@ func (g *GitPullRequest) GetLastMergeTargetCommit() *GitCommitRef {
 	return g.LastMergeTargetCommit
 }
 
-// GetLinks returns the Links field.
-func (g *GitPullRequest) GetLinks() *ReferenceLinks {
-	if g == nil {
-		return nil
+// GetLinks returns the Links field if it's non-nil, zero value otherwise.
+func (g *GitPullRequest) GetLinks() map[string]Link {
+	if g == nil || g.Links == nil {
+		return map[string]Link{}
 	}
-	return g.Links
+	return *g.Links
 }
 
 // GetMergeFailureMessage returns the MergeFailureMessage field if it's non-nil, zero value otherwise.
@@ -1211,12 +1211,12 @@ func (g *GitPullRequestCommentThread) GetLastUpdatedDate() time.Time {
 	return *g.LastUpdatedDate
 }
 
-// GetLinks returns the Links field.
-func (g *GitPullRequestCommentThread) GetLinks() *ReferenceLinks {
-	if g == nil {
-		return nil
+// GetLinks returns the Links field if it's non-nil, zero value otherwise.
+func (g *GitPullRequestCommentThread) GetLinks() map[string]Link {
+	if g == nil || g.Links == nil {
+		return map[string]Link{}
 	}
-	return g.Links
+	return *g.Links
 }
 
 // GetProperties returns the Properties field if it's non-nil, zero value otherwise.
@@ -1395,12 +1395,12 @@ func (g *GitPush) GetDate() time.Time {
 	return *g.Date
 }
 
-// GetLinks returns the Links field.
-func (g *GitPush) GetLinks() *ReferenceLinks {
-	if g == nil {
-		return nil
+// GetLinks returns the Links field if it's non-nil, zero value otherwise.
+func (g *GitPush) GetLinks() map[string]Link {
+	if g == nil || g.Links == nil {
+		return map[string]Link{}
 	}
-	return g.Links
+	return *g.Links
 }
 
 // GetPushedBy returns the PushedBy field.
@@ -1491,12 +1491,12 @@ func (g *GitRef) GetIsLockedBy() *IdentityRef {
 	return g.IsLockedBy
 }
 
-// GetLinks returns the Links field.
-func (g *GitRef) GetLinks() *ReferenceLinks {
-	if g == nil {
-		return nil
+// GetLinks returns the Links field if it's non-nil, zero value otherwise.
+func (g *GitRef) GetLinks() map[string]Link {
+	if g == nil || g.Links == nil {
+		return map[string]Link{}
 	}
-	return g.Links
+	return *g.Links
 }
 
 // GetName returns the Name field if it's non-nil, zero value otherwise.
@@ -1611,12 +1611,12 @@ func (g *GitRepository) GetIsFork() bool {
 	return *g.IsFork
 }
 
-// GetLinks returns the Links field.
-func (g *GitRepository) GetLinks() *ReferenceLinks {
-	if g == nil {
-		return nil
+// GetLinks returns the Links field if it's non-nil, zero value otherwise.
+func (g *GitRepository) GetLinks() map[string]Link {
+	if g == nil || g.Links == nil {
+		return map[string]Link{}
 	}
-	return g.Links
+	return *g.Links
 }
 
 // GetName returns the Name field if it's non-nil, zero value otherwise.
@@ -1795,12 +1795,12 @@ func (g *GitStatus) GetID() int {
 	return *g.ID
 }
 
-// GetLinks returns the Links field.
-func (g *GitStatus) GetLinks() *ReferenceLinks {
-	if g == nil {
-		return nil
+// GetLinks returns the Links field if it's non-nil, zero value otherwise.
+func (g *GitStatus) GetLinks() map[string]Link {
+	if g == nil || g.Links == nil {
+		return map[string]Link{}
 	}
-	return g.Links
+	return *g.Links
 }
 
 // GetState returns the State field if it's non-nil, zero value otherwise.
@@ -1955,12 +1955,12 @@ func (i *IdentityRef) GetIsDeletedInOrigin() bool {
 	return *i.IsDeletedInOrigin
 }
 
-// GetLinks returns the Links field.
-func (i *IdentityRef) GetLinks() *ReferenceLinks {
-	if i == nil {
-		return nil
+// GetLinks returns the Links field if it's non-nil, zero value otherwise.
+func (i *IdentityRef) GetLinks() map[string]Link {
+	if i == nil || i.Links == nil {
+		return map[string]Link{}
 	}
-	return i.Links
+	return *i.Links
 }
 
 // GetProfileURL returns the ProfileURL field if it's non-nil, zero value otherwise.
@@ -2051,12 +2051,12 @@ func (i *ItemContentType) GetRawText() string {
 	return *i.RawText
 }
 
-// GetLinks returns the Links field.
-func (i *IterationWorkItems) GetLinks() *ReferenceLinks {
-	if i == nil {
-		return nil
+// GetLinks returns the Links field if it's non-nil, zero value otherwise.
+func (i *IterationWorkItems) GetLinks() map[string]Link {
+	if i == nil || i.Links == nil {
+		return map[string]Link{}
 	}
-	return i.Links
+	return *i.Links
 }
 
 // GetURL returns the URL field if it's non-nil, zero value otherwise.
@@ -2065,6 +2065,14 @@ func (i *IterationWorkItems) GetURL() string {
 		return ""
 	}
 	return *i.URL
+}
+
+// GetHref returns the Href field if it's non-nil, zero value otherwise.
+func (l *Link) GetHref() string {
+	if l == nil || l.Href == nil {
+		return ""
+	}
+	return *l.Href
 }
 
 // GetCount returns the Count field if it's non-nil, zero value otherwise.
@@ -2355,12 +2363,12 @@ func (w *WorkItem) GetID() int {
 	return *w.ID
 }
 
-// GetLinks returns the Links field.
-func (w *WorkItem) GetLinks() *ReferenceLinks {
-	if w == nil {
-		return nil
+// GetLinks returns the Links field if it's non-nil, zero value otherwise.
+func (w *WorkItem) GetLinks() map[string]Link {
+	if w == nil || w.Links == nil {
+		return map[string]Link{}
 	}
-	return w.Links
+	return *w.Links
 }
 
 // GetRev returns the Rev field if it's non-nil, zero value otherwise.
@@ -2419,12 +2427,12 @@ func (w *WorkItemReference) GetURL() string {
 	return *w.URL
 }
 
-// GetAttributes returns the Attributes field.
-func (w *WorkItemRelation) GetAttributes() *ReferenceLinks {
-	if w == nil {
-		return nil
+// GetAttributes returns the Attributes field if it's non-nil, zero value otherwise.
+func (w *WorkItemRelation) GetAttributes() map[string]Link {
+	if w == nil || w.Attributes == nil {
+		return map[string]Link{}
 	}
-	return w.Attributes
+	return *w.Attributes
 }
 
 // GetRel returns the Rel field if it's non-nil, zero value otherwise.
@@ -2459,12 +2467,12 @@ func (w *WorkItemUpdate) GetID() int {
 	return *w.ID
 }
 
-// GetLinks returns the Links field.
-func (w *WorkItemUpdate) GetLinks() *ReferenceLinks {
-	if w == nil {
-		return nil
+// GetLinks returns the Links field if it's non-nil, zero value otherwise.
+func (w *WorkItemUpdate) GetLinks() map[string]Link {
+	if w == nil || w.Links == nil {
+		return map[string]Link{}
 	}
-	return w.Links
+	return *w.Links
 }
 
 // GetRelations returns the Relations field.

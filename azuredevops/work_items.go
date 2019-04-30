@@ -16,9 +16,9 @@ type WorkItemsService struct {
 
 // IterationWorkItems Represents work items in an iteration backlog
 type IterationWorkItems struct {
-	Links             *ReferenceLinks `json:"_links,omitempty"`
-	WorkItemRelations []*WorkItemLink `json:"workItemRelations"`
-	URL               *string         `json:"url,omitempty"`
+	Links             *map[string]Link `json:"_links,omitempty"`
+	WorkItemRelations []*WorkItemLink  `json:"workItemRelations"`
+	URL               *string          `json:"url,omitempty"`
 }
 
 // WorkItemLink A link between two work items.
@@ -36,7 +36,7 @@ type WorkItemListResponse struct {
 
 // WorkItem describes an individual work item in TFS
 type WorkItem struct {
-	Links             *ReferenceLinks         `json:"_links,omitempty"`
+	Links             *map[string]Link        `json:"_links,omitempty"`
 	CommentVersionRef *CommentVersionRef      `json:"commentVersionRef,omitempty"`
 	Fields            *map[string]interface{} `json:"fields,omitempty"`
 	ID                *int                    `json:"id,omitempty"`
@@ -61,7 +61,7 @@ type WorkItemFields struct {
 }
 */
 
-// Describes an update to a work item field.
+// WorkItemFieldUpdate Describes an update to a work item field.
 type WorkItemFieldUpdate struct {
 	NewValue interface{} `json:"newValue,omitempty"`
 	OldValue interface{} `json:"oldValue,omitempty"`
@@ -83,20 +83,20 @@ type CommentVersionRef struct {
 
 // WorkItemReference Contains reference to a work item.
 type WorkItemReference struct {
-	ID  *int    `json:"id,omitempty"`
+	ID  *int    `json:"id,omitempty,string"`
 	URL *string `json:"url,omitempty"`
 }
 
 // WorkItemRelation describes an intermediary between iterations and work items
 type WorkItemRelation struct {
-	Attributes *ReferenceLinks `json:"attributes,omitempty"`
-	Rel        *string         `json:"rel,omitempty"`
-	URL        *string         `json:"url,omitempty"`
+	Attributes *map[string]Link `json:"attributes,omitempty"`
+	Rel        *string          `json:"rel,omitempty"`
+	URL        *string          `json:"url,omitempty"`
 }
 
 // WorkItemUpdate Describes an update to a work item.
 type WorkItemUpdate struct {
-	Links       *ReferenceLinks                 `json:"attributes,omitempty"`
+	Links       *map[string]Link                `json:"attributes,omitempty"`
 	Fields      *map[string]WorkItemFieldUpdate `json:"fields,omitempty"`
 	ID          *int                            `json:"id,omitempty"`
 	Relations   *WorkItemRelationUpdates        `json:"relations,omitempty"`
