@@ -1683,6 +1683,14 @@ func (g *GitRepository) GetValidRemoteURLs() []string {
 	return *g.ValidRemoteURLs
 }
 
+// GetWebURL returns the WebURL field if it's non-nil, zero value otherwise.
+func (g *GitRepository) GetWebURL() string {
+	if g == nil || g.WebURL == nil {
+		return ""
+	}
+	return *g.WebURL
+}
+
 // GetCollection returns the Collection field.
 func (g *GitRepositoryRef) GetCollection() *TeamProjectCollectionReference {
 	if g == nil {

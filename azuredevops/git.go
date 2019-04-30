@@ -267,6 +267,7 @@ type GitRepository struct {
 	SSHURL           *string               `json:"sshUrl,omitempty"`
 	URL              *string               `json:"url,omitempty"`
 	ValidRemoteURLs  *[]string             `json:"validRemoteUrls,omitempty"`
+	WebURL           *string               `json:"webUrl,omitempty"`
 }
 
 // GitRepositoryRef
