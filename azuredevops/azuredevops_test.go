@@ -20,6 +20,7 @@ const (
 
 // Pulled from https://github.com/google/go-github/blob/master/github/github_test.go
 func setup() (client *azuredevops.Client, mux *http.ServeMux, serverURL string, teardown func()) {
+
 	// mux is the HTTP request multiplexer used with the test server.
 	mux = http.NewServeMux()
 
@@ -89,3 +90,19 @@ func Test_NewClient(t *testing.T) {
 		t.Errorf("Client.Token = %s; expected %s", c.AuthToken, "AZURE_DEVOPS_TOKEN")
 	}
 }
+
+// Bool is a helper routine that allocates a new bool value
+// to store v and returns a pointer to it.
+func Bool(v bool) *bool { return &v }
+
+// Int is a helper routine that allocates a new int value
+// to store v and returns a pointer to it.
+func Int(v int) *int { return &v }
+
+// Int64 is a helper routine that allocates a new int64 value
+// to store v and returns a pointer to it.
+func Int64(v int64) *int64 { return &v }
+
+// String is a helper routine that allocates a new string value
+// to store v and returns a pointer to it.
+func String(v string) *string { return &v }
