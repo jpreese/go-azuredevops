@@ -2,6 +2,7 @@ package azuredevops
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -14,7 +15,6 @@ import (
 )
 
 const (
-	APIVersion     = "5.1-preview.1"
 	defaultBaseURL = "https://dev.azure.com"
 	userAgent      = "go-azuredevops"
 )
@@ -150,13 +150,39 @@ func (c *Client) NewRequest(method, urlStr string, body interface{}) (*http.Requ
 	return req, nil
 }
 
+// Execute sends an API request and returns the API response. The API response is
+// JSON decoded and stored in the value pointed to by r, or returned as an
+// error if an API error has occurred. If r implements the io.Writer
+// interface, the raw response body will be written to r, without attempting to
+// first decode it. If rate limit is exceeded and reset time is in the future,
+// Do returns *RateLimitError immediately without making a network API call.
+//
+// The provided ctx must be non-nil. If it is canceled or times out,
+// ctx.Err() will be returned.
 // Execute runs all the http requests on the API
-func (c *Client) Execute(request *http.Request, r interface{}) (*http.Response, error) {
+func (c *Client) Execute(ctx context.Context, request *http.Request, r interface{}) (*http.Response, error) {
+	request = request.WithContext(ctx)
 	request.SetBasicAuth("", c.AuthToken)
 
 	//client := &http.Client{}
 	response, err := c.client.Do(request)
 	if err != nil {
+		// If we got an error, and the context has been canceled,
+		// the context's error is probably more useful.
+		select {
+		case <-ctx.Done():
+			return nil, ctx.Err()
+		default:
+		}
+
+		// If the error type is *url.Error, sanitize its URL before returning.
+		if e, ok := err.(*url.Error); ok {
+			if url, err := url.Parse(e.URL); err == nil {
+				e.URL = url.String()
+				return nil, e
+			}
+		}
+
 		return nil, err
 	}
 	defer response.Body.Close()

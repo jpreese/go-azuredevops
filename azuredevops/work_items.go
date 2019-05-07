@@ -1,6 +1,7 @@
 package azuredevops
 
 import (
+	"context"
 	"fmt"
 	"net/url"
 	"strconv"
@@ -19,6 +20,19 @@ type IterationWorkItems struct {
 	Links             *map[string]Link `json:"_links,omitempty"`
 	WorkItemRelations []*WorkItemLink  `json:"workItemRelations"`
 	URL               *string          `json:"url,omitempty"`
+}
+
+// WorkItemComment Describes a response to CreateComment()
+type WorkItemComment struct {
+	CreatedBy    *IdentityRef `json:"createdBy,omitempty"`
+	CreatedDate  *time.Time   `json:"createdDate,omitempty"`
+	ID           *int         `json:"id,omitempty"`
+	ModifiedBy   *IdentityRef `json:"modifiedBy,omitempty"`
+	ModifiedDate *time.Time   `json:"modifiedDate,omitempty"`
+	Text         *string      `json:"text,omitempty"`
+	URL          *string      `json:"url,omitempty"`
+	Version      *int         `json:"version,omitempty"`
+	WorkItemID   *int         `json:"workItemId,omitempty"`
 }
 
 // WorkItemLink A link between two work items.
@@ -44,22 +58,6 @@ type WorkItem struct {
 	Rev               *int                    `json:"rev,omitempty"`
 	URL               *string                 `json:"url,omitempty"`
 }
-
-/*
-// WorkItemFields describes all the fields for a given work item
-type WorkItemFields struct {
-	ID          *int     `json:"System.Id"`
-	Title       *string  `json:"System.Title"`
-	State       *string  `json:"System.State"`
-	Type        *string  `json:"System.WorkItemType"`
-	Points      *float64 `json:"Microsoft.VSTS.Scheduling.StoryPoints"`
-	BoardColumn *string  `json:"System.BoardColumn"`
-	CreatedBy   *string  `json:"System.CreatedBy"`
-	AssignedTo  *string  `json:"System.AssignedTo"`
-	Tags        *string  `json:"System.Tags"`
-	TagList     *[]string
-}
-*/
 
 // WorkItemFieldUpdate Describes an update to a work item field.
 type WorkItemFieldUpdate struct {
@@ -89,14 +87,14 @@ type WorkItemReference struct {
 
 // WorkItemRelation describes an intermediary between iterations and work items
 type WorkItemRelation struct {
-	Attributes *map[string]Link `json:"attributes,omitempty"`
-	Rel        *string          `json:"rel,omitempty"`
-	URL        *string          `json:"url,omitempty"`
+	Attributes *map[string]interface{} `json:"attributes,omitempty"`
+	Rel        *string                 `json:"rel,omitempty"`
+	URL        *string                 `json:"url,omitempty"`
 }
 
 // WorkItemUpdate Describes an update to a work item.
 type WorkItemUpdate struct {
-	Links       *map[string]Link                `json:"attributes,omitempty"`
+	Links       *map[string]interface{}         `json:"attributes,omitempty"`
 	Fields      *map[string]WorkItemFieldUpdate `json:"fields,omitempty"`
 	ID          *int                            `json:"id,omitempty"`
 	Relations   *WorkItemRelationUpdates        `json:"relations,omitempty"`
@@ -109,8 +107,8 @@ type WorkItemUpdate struct {
 
 // GetForIteration will get a list of work items based on an iteration name
 // utilising https://docs.microsoft.com/en-gb/rest/api/vsts/wit/work%20items/list
-func (s *WorkItemsService) GetForIteration(team string, iteration Iteration) ([]*WorkItem, error) {
-	queryIds, err := s.GetIdsForIteration(team, iteration)
+func (s *WorkItemsService) GetForIteration(ctx context.Context, team string, iteration Iteration) ([]*WorkItem, error) {
+	queryIds, err := s.GetIdsForIteration(ctx, team, iteration)
 	if err != nil {
 		return nil, err
 	}
@@ -129,10 +127,9 @@ func (s *WorkItemsService) GetForIteration(team string, iteration Iteration) ([]
 
 	// Now we want to pad out the fields for the work items
 	URL := fmt.Sprintf(
-		"_apis/wit/workitems?ids=%s&fields=%s&api-version=%s",
+		"_apis/wit/workitems?ids=%s&fields=%s&api-version=5.1-preview.1",
 		strings.Join(workIds, ","),
 		strings.Join(fields, ","),
-		APIVersion,
 	)
 
 	request, err := s.client.NewRequest("GET", URL, nil)
@@ -141,19 +138,18 @@ func (s *WorkItemsService) GetForIteration(team string, iteration Iteration) ([]
 	}
 
 	var response WorkItemListResponse
-	_, err = s.client.Execute(request, &response)
+	_, err = s.client.Execute(ctx, request, &response)
 
 	return response.WorkItems, err
 }
 
 // GetIdsForIteration will return an array of ids for a given iteration
 // utilising https://docs.microsoft.com/en-gb/rest/api/vsts/work/iterations/get%20iteration%20work%20items
-func (s *WorkItemsService) GetIdsForIteration(team string, iteration Iteration) ([]int, error) {
+func (s *WorkItemsService) GetIdsForIteration(ctx context.Context, team string, iteration Iteration) ([]int, error) {
 	URL := fmt.Sprintf(
-		"/%s/_apis/work/teamsettings/iterations/%s/workitems?api-version=%s",
+		"%s/_apis/work/teamsettings/iterations/%s/workitems?api-version=5.1-preview.1",
 		url.PathEscape(team),
 		iteration.ID,
-		APIVersion,
 	)
 
 	request, err := s.client.NewRequest("GET", URL, nil)
@@ -163,7 +159,7 @@ func (s *WorkItemsService) GetIdsForIteration(team string, iteration Iteration) 
 
 	var response IterationWorkItems
 
-	_, err = s.client.Execute(request, &response)
+	_, err = s.client.Execute(ctx, request, &response)
 
 	var queryIds []int
 	for index := 0; index < len(response.WorkItemRelations); index++ {
@@ -172,4 +168,24 @@ func (s *WorkItemsService) GetIdsForIteration(team string, iteration Iteration) 
 	}
 
 	return queryIds, err
+}
+
+// CreateComment Posts a comment to a work item
+// https://docs.microsoft.com/en-us/rest/api/azure/devops/wit/comments/add
+func (s *WorkItemsService) CreateComment(ctx context.Context, workItemID int, comment *WorkItemComment) (*WorkItemComment, *WorkItemComment, error) {
+	URL := fmt.Sprintf(
+		"_apis/wit/workItems/%d/comments?api-version=5.1-preview.3",
+		workItemID,
+	)
+
+	response := WorkItemComment{}
+
+	request, err := s.client.NewRequest("POST", URL, &response)
+	if err != nil {
+		return nil, &response, err
+	}
+
+	_, err = s.client.Execute(ctx, request, &response)
+
+	return comment, &response, nil
 }

@@ -1,6 +1,7 @@
 package azuredevops_test
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"reflect"
@@ -114,7 +115,7 @@ func TestGitService_ListRefs(t *testing.T) {
 			})
 
 			opts := azuredevops.GitRefListOptions{}
-			refs, count, err := c.Git.ListRefs("vscode", "heads", &opts)
+			refs, count, err := c.Git.ListRefs(context.Background(), "vscode", "heads", &opts)
 			if err != nil {
 				t.Fatalf("returned error: %v", err)
 			}
@@ -163,7 +164,7 @@ func TestGitService_Get(t *testing.T) {
 				fmt.Fprint(w, json)
 			})
 
-			resp, count, err := c.Git.GetRepository("vscode")
+			resp, count, err := c.Git.GetRepository(context.Background(), "vscode")
 			if err != nil {
 				t.Fatalf("returned error: %v", err)
 			}
@@ -183,7 +184,7 @@ func TestGitService_Get(t *testing.T) {
 func TestGitService_CreateStatus(t *testing.T) {
 	n := "Build123"
 	g := "continuous-integration"
-	context := azuredevops.GitStatusContext{
+	gitContext := azuredevops.GitStatusContext{
 		Name:  &n,
 		Genre: &g,
 	}
@@ -196,10 +197,10 @@ func TestGitService_CreateStatus(t *testing.T) {
 		description string
 		targetUrl   string
 		state       string
-		context     *azuredevops.GitStatusContext
+		gitContext  *azuredevops.GitStatusContext
 	}{
-		{name: "CreateStatus() success", URL: gitCreateStatusURL, response: gitCreateStatusResponse, count: 1, description: "some", targetUrl: "", state: "succeeded", context: &context},
-		{name: "CreateStatus() failed", URL: gitCreateStatusURL, response: "{}", count: 0, description: "some", targetUrl: "", state: "succeeded", context: &context},
+		{name: "CreateStatus() success", URL: gitCreateStatusURL, response: gitCreateStatusResponse, count: 1, description: "some", targetUrl: "", state: "succeeded", gitContext: &gitContext},
+		{name: "CreateStatus() failed", URL: gitCreateStatusURL, response: "{}", count: 0, description: "some", targetUrl: "", state: "succeeded", gitContext: &gitContext},
 	}
 
 	for _, tc := range tt {
@@ -219,12 +220,12 @@ func TestGitService_CreateStatus(t *testing.T) {
 			state := "succeeded"
 			target := "https://ci.fabrikam.com/my-project/build/123"
 			status := azuredevops.GitStatus{
-				Context:     &context,
+				Context:     &gitContext,
 				Description: &s,
 				State:       &state,
 				TargetURL:   &target,
 			}
-			resp, count, err := c.Git.CreateStatus("repo", "67cae2b029dff7eb3dc062b49403aaedca5bad8d", status)
+			resp, count, err := c.Git.CreateStatus(context.Background(), "repo", "67cae2b029dff7eb3dc062b49403aaedca5bad8d", status)
 			if err != nil {
 				t.Fatalf("returned error: %v", err)
 			}
@@ -233,8 +234,8 @@ func TestGitService_CreateStatus(t *testing.T) {
 				if *resp.Description != tc.description {
 					t.Fatalf("expected git ref name %s, got %s", tc.description, *resp.Description)
 				}
-				if !reflect.DeepEqual(resp.Context, tc.context) {
-					t.Errorf("Git.GetRef returned %+v, want %+v", tc.context, resp.Context)
+				if !reflect.DeepEqual(resp.Context, tc.gitContext) {
+					t.Errorf("Git.GetRef returned %+v, want %+v", tc.gitContext, resp.Context)
 				}
 				if *resp.State != tc.state {
 					t.Fatalf("expected git ref name %s, got %s", tc.state, *resp.State)

@@ -1,6 +1,7 @@
 package azuredevops
 
 import (
+	"context"
 	"fmt"
 	"net/url"
 	"time"
@@ -101,7 +102,7 @@ type GitCommitChanges struct {
 
 // GitCommitRef describes a single git commit reference
 type GitCommitRef struct {
-	Links            *map[string]Link        `json:"_links,omitempty"`
+	Links            *map[string]Link       `json:"_links,omitempty"`
 	CommitID         *string                `json:"commitId,omitempty"`
 	Author           *GitUserDate           `json:"author,omitempty"`
 	Committer        *GitUserDate           `json:"committer,omitempty"`
@@ -120,20 +121,20 @@ type GitCommitRef struct {
 // GitRef provides information about a git/fork ref.
 type GitRef struct {
 	Links          *map[string]Link `json:"_links,omitempty"`
-	Creator        *IdentityRef    `json:"creator,omitempty"`
-	IsLocked       *bool           `json:"isLocked,omitempty"`
-	IsLockedBy     *IdentityRef    `json:"isLockedBy,omitempty"`
-	Name           *string         `json:"name,omitempty"`
-	ObjectID       *string         `json:"objectId,omitempty"`
-	PeeledObjectID *string         `json:"peeledObjectId,omitempty"`
-	Repository     *GitRepository  `json:"repository,omitempty"`
-	Statuses       *[]GitStatus    `json:"statuses,omitempty"`
-	URL            *string         `json:"url,omitempty"`
+	Creator        *IdentityRef     `json:"creator,omitempty"`
+	IsLocked       *bool            `json:"isLocked,omitempty"`
+	IsLockedBy     *IdentityRef     `json:"isLockedBy,omitempty"`
+	Name           *string          `json:"name,omitempty"`
+	ObjectID       *string          `json:"objectId,omitempty"`
+	PeeledObjectID *string          `json:"peeledObjectId,omitempty"`
+	Repository     *GitRepository   `json:"repository,omitempty"`
+	Statuses       *[]GitStatus     `json:"statuses,omitempty"`
+	URL            *string          `json:"url,omitempty"`
 }
 
 // GitItem describes a single git item
 type GitItem struct {
-	Links                 *map[string]Link      `json:"_links,omitempty"`
+	Links                 *map[string]Link     `json:"_links,omitempty"`
 	CommitID              *string              `json:"commitId,omitempty"`
 	Content               *string              `json:"content,omitempty"`
 	ContentMetadata       *FileContentMetadata `json:"contentMetadata,omitempty"`
@@ -149,7 +150,7 @@ type GitItem struct {
 
 // GitPullRequest represents all the data associated with a pull request.
 type GitPullRequest struct {
-	Links                 *map[string]Link                  `json:"_links,omitempty"`
+	Links                 *map[string]Link                 `json:"_links,omitempty"`
 	ArtifactID            *string                          `json:"artifactId,omitempty"`
 	AutoCompleteSetBy     *IdentityRef                     `json:"autoCompleteSetBy,omitempty"`
 	ClosedBy              *IdentityRef                     `json:"closedBy,omitempty"`
@@ -228,13 +229,13 @@ func (d GitPullRequestMergeStrategy) String() string {
 // GitPush describes a code push request event.
 type GitPush struct {
 	Links      *map[string]Link `json:"_links,omitempty"`
-	Commits    *[]GitCommitRef `json:"commits,omitempty"`
-	Date       *time.Time      `json:"date,omitempty"`
-	PushID     *int            `json:"pushId,omitempty"`
-	PushedBy   *IdentityRef    `json:"pushedBy,omitempty"`
-	RefUpdates *[]GitRefUpdate `json:"refUpdates,omitempty"`
-	Repository *GitRepository  `json:"repository,omitempty"`
-	URL        *string         `json:"url,omitempty"`
+	Commits    *[]GitCommitRef  `json:"commits,omitempty"`
+	Date       *time.Time       `json:"date,omitempty"`
+	PushID     *int             `json:"pushId,omitempty"`
+	PushedBy   *IdentityRef     `json:"pushedBy,omitempty"`
+	RefUpdates *[]GitRefUpdate  `json:"refUpdates,omitempty"`
+	Repository *GitRepository   `json:"repository,omitempty"`
+	URL        *string          `json:"url,omitempty"`
 }
 
 // GitPushRef Describes a push request
@@ -255,7 +256,7 @@ type GitRefUpdate struct {
 
 // GitRepository describes an Azure Devops Git repository.
 type GitRepository struct {
-	Links            *map[string]Link       `json:"_links,omitempty"`
+	Links            *map[string]Link      `json:"_links,omitempty"`
 	DefaultBranch    *string               `json:"defaultBranch,omitempty"`
 	ID               *string               `json:"id,omitempty"`
 	IsFork           *bool                 `json:"isFork,omitempty"`
@@ -300,7 +301,7 @@ func (d GitStatusState) String() string {
 }
 
 type GitStatus struct {
-	Links        *map[string]Link   `json:"_links,omitempty"`
+	Links        *map[string]Link  `json:"_links,omitempty"`
 	Context      *GitStatusContext `json:"context,omitempty"`
 	CreatedBy    *IdentityRef      `json:"createdBy,omitempty"`
 	CreationDate *time.Time        `json:"creationDate,omitempty"`
@@ -347,12 +348,11 @@ type GitUserDate struct {
 }
 
 // ListRefs returns a list of the references for a git repo
-func (s *GitService) ListRefs(repo, refType string, opts *GitRefListOptions) ([]*GitRef, int, error) {
+func (s *GitService) ListRefs(ctx context.Context, repo, refType string, opts *GitRefListOptions) ([]*GitRef, int, error) {
 	URL := fmt.Sprintf(
-		"_apis/git/repositories/%s/refs/%s?api-version=%s",
+		"_apis/git/repositories/%s/refs/%s?api-version=5.1-preview.1",
 		repo,
 		refType,
-		APIVersion,
 	)
 
 	URL, err := addOptions(URL, opts)
@@ -362,18 +362,17 @@ func (s *GitService) ListRefs(repo, refType string, opts *GitRefListOptions) ([]
 		return nil, 0, err
 	}
 	var response GitRefsResponse
-	_, err = s.client.Execute(request, &response)
+	_, err = s.client.Execute(ctx, request, &response)
 
 	return response.GitRefs, response.Count, err
 }
 
 // GetRepository Return a single GitRepository
 // https://docs.microsoft.com/en-us/rest/api/azure/devops/git/repositories/get%20repository?view=azure-devops-rest-5.1
-func (s *GitService) GetRepository(repoName string) (*GitRepository, int, error) {
+func (s *GitService) GetRepository(ctx context.Context, repoName string) (*GitRepository, int, error) {
 	URL := fmt.Sprintf(
-		"_apis/git/repositories/%s?api-version=%s",
+		"_apis/git/repositories/%s?api-version=5.1-preview.1",
 		repoName,
-		APIVersion,
 	)
 
 	request, err := s.client.NewRequest("GET", URL, nil)
@@ -381,7 +380,7 @@ func (s *GitService) GetRepository(repoName string) (*GitRepository, int, error)
 		return nil, 0, err
 	}
 	var response GitRepository
-	_, err = s.client.Execute(request, &response)
+	_, err = s.client.Execute(ctx, request, &response)
 
 	return &response, 1, err
 
@@ -390,12 +389,11 @@ func (s *GitService) GetRepository(repoName string) (*GitRepository, int, error)
 // CreateStatus creates a new status for a repository at the specified
 // reference. Ref can be a SHA, a branch name, or a tag name.
 // https://docs.microsoft.com/en-us/rest/api/azure/devops/git/statuses/create?view=azure-devops-rest-5.0
-func (s *GitService) CreateStatus(repoName, ref string, status GitStatus) (*GitStatus, int, error) {
+func (s *GitService) CreateStatus(ctx context.Context, repoName, ref string, status GitStatus) (*GitStatus, int, error) {
 	URL := fmt.Sprintf(
-		"_apis/git/repositories/%s/commits/%s/statuses?api-version=%s",
+		"_apis/git/repositories/%s/commits/%s/statuses?api-version=5.1-preview.1",
 		repoName,
 		url.QueryEscape(ref),
-		APIVersion,
 	)
 
 	request, err := s.client.NewRequest("POST", URL, status)
@@ -403,7 +401,7 @@ func (s *GitService) CreateStatus(repoName, ref string, status GitStatus) (*GitS
 		return nil, 0, err
 	}
 	var response GitStatus
-	_, err = s.client.Execute(request, &response)
+	_, err = s.client.Execute(ctx, request, &response)
 
 	return &response, 1, err
 }

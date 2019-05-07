@@ -1,6 +1,7 @@
 package azuredevops
 
 import (
+	"context"
 	"fmt"
 	"time"
 )
@@ -19,33 +20,33 @@ type TestListResponse struct {
 
 // Test represents a test
 type Test struct {
-	ID          int    `json:"id"`
-	Name        string `json:"name"`
-	URL         string `json:"url"`
-	IsAutomated bool   `json:"isAutomated"`
-	Iteration   string `json:"iteration"`
+	ID          *int    `json:"id,omitempty"`
+	Name        *string `json:"name,omitempty"`
+	URL         *string `json:"url,omitempty"`
+	IsAutomated *bool   `json:"isAutomated,omitempty"`
+	Iteration   *string `json:"iteration,omitempty"`
 	Owner       *struct {
-		ID          string `json:"id"`
-		DisplayName string `json:"displayName"`
+		ID          string `json:"id,omitempty"`
+		DisplayName string `json:"displayName,omitempty"`
 	} `json:"owner,omitempty"`
-	StartedDate   string `json:"startedDate"`
-	CompletedDate string `json:"completedDate"`
-	State         string `json:"state"`
+	StartedDate   *string `json:"startedDate,omitempty"`
+	CompletedDate *string `json:"completedDate,omitempty"`
+	State         *string `json:"state,omitempty"`
 	Plan          *struct {
-		ID string `json:"id"`
+		ID string `json:"id,omitempty"`
 	} `json:"plan,omitempty"`
-	Revision int `json:"revision"`
+	Revision *int `json:"revision,omitempty"`
 }
 
 // TestsListOptions describes what the request to the API should look like
 type TestsListOptions struct {
-	Count    int    `url:"$top,omitempty"`
-	BuildURI string `url:"buildUri,omitempty"`
+	Count    *int    `url:"$top,omitempty"`
+	BuildURI *string `url:"buildUri,omitempty"`
 }
 
 // List returns list of the tests
 // utilising https://docs.microsoft.com/en-gb/rest/api/vsts/test/runs/list
-func (s *TestsService) List(opts *TestsListOptions) ([]*Test, error) {
+func (s *TestsService) List(ctx context.Context, opts *TestsListOptions) ([]*Test, error) {
 	URL := fmt.Sprintf("_apis/test/runs?api-version=4.1")
 	URL, err := addOptions(URL, opts)
 
@@ -54,7 +55,7 @@ func (s *TestsService) List(opts *TestsListOptions) ([]*Test, error) {
 		return nil, err
 	}
 	var response TestListResponse
-	_, err = s.client.Execute(request, &response)
+	_, err = s.client.Execute(ctx, request, &response)
 
 	return response.Tests, err
 }
@@ -135,7 +136,7 @@ type TestResultsListOptions struct {
 
 // ResultsList returns list of the test results
 // utilising https://docs.microsoft.com/en-gb/rest/api/vsts/test/runs/list
-func (s *TestsService) ResultsList(opts *TestResultsListOptions) ([]TestResult, error) {
+func (s *TestsService) ResultsList(ctx context.Context, opts *TestResultsListOptions) ([]TestResult, error) {
 	URL := fmt.Sprintf("_apis/test/Runs/%s/results?api-version=4.1", opts.RunID)
 	opts.RunID = ""
 	URL, err := addOptions(URL, opts)
@@ -145,7 +146,7 @@ func (s *TestsService) ResultsList(opts *TestResultsListOptions) ([]TestResult, 
 		return nil, err
 	}
 	var response TestResultsListResponse
-	_, err = s.client.Execute(request, &response)
+	_, err = s.client.Execute(ctx, request, &response)
 
 	return response.Results, err
 }

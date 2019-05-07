@@ -1,6 +1,7 @@
 package azuredevops_test
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"testing"
@@ -55,7 +56,7 @@ func TestTeamsService_List(t *testing.T) {
 			})
 
 			opt := &azuredevops.TeamsListOptions{}
-			response, count, err := c.Teams.List(opt)
+			response, count, err := c.Teams.List(context.Background(), opt)
 			if err != nil {
 				t.Fatalf("returned error: %v", err)
 			}
@@ -69,8 +70,8 @@ func TestTeamsService_List(t *testing.T) {
 			}
 
 			if count > 0 {
-				if tc.title != response[0].Name {
-					t.Fatalf("expected name to be %s; got %s", tc.title, response[0].Name)
+				if &tc.title != response[0].Name {
+					t.Fatalf("expected name to be %s; got %s", tc.title, *response[0].Name)
 				}
 			}
 		})

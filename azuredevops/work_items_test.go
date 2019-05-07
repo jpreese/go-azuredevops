@@ -1,15 +1,17 @@
 package azuredevops_test
 
 import (
+	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
+	"reflect"
 	"testing"
 
 	"github.com/mcdafydd/go-azuredevops/azuredevops"
 )
 
 const (
-	getURL = "/AZURE_DEVOPS_Project/_apis/wit/workitems"
 	// Pulled from https://docs.microsoft.com/en-gb/rest/api/vsts/wit/work%20items/list
 	getResponse = `{
 		"count": 3,
@@ -115,11 +117,20 @@ const (
 		}
 	  }
 	`
+
+	commentResponse = `{
+		"workItemId" : 1,
+		"text" : "TEST COMMENT",
+		"version" : 1,
+		"id" : 4222704,
+		"createdDate" : "0001-01-01 00:00:00 +0000 UTC",
+		"modifiedDate" : "0001-01-01 00:00:00 +0000 UTC",
+ }`
 )
 
 func TestWorkItems_GetForIteration(t *testing.T) {
-	actualIdsURL := fmt.Sprintf("/AZURE_DEVOPS_Project/AZURE_DEVOPS_TEAM/_apis/work/teamsettings/iterations/1/workitems?api-version=%s", azuredevops.APIVersion)
-	actualGetURL := fmt.Sprintf("/AZURE_DEVOPS_Project/_apis/wit/workitems?ids=1,3&fields=System.Id,System.Title,System.State,System.WorkItemType,Microsoft.VSTS.Scheduling.StoryPoints,System.BoardColumn,System.CreatedBy,System.AssignedTo,System.Tags&api-version=%s", azuredevops.APIVersion)
+	actualIdsURL := fmt.Sprintf("/AZURE_DEVOPS_Project/AZURE_DEVOPS_TEAM/_apis/work/teamsettings/iterations/1/workitems?api-version=5.1-preview.1")
+	actualGetURL := fmt.Sprintf("/AZURE_DEVOPS_Project/_apis/wit/workitems?ids=1,3&fields=System.Id,System.Title,System.State,System.WorkItemType,Microsoft.VSTS.Scheduling.StoryPoints,System.BoardColumn,System.CreatedBy,System.AssignedTo,System.Tags&api-version=5.1-preview.1")
 
 	tt := []struct {
 		name              string
@@ -136,7 +147,6 @@ func TestWorkItems_GetForIteration(t *testing.T) {
 			name:              "we get ids and we get iterations",
 			idsBaseURL:        getIdsURL,
 			actualIdsURL:      actualIdsURL,
-			getBaseURL:        getURL,
 			actualGetURL:      actualGetURL,
 			idsResponse:       getIdsResponse,
 			getResponse:       getResponse,
@@ -156,7 +166,7 @@ func TestWorkItems_GetForIteration(t *testing.T) {
 				json := tc.idsResponse
 				fmt.Fprint(w, json)
 			})
-			mux.HandleFunc(tc.getBaseURL, func(w http.ResponseWriter, r *http.Request) {
+			mux.HandleFunc("/testing/AZURE_DEVOPS_Project/_apis/wit/workitems", func(w http.ResponseWriter, r *http.Request) {
 				testMethod(t, r, "GET")
 				testURL(t, r, tc.actualGetURL)
 				json := tc.getResponse
@@ -164,7 +174,7 @@ func TestWorkItems_GetForIteration(t *testing.T) {
 			})
 
 			iteration := azuredevops.Iteration{ID: "1"}
-			workItems, err := c.WorkItems.GetForIteration("AZURE_DEVOPS_TEAM", iteration)
+			workItems, err := c.WorkItems.GetForIteration(context.Background(), "AZURE_DEVOPS_TEAM", iteration)
 			if err != nil {
 				t.Fatalf("returned error: %v", err)
 			}
@@ -173,5 +183,35 @@ func TestWorkItems_GetForIteration(t *testing.T) {
 				t.Fatalf("expected %d work items; got %d", tc.expectedWorkItems, len(workItems))
 			}
 		})
+	}
+}
+
+func TestWorkItems_CreateComment(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
+
+	comment := "TEST COMMENT"
+	id := 1
+	want := &azuredevops.WorkItemComment{ID: &id, Text: &comment}
+
+	mux.HandleFunc("/AZURE_DEVOPS_Project/_apis/wit/workItems/1/comments", func(w http.ResponseWriter, r *http.Request) {
+		v := new(azuredevops.WorkItemComment)
+		json.NewDecoder(r.Body).Decode(v)
+
+		testMethod(t, r, "POST")
+		/*if !reflect.DeepEqual(v, comment) {
+			t.Errorf("Request body = %+v, want %+v", v, comment)
+		}*/
+
+		fmt.Fprint(w, `{"id":1, "text": "TEST COMMENT"}`)
+	})
+
+	got, resp, err := client.WorkItems.CreateComment(context.Background(), 1, want)
+	if err != nil {
+		t.Errorf("WorkItems.CreateComment returned error: %v", err)
+	}
+
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("WorkItems.CreateComment returned %+v, want %+v", resp, want)
 	}
 }

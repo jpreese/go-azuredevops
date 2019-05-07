@@ -1,6 +1,7 @@
 package azuredevops
 
 import (
+	"context"
 	"fmt"
 )
 
@@ -25,7 +26,7 @@ type Favourite struct {
 }
 
 // List returns a list of the favourite items from for the user
-func (s *FavouritesService) List() ([]*Favourite, int, error) {
+func (s *FavouritesService) List(ctx context.Context) ([]*Favourite, int, error) {
 	URL := fmt.Sprintf(
 		"_apis/Favorite/Favorites?artifactType=%s",
 		"Microsoft.TeamFoundation.Git.Repository", // @todo This needs fixing
@@ -37,7 +38,7 @@ func (s *FavouritesService) List() ([]*Favourite, int, error) {
 		return nil, 0, err
 	}
 	var response FavouritesResponse
-	_, err = s.client.Execute(request, &response)
+	_, err = s.client.Execute(ctx, request, &response)
 
 	return response.Favourites, response.Count, err
 }

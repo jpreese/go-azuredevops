@@ -1,6 +1,6 @@
 # go-azuredevops
 
-*** Currently in development - may not be stable ***
+**6 May 2019 Currently in development - may not be stable**
 
 [![GoDoc](https://godoc.org/github.com/mcdafydd/go-azuredevops/azuredevops?status.svg)](https://godoc.org/github.com/mcdafydd/go-azuredevops/azuredevops)
 [![Build Status](https://travis-ci.org/mcdafydd/go-azuredevops.png?branch=master)](https://travis-ci.org/mcdafydd/go-azuredevops)
@@ -67,6 +67,7 @@ This library is re-using a lot of the code and style from the [go-github](https:
 * Debate on whether nillable fields are important for receiving structs, especially when also using separate request structs.  Other popular libraries also use pointers approach, but it is often viewed as a big ugly. [google/go-github#537](https://github.com/google/go-github/issues/537)
 * Large receiving struct types should return []*Type, not []Type [google/go-github#375](https://github.com/google/go-github/pull/375)
 * Use omitempty in receiving struct JSON tags
+* Pass context in API functions and Do() [google/go-github#526](https://github.com/google/go-github/issues/526#issuecomment-280985393)  **UNDER DEVELOPMENT AS OF 6 MAY 2019**
 
 An exception to the pointer members are the count/value receiving structs used for responses containing multiple entities.
 

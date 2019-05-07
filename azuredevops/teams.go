@@ -1,6 +1,7 @@
 package azuredevops
 
 import (
+	"context"
 	"fmt"
 	"time"
 )
@@ -25,17 +26,17 @@ type Project struct {
 
 // Team describes what a team looks like
 type Team struct {
-	ID          string `url:"id,omitempty"`
-	Name        string `url:"name,omitempty"`
-	URL         string `url:"url,omitempty"`
-	Description string `url:"description,omitempty"`
+	ID          *string `url:"id,omitempty"`
+	Name        *string `url:"name,omitempty"`
+	URL         *string `url:"url,omitempty"`
+	Description *string `url:"description,omitempty"`
 }
 
 // TeamsListOptions describes what the request to the API should look like
 type TeamsListOptions struct {
-	Mine bool `url:"$mine,omitempty"`
-	Top  int  `url:"$top,omitempty"`
-	Skip int  `url:"$skip,omitempty"`
+	Mine *bool `url:"$mine,omitempty"`
+	Top  *int  `url:"$top,omitempty"`
+	Skip *int  `url:"$skip,omitempty"`
 }
 
 // TeamsListResponse Requests that may return multiple entities use this format
@@ -67,8 +68,8 @@ type TeamProjectReference struct {
 // List returns list of the teams
 // https://docs.microsoft.com/en-us/rest/api/azure/devops/core/teams/get%20teams
 // GET https://dev.azure.com/{organization}/_apis/projects/{projectId}/teams?api-version=5.1-preview.2
-func (s *TeamsService) List(opts *TeamsListOptions) ([]*Team, int, error) {
-	URL := fmt.Sprintf("_apis/teams?api-version=%s", APIVersion)
+func (s *TeamsService) List(ctx context.Context, opts *TeamsListOptions) ([]*Team, int, error) {
+	URL := fmt.Sprintf("_apis/teams?api-version=5.1-preview.1")
 	URL, err := addOptions(URL, opts)
 
 	u, _ := s.client.BaseURL.Parse(URL)
@@ -77,7 +78,7 @@ func (s *TeamsService) List(opts *TeamsListOptions) ([]*Team, int, error) {
 		return nil, 0, err
 	}
 	var response TeamsListResponse
-	_, err = s.client.Execute(request, &response)
+	_, err = s.client.Execute(ctx, request, &response)
 
 	return response.Teams, response.Count, err
 }

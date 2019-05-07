@@ -1,6 +1,7 @@
 package azuredevops_test
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"strings"
@@ -60,7 +61,7 @@ func TestBoardsService_List(t *testing.T) {
 				fmt.Fprint(w, json)
 			})
 
-			boards, err := c.Boards.List("AZURE_DEVOPS_TEAM")
+			boards, err := c.Boards.List(context.Background(), "AZURE_DEVOPS_TEAM")
 			if err != nil {
 				t.Fatalf("returned error: %v", err)
 			}
@@ -88,7 +89,7 @@ func TestBuildsService_List_ResponseDecodeFailure(t *testing.T) {
 		fmt.Fprint(w, json)
 	})
 
-	_, err := c.Boards.List("AZURE_DEVOPS_TEAM")
+	_, err := c.Boards.List(context.Background(), "AZURE_DEVOPS_TEAM")
 	if err == nil {
 		t.Fatalf("expected error decoding the response, did not get one")
 	}
@@ -104,7 +105,7 @@ func TestBuildsService_List_CallFailureForBuildingURL(t *testing.T) {
 		fmt.Fprint(w, json)
 	})
 
-	_, err := c.Boards.List("")
+	_, err := c.Boards.List(context.Background(), "")
 	if err != nil && !strings.Contains(err.Error(), "404") {
 		t.Fatalf("expected 404 error, got %s", err.Error())
 	}
@@ -144,7 +145,7 @@ func TestBuildsService_Get(t *testing.T) {
 				fmt.Fprint(w, json)
 			})
 
-			board, err := c.Boards.Get("AZURE_DEVOPS_TEAM", tc.boardId)
+			board, err := c.Boards.Get(context.Background(), "AZURE_DEVOPS_TEAM", tc.boardId)
 			if err != nil {
 				t.Fatalf("returned error: %v", err)
 			}
@@ -178,7 +179,7 @@ func TestBuildsService_Get_ResponseDecodeFailure(t *testing.T) {
 		fmt.Fprint(w, json)
 	})
 
-	_, err := c.Boards.Get("AZURE_DEVOPS_TEAM", "b5f5e386-fd86-4459-af9a-72f881bd1b23")
+	_, err := c.Boards.Get(context.Background(), "AZURE_DEVOPS_TEAM", "b5f5e386-fd86-4459-af9a-72f881bd1b23")
 	if err == nil {
 		t.Fatalf("expected error decoding the response, did not get one")
 	}
@@ -194,7 +195,7 @@ func TestBuildsService_Get_CallFailureForBuildingURL(t *testing.T) {
 		fmt.Fprint(w, json)
 	})
 
-	_, err := c.Boards.Get("AZURE_DEVOPS_TEAM", "b5f5e386-fd86-4459-af9a-72f881bd1b23")
+	_, err := c.Boards.Get(context.Background(), "AZURE_DEVOPS_TEAM", "b5f5e386-fd86-4459-af9a-72f881bd1b23")
 	if err != nil && !strings.Contains(err.Error(), "404") {
 		t.Fatalf("expected 404 error, got %s", err.Error())
 	}

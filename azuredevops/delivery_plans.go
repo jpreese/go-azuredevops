@@ -1,6 +1,7 @@
 package azuredevops
 
 import (
+	"context"
 	"fmt"
 	"time"
 )
@@ -62,8 +63,8 @@ type DeliveryPlansListOptions struct {
 }
 
 // List returns a list of delivery plans
-func (s *DeliveryPlansService) List(opts *DeliveryPlansListOptions) ([]*DeliveryPlan, int, error) {
-	URL := fmt.Sprintf("_apis/work/plans?api-version=%s", APIVersion)
+func (s *DeliveryPlansService) List(ctx context.Context, opts *DeliveryPlansListOptions) ([]*DeliveryPlan, int, error) {
+	URL := fmt.Sprintf("_apis/work/plans?api-version=5.1-preview.1")
 	URL, err := addOptions(URL, opts)
 
 	request, err := s.client.NewRequest("GET", URL, nil)
@@ -71,17 +72,16 @@ func (s *DeliveryPlansService) List(opts *DeliveryPlansListOptions) ([]*Delivery
 		return nil, 0, err
 	}
 	var response DeliveryPlansListResponse
-	_, err = s.client.Execute(request, &response)
+	_, err = s.client.Execute(ctx, request, &response)
 
 	return response.DeliveryPlans, response.Count, err
 }
 
 // GetTimeLine will fetch the details about a specific delivery plan
-func (s *DeliveryPlansService) GetTimeLine(ID string, startDate, endDate string) (*DeliveryPlanTimeLine, error) {
+func (s *DeliveryPlansService) GetTimeLine(ctx context.Context, ID string, startDate, endDate string) (*DeliveryPlanTimeLine, error) {
 	URL := fmt.Sprintf(
-		"_apis/work/plans/%s/deliverytimeline?api-version=%s",
+		"_apis/work/plans/%s/deliverytimeline?api-version=5.1-preview.1",
 		ID,
-		APIVersion,
 	)
 
 	if startDate == "" {
@@ -97,7 +97,7 @@ func (s *DeliveryPlansService) GetTimeLine(ID string, startDate, endDate string)
 		return nil, err
 	}
 	var response DeliveryPlanTimeLine
-	_, err = s.client.Execute(request, &response)
+	_, err = s.client.Execute(ctx, request, &response)
 
 	return &response, err
 }

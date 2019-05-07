@@ -1,6 +1,7 @@
 package azuredevops
 
 import (
+	"context"
 	"fmt"
 	"net/url"
 )
@@ -83,11 +84,10 @@ type FieldReference struct {
 
 // List returns list of the boards
 // utilising https://docs.microsoft.com/en-gb/rest/api/vsts/work/boards/list
-func (s *BoardsService) List(team string) ([]*BoardReference, error) {
+func (s *BoardsService) List(ctx context.Context, team string) ([]*BoardReference, error) {
 	URL := fmt.Sprintf(
-		"%s/_apis/work/boards?api-version=%s",
+		"%s/_apis/work/boards?api-version=5.1-preview.1",
 		url.PathEscape(team),
-		APIVersion,
 	)
 
 	request, err := s.client.NewRequest("GET", URL, nil)
@@ -95,18 +95,17 @@ func (s *BoardsService) List(team string) ([]*BoardReference, error) {
 		return nil, err
 	}
 	var response ListBoardsResponse
-	_, err = s.client.Execute(request, &response)
+	_, err = s.client.Execute(ctx, request, &response)
 
 	return response.BoardReferences, err
 }
 
 // Get returns a single board utilising https://docs.microsoft.com/en-gb/rest/api/vsts/work/boards/get
-func (s *BoardsService) Get(team string, id string) (*Board, error) {
+func (s *BoardsService) Get(ctx context.Context, team string, id string) (*Board, error) {
 	URL := fmt.Sprintf(
-		"%s/_apis/work/boards/%s?api-version=%s",
+		"%s/_apis/work/boards/%s?api-version=5.1-preview.1",
 		url.PathEscape(team),
 		id,
-		APIVersion,
 	)
 
 	request, err := s.client.NewRequest("GET", URL, nil)
@@ -114,7 +113,7 @@ func (s *BoardsService) Get(team string, id string) (*Board, error) {
 		return nil, err
 	}
 	var response Board
-	_, err = s.client.Execute(request, &response)
+	_, err = s.client.Execute(ctx, request, &response)
 
 	return &response, err
 }

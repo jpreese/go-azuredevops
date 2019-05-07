@@ -1,6 +1,7 @@
 package azuredevops_test
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -59,22 +60,22 @@ func TestBuildsService_List(t *testing.T) {
 			})
 
 			options := &azuredevops.BuildsListOptions{}
-			builds, err := c.Builds.List(options)
+			builds, err := c.Builds.List(context.Background(), options)
 			if err != nil {
 				t.Fatalf("returned error: %v", err)
 			}
 
 			if tc.index > -1 {
-				if builds[tc.index].Result != tc.result {
-					t.Fatalf("expected result %s, got %s", tc.result, builds[tc.index].Result)
+				if builds[tc.index].Result != &tc.result {
+					t.Fatalf("expected result %s, got %s", tc.result, *builds[tc.index].Result)
 				}
 
-				if builds[tc.index].Status != tc.status {
-					t.Fatalf("expected status %s, got %s", tc.status, builds[tc.index].Status)
+				if builds[tc.index].Status != &tc.status {
+					t.Fatalf("expected status %s, got %s", tc.status, *builds[tc.index].Status)
 				}
 
-				if builds[tc.index].Definition.Name != tc.definitionName {
-					t.Fatalf("expected definition name %s, got %s", tc.definitionName, builds[tc.index].Definition.Name)
+				if builds[tc.index].Definition.Name != &tc.definitionName {
+					t.Fatalf("expected definition name %s, got %s", tc.definitionName, *builds[tc.index].Definition.Name)
 				}
 			}
 
@@ -92,14 +93,14 @@ func TestBuildsService_Queue(t *testing.T) {
 
 		// *** test invalid enums too
 		requestBuild := &azuredevops.Build{
-			Status: "completed",
+			Status: String("completed"),
 			Definition: &azuredevops.BuildDefinition{
-				Name: "build-one",
+				Name: String("build-one"),
 			},
 		}
 
 		responseBuild := requestBuild
-		responseBuild.Result = "succeeded"
+		responseBuild.Result = String("succeeded")
 
 		mux.HandleFunc(queueBuildURL, func(w http.ResponseWriter, r *http.Request) {
 			b, err := json.Marshal(responseBuild)
@@ -117,22 +118,22 @@ func TestBuildsService_Queue(t *testing.T) {
 
 		options := &azuredevops.QueueBuildOptions{}
 
-		err := c.Builds.Queue(requestBuild, options)
+		err := c.Builds.Queue(context.Background(), requestBuild, options)
 
 		if err != nil {
 			t.Fatalf("returned error: %v", err)
 		}
 
 		if requestBuild.Result != responseBuild.Result {
-			t.Fatalf("expected result %s, got %s", responseBuild.Result, requestBuild.Result)
+			t.Fatalf("expected result %s, got %s", *responseBuild.Result, *requestBuild.Result)
 		}
 
 		if requestBuild.Status != responseBuild.Status {
-			t.Fatalf("expected status %s, got %s", responseBuild.Status, requestBuild.Status)
+			t.Fatalf("expected status %s, got %s", *responseBuild.Status, *requestBuild.Status)
 		}
 
 		if requestBuild.Definition.Name != responseBuild.Definition.Name {
-			t.Fatalf("expected definition name %s, got %s", responseBuild.Definition.Name, requestBuild.Definition.Name)
+			t.Fatalf("expected definition name %s, got %s", *responseBuild.Definition.Name, *requestBuild.Definition.Name)
 		}
 	})
 }

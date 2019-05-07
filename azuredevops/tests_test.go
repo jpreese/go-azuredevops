@@ -1,6 +1,7 @@
 package azuredevops_test
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"testing"
@@ -145,17 +146,17 @@ func TestTestsService_List(t *testing.T) {
 			})
 
 			options := &azuredevops.TestsListOptions{}
-			tests, err := c.Tests.List(options)
+			tests, err := c.Tests.List(context.Background(), options)
 			if err != nil {
 				t.Fatalf("returned error: %v", err)
 			}
 
 			if tc.index > -1 {
-				if tests[tc.index].State != tc.state {
-					t.Fatalf("expected state %s, got %s", tc.state, tests[tc.index].State)
+				if tests[tc.index].State != &tc.state {
+					t.Fatalf("expected state %s, got %s", tc.state, *tests[tc.index].State)
 				}
 
-				if tests[tc.index].Revision != tc.revision {
+				if tests[tc.index].Revision != &tc.revision {
 					t.Fatalf("expected revision %d, got %d", tc.revision, tests[tc.index].Revision)
 				}
 			}
@@ -193,7 +194,7 @@ func TestTestsService_ResultsList(t *testing.T) {
 			})
 
 			options := &azuredevops.TestResultsListOptions{RunID: "1"}
-			tests, err := c.Tests.ResultsList(options)
+			tests, err := c.Tests.ResultsList(context.Background(), options)
 			if err != nil {
 				t.Fatalf("returned error: %v", err)
 			}

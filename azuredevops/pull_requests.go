@@ -1,6 +1,7 @@
 package azuredevops
 
 import (
+	"context"
 	"fmt"
 	"time"
 )
@@ -125,8 +126,8 @@ type PullRequestListOptions struct {
 
 // List returns list of the pull requests
 // utilising https://docs.microsoft.com/en-us/rest/api/vsts/git/pull%20requests/get%20pull%20requests%20by%20project
-func (s *PullRequestsService) List(opts *PullRequestListOptions) ([]*GitPullRequest, int, error) {
-	URL := fmt.Sprintf("_apis/git/pullrequests?api-version=%s", APIVersion)
+func (s *PullRequestsService) List(ctx context.Context, opts *PullRequestListOptions) ([]*GitPullRequest, int, error) {
+	URL := fmt.Sprintf("_apis/git/pullrequests?api-version=5.1-preview.1")
 	URL, err := addOptions(URL, opts)
 
 	req, err := s.client.NewRequest("GET", URL, nil)
@@ -134,17 +135,16 @@ func (s *PullRequestsService) List(opts *PullRequestListOptions) ([]*GitPullRequ
 		return nil, 0, err
 	}
 	var resp PullRequestsListResponse
-	_, err = s.client.Execute(req, &resp)
+	_, err = s.client.Execute(ctx, req, &resp)
 
 	return resp.GitPullRequests, resp.Count, err
 }
 
 // Get returns a single pull request
 // utilising https://docs.microsoft.com/en-us/rest/api/vsts/git/pull%20requests/get%20pull%20requests%20by%20project
-func (s *PullRequestsService) Get(pullNum int, opts *PullRequestListOptions) (*GitPullRequest, int, error) {
-	URL := fmt.Sprintf("_apis/git/pullrequests/%d?api-version=%s",
+func (s *PullRequestsService) Get(ctx context.Context, pullNum int, opts *PullRequestListOptions) (*GitPullRequest, int, error) {
+	URL := fmt.Sprintf("_apis/git/pullrequests/%d?api-version=5.1-preview.1",
 		pullNum,
-		APIVersion,
 	)
 	URL, err := addOptions(URL, opts)
 
@@ -153,7 +153,7 @@ func (s *PullRequestsService) Get(pullNum int, opts *PullRequestListOptions) (*G
 		return nil, 0, err
 	}
 	var response GitPullRequest
-	_, err = s.client.Execute(request, &response)
+	_, err = s.client.Execute(ctx, request, &response)
 
 	return &response, 1, err
 }
@@ -161,10 +161,9 @@ func (s *PullRequestsService) Get(pullNum int, opts *PullRequestListOptions) (*G
 // Merge Completes a pull request
 // https://docs.microsoft.com/en-us/rest/api/azure/devops/git/pull%20requests/update?view=azure-devops-rest-5.1
 // pullRequest = EnableAutoCompleteOnAnExistingPullRequest(gitHttpClient, pullRequest, mergeCommitMessage);
-func (s *PullRequestsService) Merge(repoName string, pullNum int, id *IdentityRef, commitMsg string) (*GitPullRequest, int, error) {
-	URL := fmt.Sprintf("_apis/git/repositories/%s/pullrequests?api-version=%s",
+func (s *PullRequestsService) Merge(ctx context.Context, repoName string, pullNum int, id *IdentityRef, commitMsg string) (*GitPullRequest, int, error) {
+	URL := fmt.Sprintf("_apis/git/repositories/%s/pullrequests?api-version=5.1-preview.1",
 		repoName,
-		APIVersion,
 	)
 
 	//	GitPullRequestMergeStrategy{
@@ -202,7 +201,7 @@ func (s *PullRequestsService) Merge(repoName string, pullNum int, id *IdentityRe
 		return nil, 0, err
 	}
 	var response GitPullRequest
-	_, err = s.client.Execute(request, &response)
+	_, err = s.client.Execute(ctx, request, &response)
 
 	return &response, 1, err
 }
@@ -210,16 +209,16 @@ func (s *PullRequestsService) Merge(repoName string, pullNum int, id *IdentityRe
 // Comment Represents a comment which is one of potentially many in a comment thread.
 type Comment struct {
 	Links                  *map[string]Link `json:"_links,omitempty"`
-	Author                 *IdentityRef    `json:"author,omitempty"`
-	CommentType            *string         `json:"commentType,omitempty"`
-	Content                *string         `json:"content,omitempty"`
-	ID                     *int            `json:"id,omitempty"`
-	IsDeleted              *bool           `json:"isDeleted,omitempty"`
-	LastContentUpdatedDate *time.Time      `json:"lastContentUpdatedDate,omitempty"`
-	LastUpdatedDate        *time.Time      `json:"lastUpdatedDate,omitempty"`
-	ParentCommentID        *int            `json:"parentCommentId,omitempty"`
-	PublishedDate          *time.Time      `json:"publishedDate,omitempty"`
-	UsersLiked             *[]IdentityRef  `json:"usersLiked,omitempty"`
+	Author                 *IdentityRef     `json:"author,omitempty"`
+	CommentType            *string          `json:"commentType,omitempty"`
+	Content                *string          `json:"content,omitempty"`
+	ID                     *int             `json:"id,omitempty"`
+	IsDeleted              *bool            `json:"isDeleted,omitempty"`
+	LastContentUpdatedDate *time.Time       `json:"lastContentUpdatedDate,omitempty"`
+	LastUpdatedDate        *time.Time       `json:"lastUpdatedDate,omitempty"`
+	ParentCommentID        *int             `json:"parentCommentId,omitempty"`
+	PublishedDate          *time.Time       `json:"publishedDate,omitempty"`
+	UsersLiked             *[]IdentityRef   `json:"usersLiked,omitempty"`
 }
 
 type CommentPosition struct {
@@ -231,7 +230,7 @@ type CommentPosition struct {
 // A thread contains meta data about the file it was left on along with one or
 // more comments (an initial comment and the subsequent replies).
 type GitPullRequestCommentThread struct {
-	Links                    *map[string]Link                     `json:"_links,omitempty"`
+	Links                    *map[string]Link                    `json:"_links,omitempty"`
 	Comments                 *[]Comment                          `json:"comments,omitempty"`
 	ID                       *int                                `json:"id,omitempty"`
 	Identities               *[]IdentityRef                      `json:"identities,omitempty"`
@@ -257,11 +256,10 @@ type GitPullRequestCommentThreadContext struct {
 // ListCommits lists the commits in a pull request.
 // Azure Devops API docs: https://docs.microsoft.com/en-us/rest/api/azure/devops/git/pull%20request%20commits/get%20pull%20request%20commits
 //
-func (s *PullRequestsService) ListCommits(repo string, pullNum int) ([]*GitCommitRef, int, error) {
-	URL := fmt.Sprintf("_apis/git/repositories/%s/pullRequests/%d/commits?api-version=%s",
+func (s *PullRequestsService) ListCommits(ctx context.Context, repo string, pullNum int) ([]*GitCommitRef, int, error) {
+	URL := fmt.Sprintf("_apis/git/repositories/%s/pullRequests/%d/commits?api-version=5.1-preview.1",
 		repo,
 		pullNum,
-		APIVersion,
 	)
 
 	req, err := s.client.NewRequest("GET", URL, nil)
@@ -270,7 +268,7 @@ func (s *PullRequestsService) ListCommits(repo string, pullNum int) ([]*GitCommi
 	}
 
 	var resp PullRequestsCommitsResponse
-	_, err = s.client.Execute(req, resp)
+	_, err = s.client.Execute(ctx, req, resp)
 
 	return resp.GitCommitRefs, resp.Count, nil
 }

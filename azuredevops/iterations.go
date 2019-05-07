@@ -1,6 +1,7 @@
 package azuredevops
 
 import (
+	"context"
 	"fmt"
 	"net/url"
 )
@@ -30,11 +31,10 @@ type Iteration struct {
 
 // List returns list of the iterations available to the user
 // utilising https://docs.microsoft.com/en-gb/rest/api/vsts/work/iterations/list
-func (s *IterationsService) List(team string) ([]Iteration, error) {
+func (s *IterationsService) List(ctx context.Context, team string) ([]Iteration, error) {
 	URL := fmt.Sprintf(
-		"/%s/_apis/work/teamsettings/iterations?api-version=%s",
+		"/%s/_apis/work/teamsettings/iterations?api-version=5.1-preview.1",
 		url.PathEscape(team),
-		APIVersion,
 	)
 
 	request, err := s.client.NewRequest("GET", URL, nil)
@@ -42,15 +42,15 @@ func (s *IterationsService) List(team string) ([]Iteration, error) {
 		return nil, err
 	}
 	var response IterationsResponse
-	_, err = s.client.Execute(request, &response)
+	_, err = s.client.Execute(ctx, request, &response)
 
 	return response.Iterations, err
 }
 
 // GetByName will search the iterations for the account and project
 // and return a single iteration if the names match
-func (s *IterationsService) GetByName(team string, name string) (*Iteration, error) {
-	iterations, err := s.List(team)
+func (s *IterationsService) GetByName(ctx context.Context, team string, name string) (*Iteration, error) {
+	iterations, err := s.List(ctx, team)
 	if err != nil {
 		return nil, err
 	}

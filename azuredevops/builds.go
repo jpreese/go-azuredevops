@@ -1,6 +1,7 @@
 package azuredevops
 
 import (
+	"context"
 	"fmt"
 )
 
@@ -12,79 +13,92 @@ type BuildsService struct {
 
 // BuildsListResponse is the wrapper around the main response for the List of Builds
 type BuildsListResponse struct {
-	Count  int     `json:"count"`
-	Builds []Build `json:"value"`
+	Count  int      `json:"count"`
+	Builds []*Build `json:"value"`
 }
 
-type buildOrchestrationPlanSchema struct {
+// TaskOrchestrationPlanReference The orchestration plan for the build.
+type TaskOrchestrationPlanReference struct {
 	Type   *int    `json:"orchestrationType,omitempty"`
 	PlanID *string `json:"planId,omitempty"`
 }
 
-// Build represents a build
+// Build Represents a build.
 type Build struct {
-	Definition    *BuildDefinition `json:"definition,omitempty"`
-	Controller    *BuildController `json:"controller,omitempty"`
-	LastChangedBy *IdentityRef     `json:"lastChangedBy,omitempty"`
-	DeletedBy     *IdentityRef     `json:"deletedBy,omitempty"`
-	BuildNumber   *string          `json:"buildNumber,omitempty"`
-	FinishTime    *string          `json:"finishTime,omitempty"`
-	Branch        *string          `json:"sourceBranch,omitempty"`
-	Repository    *Repository      `json:"repository,omitempty"`
-	Demands       []struct {
-		Name  string `json:"name"`
-		Value string `json:"value"`
-	} `json:"demands"`
-	Logs *struct {
-		ID   int    `json:"id"`
-		Type string `json:"type"`
-		URL  string `json:"url"`
-	} `json:"logs,omitempty"`
+	Definition          *BuildDefinition      `json:"definition,omitempty"`
+	Controller          *BuildController      `json:"controller,omitempty"`
+	LastChangedBy       *IdentityRef          `json:"lastChangedBy,omitempty"`
+	DeletedBy           *IdentityRef          `json:"deletedBy,omitempty"`
+	BuildNumber         *string               `json:"buildNumber,omitempty"`
+	FinishTime          *string               `json:"finishTime,omitempty"`
+	Branch              *string               `json:"sourceBranch,omitempty"`
+	Repository          *BuildRepository      `json:"repository,omitempty"`
+	Demands             []*BuildDemand        `json:"demands,omitempty"`
+	Logs                *BuildLogReference    `json:"logs,omitempty"`
 	Project             *TeamProjectReference `json:"project,omitempty"`
 	Properties          map[string]string
-	Priority            string                         `json:"priority,omitempty"`
-	OrchestrationPlan   *buildOrchestrationPlanSchema  `json:"orchestrationPlan,omitempty"`
-	Plans               []buildOrchestrationPlanSchema `json:"plans,omitempty"`
-	BuildNumberRevision int                            `json:"buildNumberRevision,omitempty"`
-	Deleted             *bool                          `json:"deleted,omitempty"`
-	DeletedDate         string                         `json:"deletedDate,omitempty"`
-	DeletedReason       string                         `json:"deletedReason,omitempty"`
-	ID                  int                            `json:"id,omitempty"`
-	KeepForever         bool                           `json:"keepForever,omitempty"`
-	ChangedDate         string                         `json:"lastChangedDate,omitempty"`
-	Params              string                         `json:"parameters,omitempty"`
-	Quality             string                         `json:"quality,omitempty"`
-	Queue               struct {
-		ID   int    `json:"id"`
-		Name string `json:"name"`
-		URL  string `json:"url"`
-		Pool *struct {
-			ID       int    `json:"id"`
-			IsHosted bool   `json:"is_hosted"`
-			Name     string `json:"name"`
-		} `json:"pool,omitempty"`
-	} `json:"queue"`
-	QueueOptions      map[string]string `json:"queue_options"`
-	QueuePosition     *int              `json:"queuePosition,omitempty"`
-	QueueTime         string            `json:"queueTime,omitempty"`
-	RetainedByRelease *bool             `json:"retainedByRelease,omitempty"`
-	Version           string            `json:"sourceVersion,omitempty"`
-	StartTime         string            `json:"startTime,omitempty"`
-	Status            string            `json:"status,omitempty"`
-	Result            string            `json:"result,omitempty"`
-	ValidationResults []struct {
-		Message string `json:"message"`
-		Result  string `json:"result"`
-	}
-	Tags         []string `json:"tags,omitempty"`
-	TriggerBuild *Build   `json:"triggeredByBuild,omitempty"`
-	URI          string   `json:"uri,omitempty"`
-	URL          string   `json:"url,omitempty"`
-	TriggerInfo  struct {
-		CiSourceBranch string `json:"ci.sourceBranch"`
-		CiSourceSha    string `json:"ci.sourceSha"`
-		CiMessage      string `json:"ci.message"`
-	} `json:"triggerInfo"`
+	Priority            *string                           `json:"priority,omitempty"`
+	OrchestrationPlan   *TaskOrchestrationPlanReference   `json:"orchestrationPlan,omitempty"`
+	Plans               []*TaskOrchestrationPlanReference `json:"plans,omitempty"`
+	BuildNumberRevision *int                              `json:"buildNumberRevision,omitempty"`
+	Deleted             *bool                             `json:"deleted,omitempty"`
+	DeletedDate         *string                           `json:"deletedDate,omitempty"`
+	DeletedReason       *string                           `json:"deletedReason,omitempty"`
+	ID                  *int                              `json:"id,omitempty"`
+	KeepForever         *bool                             `json:"keepForever,omitempty"`
+	ChangedDate         *string                           `json:"lastChangedDate,omitempty"`
+	Params              *string                           `json:"parameters,omitempty"`
+	Quality             *string                           `json:"quality,omitempty"`
+	Queue               *AgentPoolQueue                   `json:"queue,omitempty"`
+	QueueOptions        map[string]string                 `json:"queue_options,omitempty"`
+	QueuePosition       *int                              `json:"queuePosition,omitempty"`
+	QueueTime           *string                           `json:"queueTime,omitempty"`
+	RetainedByRelease   *bool                             `json:"retainedByRelease,omitempty"`
+	Version             *string                           `json:"sourceVersion,omitempty"`
+	StartTime           *string                           `json:"startTime,omitempty"`
+	Status              *string                           `json:"status,omitempty"`
+	Result              *string                           `json:"result,omitempty"`
+	ValidationResults   []*ValidationResult               `json:"validationResult,omitempty"`
+	Tags                []*string                         `json:"tags,omitempty"`
+	TriggerBuild        *Build                            `json:"triggeredByBuild,omitempty"`
+	URI                 *string                           `json:"uri,omitempty"`
+	URL                 *string                           `json:"url,omitempty"`
+	TriggerInfo         *TriggerInfo                      `json:"triggerInfo,omitempty"`
+}
+
+// AgentPoolQueue The queue. This is only set if the definition type is Build.
+type AgentPoolQueue struct {
+	Links *map[string]Link        `json:"_links,omitempty"`
+	ID    *int                    `json:"id,omitempty"`
+	Name  *string                 `json:"name,omitempty"`
+	URL   *string                 `json:"url,omitempty"`
+	Pool  *TaskAgentPoolReference `json:"pool,omitempty"`
+}
+
+// TaskAgentPoolReference Represents a reference to an agent pool.
+type TaskAgentPoolReference struct {
+	ID       *int    `json:"id,omitempty"`
+	IsHosted *bool   `json:"is_hosted,omitempty"`
+	Name     *string `json:"name,omitempty"`
+}
+
+// TriggerInfo Source provider-specific information about what triggered the build.
+type TriggerInfo struct {
+	CiSourceBranch *string `json:"ci.sourceBranch,omitempty"`
+	CiSourceSha    *string `json:"ci.sourceSha,omitempty"`
+	CiMessage      *string `json:"ci.message,omitempty"`
+}
+
+// ValidationResult Represents the result of validating a build request.
+type ValidationResult struct {
+	Message *string `json:"message,omitempty"`
+	Result  *string `json:"result,omitempty"`
+}
+
+// BuildDemand Represents a demand used by a definition or build.
+type BuildDemand struct {
+	Name  *string `json:"name,omitempty"`
+	Value *string `json:"value,omitempty"`
 }
 
 // BuildListOrder is enum type for build list order
@@ -107,32 +121,39 @@ const (
 
 // BuildsListOptions describes what the request to the API should look like
 type BuildsListOptions struct {
-	Definitions      string         `url:"definitions,omitempty"`
-	Branch           string         `url:"branchName,omitempty"`
-	Count            int            `url:"$top,omitempty"`
-	Repository       string         `url:"repositoryId,omitempty"`
-	BuildIDs         string         `url:"buildIds,omitempty"`
-	Order            BuildListOrder `url:"queryOrder,omitempty"`
-	Deleted          string         `url:"deletedFilter,omitempty"`
-	MaxPerDefinition string         `url:"maxBuildsPerDefinition,omitempty"`
-	Token            string         `url:"continuationToken,omitempty"`
-	Props            string         `url:"properties,omitempty"`
-	Tags             string         `url:"tagFilters,omitempty"`
-	Result           string         `url:"resultFilter,omitempty"`
-	Status           string         `url:"statusFilter,omitempty"`
-	Reason           string         `url:"reasonFilter,omitempty"`
-	UserID           string         `url:"requestedFor,omitempty"`
-	MaxTime          string         `url:"maxTime,omitempty"`
-	MinTime          string         `url:"minTime,omitempty"`
-	BuildNumber      string         `url:"buildNumber,omitempty"`
-	Queues           string         `url:"queues,omitempty"`
-	RepoType         string         `url:"repositoryType,omitempty"`
+	Definitions      *string `url:"definitions,omitempty"`
+	Branch           *string `url:"branchName,omitempty"`
+	Count            *int    `url:"$top,omitempty"`
+	Repository       *string `url:"repositoryId,omitempty"`
+	BuildIDs         *string `url:"buildIds,omitempty"`
+	Order            *string `url:"queryOrder,omitempty"`
+	Deleted          *string `url:"deletedFilter,omitempty"`
+	MaxPerDefinition *string `url:"maxBuildsPerDefinition,omitempty"`
+	Token            *string `url:"continuationToken,omitempty"`
+	Props            *string `url:"properties,omitempty"`
+	Tags             *string `url:"tagFilters,omitempty"`
+	Result           *string `url:"resultFilter,omitempty"`
+	Status           *string `url:"statusFilter,omitempty"`
+	Reason           *string `url:"reasonFilter,omitempty"`
+	UserID           *string `url:"requestedFor,omitempty"`
+	MaxTime          *string `url:"maxTime,omitempty"`
+	MinTime          *string `url:"minTime,omitempty"`
+	BuildNumber      *string `url:"buildNumber,omitempty"`
+	Queues           *string `url:"queues,omitempty"`
+	RepoType         *string `url:"repositoryType,omitempty"`
+}
+
+// BuildLogReference Information about the build logs.
+type BuildLogReference struct {
+	ID   *int    `json:"id"`
+	Type *string `json:"type"`
+	URL  *string `json:"url"`
 }
 
 // List returns list of the builds
 // utilising https://docs.microsoft.com/en-gb/rest/api/vsts/build/builds/list
-func (s *BuildsService) List(opts *BuildsListOptions) ([]Build, error) {
-	URL := fmt.Sprintf("_apis/build/builds?api-version=%s", APIVersion)
+func (s *BuildsService) List(ctx context.Context, opts *BuildsListOptions) ([]*Build, error) {
+	URL := fmt.Sprintf("_apis/build/builds?api-version=5.1-preview.1")
 	URL, err := addOptions(URL, opts)
 
 	request, err := s.client.NewRequest("GET", URL, nil)
@@ -140,7 +161,7 @@ func (s *BuildsService) List(opts *BuildsListOptions) ([]Build, error) {
 		return nil, err
 	}
 	var response BuildsListResponse
-	_, err = s.client.Execute(request, &response)
+	_, err = s.client.Execute(ctx, request, &response)
 
 	return response.Builds, err
 }
@@ -153,7 +174,7 @@ type QueueBuildOptions struct {
 
 // Queue inserts new build creation to queue
 // utilising https://docs.microsoft.com/en-us/rest/api/azure/devops/build/Builds/Queue
-func (s *BuildsService) Queue(build *Build, opts *QueueBuildOptions) error {
+func (s *BuildsService) Queue(ctx context.Context, build *Build, opts *QueueBuildOptions) error {
 	URL := fmt.Sprintf("_apis/build/builds?api-version=api-version=5.1-preview.5")
 	URL, err := addOptions(URL, opts)
 
@@ -167,7 +188,7 @@ func (s *BuildsService) Queue(build *Build, opts *QueueBuildOptions) error {
 		return err
 	}
 
-	_, err = s.client.Execute(request, build)
+	_, err = s.client.Execute(ctx, request, build)
 
 	return err
 }

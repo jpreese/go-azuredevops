@@ -1,6 +1,7 @@
 package azuredevops_test
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"testing"
@@ -51,18 +52,18 @@ func TestBuildDefinitionsService_List(t *testing.T) {
 			})
 
 			options := &azuredevops.BuildDefinitionsListOptions{}
-			buildDefs, err := c.BuildDefinitions.List(options)
+			buildDefs, err := c.BuildDefinitions.List(context.Background(), options)
 			if err != nil {
 				t.Fatalf("returned error: %v", err)
 			}
 
 			if tc.index > -1 {
-				if buildDefs[tc.index].ID != tc.defId {
+				if buildDefs[tc.index].ID != &tc.defId {
 					t.Fatalf("expected build definition id %d, got %d", tc.defId, buildDefs[tc.index].ID)
 				}
 
-				if buildDefs[tc.index].Name != tc.defName {
-					t.Fatalf("expected build definition name %s, got %s", tc.defName, buildDefs[tc.index].Name)
+				if buildDefs[tc.index].Name != &tc.defName {
+					t.Fatalf("expected build definition name %s, got %s", tc.defName, *buildDefs[tc.index].Name)
 				}
 			}
 

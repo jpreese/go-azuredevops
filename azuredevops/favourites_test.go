@@ -1,6 +1,7 @@
 package azuredevops_test
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"testing"
@@ -52,7 +53,7 @@ func TestFavouritesService_List(t *testing.T) {
 				fmt.Fprint(w, json)
 			})
 
-			favourites, count, err := c.Favourites.List()
+			favourites, count, err := c.Favourites.List(context.Background())
 			if err != nil {
 				t.Fatalf("returned error: %v", err)
 			}
