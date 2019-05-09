@@ -53,7 +53,7 @@ func TestFavouritesService_List(t *testing.T) {
 				fmt.Fprint(w, json)
 			})
 
-			favourites, count, err := c.Favourites.List(context.Background())
+			favourites, count, err := c.Favourites.List(context.Background(), "AZURE_DEVOPS_OWNER", "AZURE_DEVOPS_PROJECT")
 			if err != nil {
 				t.Fatalf("returned error: %v", err)
 			}

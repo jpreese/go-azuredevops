@@ -97,7 +97,7 @@ func TestPullRequestsService_List(t *testing.T) {
 			})
 
 			opt := &azuredevops.PullRequestListOptions{}
-			response, count, err := c.PullRequests.List(context.Background(), opt)
+			response, count, err := c.PullRequests.List(context.Background(), "AZURE_DEVOPS_OWNER", "AZURE_DEVOPS_PROJECT", opt)
 			if err != nil {
 				t.Fatalf("returned error: %v", err)
 			}
@@ -142,7 +142,7 @@ func TestPullRequestsService_ListCommits(t *testing.T) {
 				fmt.Fprint(w, json)
 			})
 
-			response, count, err := c.PullRequests.ListCommits(context.Background(), "test", 1)
+			response, count, err := c.PullRequests.ListCommits(context.Background(), "AZURE_DEVOPS_OWNER", "AZURE_DEVOPS_PROJECT", "test", 1)
 			if err != nil {
 				t.Fatalf("returned error: %v", err)
 			}
@@ -189,7 +189,7 @@ func TestPullRequestsService_Get(t *testing.T) {
 
 			opt := &azuredevops.PullRequestListOptions{}
 			num := 1
-			response, count, err := c.PullRequests.Get(context.Background(), num, opt)
+			response, count, err := c.PullRequests.Get(context.Background(), "AZURE_DEVOPS_OWNER", "AZURE_DEVOPS_PROJECT", num, opt)
 			if err != nil {
 				t.Fatalf("returned error: %v", err)
 			}
@@ -236,7 +236,7 @@ func TestPullRequestsService_Merge(t *testing.T) {
 
 			opt := &azuredevops.PullRequestListOptions{}
 			num := 1
-			response, count, err := c.PullRequests.Get(context.Background(), num, opt)
+			response, count, err := c.PullRequests.Merge(context.Background(), "AZURE_DEVOPS_OWNER", "AZURE_DEVOPS_PROJECT", num, opt)
 			if err != nil {
 				t.Fatalf("returned error: %v", err)
 			}

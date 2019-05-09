@@ -84,9 +84,11 @@ type FieldReference struct {
 
 // List returns list of the boards
 // utilising https://docs.microsoft.com/en-gb/rest/api/vsts/work/boards/list
-func (s *BoardsService) List(ctx context.Context, team string) ([]*BoardReference, error) {
+func (s *BoardsService) List(ctx context.Context, owner, project, team string) ([]*BoardReference, error) {
 	URL := fmt.Sprintf(
-		"%s/_apis/work/boards?api-version=5.1-preview.1",
+		"%s/%s/%s/_apis/work/boards?api-version=5.1-preview.1",
+		owner,
+		project,
 		url.PathEscape(team),
 	)
 
@@ -101,9 +103,11 @@ func (s *BoardsService) List(ctx context.Context, team string) ([]*BoardReferenc
 }
 
 // Get returns a single board utilising https://docs.microsoft.com/en-gb/rest/api/vsts/work/boards/get
-func (s *BoardsService) Get(ctx context.Context, team string, id string) (*Board, error) {
+func (s *BoardsService) Get(ctx context.Context, owner, project, team, id string) (*Board, error) {
 	URL := fmt.Sprintf(
-		"%s/_apis/work/boards/%s?api-version=5.1-preview.1",
+		"%s/%s/%s/_apis/work/boards/%s?api-version=5.1-preview.1",
+		owner,
+		project,
 		url.PathEscape(team),
 		id,
 	)

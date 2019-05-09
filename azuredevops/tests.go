@@ -46,8 +46,11 @@ type TestsListOptions struct {
 
 // List returns list of the tests
 // utilising https://docs.microsoft.com/en-gb/rest/api/vsts/test/runs/list
-func (s *TestsService) List(ctx context.Context, opts *TestsListOptions) ([]*Test, error) {
-	URL := fmt.Sprintf("_apis/test/runs?api-version=4.1")
+func (s *TestsService) List(ctx context.Context, owner, project string, opts *TestsListOptions) ([]*Test, error) {
+	URL := fmt.Sprintf("%s/%s/_apis/test/runs?api-version=4.1",
+		owner,
+		project,
+	)
 	URL, err := addOptions(URL, opts)
 
 	request, err := s.client.NewRequest("GET", URL, nil)
@@ -136,8 +139,12 @@ type TestResultsListOptions struct {
 
 // ResultsList returns list of the test results
 // utilising https://docs.microsoft.com/en-gb/rest/api/vsts/test/runs/list
-func (s *TestsService) ResultsList(ctx context.Context, opts *TestResultsListOptions) ([]TestResult, error) {
-	URL := fmt.Sprintf("_apis/test/Runs/%s/results?api-version=4.1", opts.RunID)
+func (s *TestsService) ResultsList(ctx context.Context, owner, project string, opts *TestResultsListOptions) ([]TestResult, error) {
+	URL := fmt.Sprintf("%s/%s/_apis/test/Runs/%s/results?api-version=4.1",
+		owner,
+		project,
+		opts.RunID,
+	)
 	opts.RunID = ""
 	URL, err := addOptions(URL, opts)
 

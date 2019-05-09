@@ -174,7 +174,7 @@ func TestWorkItems_GetForIteration(t *testing.T) {
 			})
 
 			iteration := azuredevops.Iteration{ID: "1"}
-			workItems, err := c.WorkItems.GetForIteration(context.Background(), "AZURE_DEVOPS_TEAM", iteration)
+			workItems, err := c.WorkItems.GetForIteration(context.Background(), "AZURE_DEVOPS_OWNER", "AZURE_DEVOPS_PROJECT", "AZURE_DEVOPS_TEAM", iteration)
 			if err != nil {
 				t.Fatalf("returned error: %v", err)
 			}
@@ -206,7 +206,7 @@ func TestWorkItems_CreateComment(t *testing.T) {
 		fmt.Fprint(w, `{"id":1, "text": "TEST COMMENT"}`)
 	})
 
-	got, resp, err := client.WorkItems.CreateComment(context.Background(), 1, want)
+	got, resp, err := client.WorkItems.CreateComment(context.Background(), "AZURE_DEVOPS_OWNER", "AZURE_DEVOPS_PROJECT", 1, want)
 	if err != nil {
 		t.Errorf("WorkItems.CreateComment returned error: %v", err)
 	}

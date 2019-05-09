@@ -348,9 +348,11 @@ type GitUserDate struct {
 }
 
 // ListRefs returns a list of the references for a git repo
-func (s *GitService) ListRefs(ctx context.Context, repo, refType string, opts *GitRefListOptions) ([]*GitRef, int, error) {
+func (s *GitService) ListRefs(ctx context.Context, owner, project, repo, refType string, opts *GitRefListOptions) ([]*GitRef, int, error) {
 	URL := fmt.Sprintf(
-		"_apis/git/repositories/%s/refs/%s?api-version=5.1-preview.1",
+		"%s/%s/_apis/git/repositories/%s/refs/%s?api-version=5.1-preview.1",
+		owner,
+		project,
 		repo,
 		refType,
 	)
@@ -369,9 +371,11 @@ func (s *GitService) ListRefs(ctx context.Context, repo, refType string, opts *G
 
 // GetRepository Return a single GitRepository
 // https://docs.microsoft.com/en-us/rest/api/azure/devops/git/repositories/get%20repository?view=azure-devops-rest-5.1
-func (s *GitService) GetRepository(ctx context.Context, repoName string) (*GitRepository, int, error) {
+func (s *GitService) GetRepository(ctx context.Context, owner, project, repoName string) (*GitRepository, int, error) {
 	URL := fmt.Sprintf(
-		"_apis/git/repositories/%s?api-version=5.1-preview.1",
+		"%s/%s/_apis/git/repositories/%s?api-version=5.1-preview.1",
+		owner,
+		project,
 		repoName,
 	)
 
@@ -389,9 +393,11 @@ func (s *GitService) GetRepository(ctx context.Context, repoName string) (*GitRe
 // CreateStatus creates a new status for a repository at the specified
 // reference. Ref can be a SHA, a branch name, or a tag name.
 // https://docs.microsoft.com/en-us/rest/api/azure/devops/git/statuses/create?view=azure-devops-rest-5.0
-func (s *GitService) CreateStatus(ctx context.Context, repoName, ref string, status GitStatus) (*GitStatus, int, error) {
+func (s *GitService) CreateStatus(ctx context.Context, owner, project, repoName, ref string, status GitStatus) (*GitStatus, int, error) {
 	URL := fmt.Sprintf(
-		"_apis/git/repositories/%s/commits/%s/statuses?api-version=5.1-preview.1",
+		"%s/%s/_apis/git/repositories/%s/commits/%s/statuses?api-version=5.1-preview.1",
+		owner,
+		project,
 		repoName,
 		url.QueryEscape(ref),
 	)

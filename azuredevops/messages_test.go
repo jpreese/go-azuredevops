@@ -18,7 +18,9 @@ import (
 )
 
 func TestParseWebHook(t *testing.T) {
-	payload := azuredevops.Event{}
+	payload := azuredevops.Event{
+		EventType: "git.pullrequest.created",
+	}
 	p, err := json.Marshal(payload)
 	if err != nil {
 		t.Fatalf("Marshal(%#v): %v", payload, err)
@@ -52,13 +54,13 @@ func TestRequestID(t *testing.T) {
 
 	req, err := http.NewRequest("POST", "http://localhost", nil)
 	if err != nil {
-		t.Fatalf("ActivityID: %v", err)
+		t.Fatalf("RequestID: %v", err)
 	}
-	req.Header.Set("X-VSS-ActivityID", id)
+	req.Header.Set("Request-Id", id)
 
 	got := azuredevops.GetRequestID(req)
 	if got != id {
-		t.Errorf("ActivityID(%#v) = %q, want %q", req, got, id)
+		t.Errorf("RequestID(%#v) = %q, want %q", req, got, id)
 	}
 }
 

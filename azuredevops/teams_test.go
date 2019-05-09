@@ -56,7 +56,7 @@ func TestTeamsService_List(t *testing.T) {
 			})
 
 			opt := &azuredevops.TeamsListOptions{}
-			response, count, err := c.Teams.List(context.Background(), opt)
+			response, count, err := c.Teams.List(context.Background(), "AZURE_DEVOPS_OWNER", "AZURE_DEVOPS_PROJECT", opt)
 			if err != nil {
 				t.Fatalf("returned error: %v", err)
 			}

@@ -60,7 +60,7 @@ func TestBuildsService_List(t *testing.T) {
 			})
 
 			options := &azuredevops.BuildsListOptions{}
-			builds, err := c.Builds.List(context.Background(), options)
+			builds, err := c.Builds.List(context.Background(), "AZURE_DEVOPS_OWNER", "AZURE_DEVOPS_PROJECT", options)
 			if err != nil {
 				t.Fatalf("returned error: %v", err)
 			}
@@ -118,7 +118,7 @@ func TestBuildsService_Queue(t *testing.T) {
 
 		options := &azuredevops.QueueBuildOptions{}
 
-		err := c.Builds.Queue(context.Background(), requestBuild, options)
+		err := c.Builds.Queue(context.Background(), "AZURE_DEVOPS_OWNER", "AZURE_DEVOPS_PROJECT", requestBuild, options)
 
 		if err != nil {
 			t.Fatalf("returned error: %v", err)

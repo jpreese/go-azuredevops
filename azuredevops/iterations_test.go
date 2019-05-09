@@ -48,7 +48,7 @@ func TestIterationService_GetByName(t *testing.T) {
 				fmt.Fprint(w, json)
 			})
 
-			iteration, err := c.Iterations.GetByName(context.Background(), "AZURE_DEVOPS_TEAM", tc.iteration)
+			iteration, err := c.Iterations.GetByName(context.Background(), "AZURE_DEVOPS_OWNER", "AZURE_DEVOPS_PROJECT", "AZURE_DEVOPS_TEAM", tc.iteration)
 			if err != nil {
 				t.Fatalf("returned error: %v", err)
 			}
@@ -91,7 +91,7 @@ func TestIterationService_List(t *testing.T) {
 				fmt.Fprint(w, json)
 			})
 
-			iterations, err := c.Iterations.List(context.Background(), "AZURE_DEVOPS_TEAM")
+			iterations, err := c.Iterations.List(context.Background(), "AZURE_DEVOPS_OWNER", "AZURE_DEVOPS_PROJECT", "AZURE_DEVOPS_TEAM")
 			if err != nil {
 				t.Fatalf("returned error: %v", err)
 			}

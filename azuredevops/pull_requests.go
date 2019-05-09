@@ -126,8 +126,11 @@ type PullRequestListOptions struct {
 
 // List returns list of the pull requests
 // utilising https://docs.microsoft.com/en-us/rest/api/vsts/git/pull%20requests/get%20pull%20requests%20by%20project
-func (s *PullRequestsService) List(ctx context.Context, opts *PullRequestListOptions) ([]*GitPullRequest, int, error) {
-	URL := fmt.Sprintf("_apis/git/pullrequests?api-version=5.1-preview.1")
+func (s *PullRequestsService) List(ctx context.Context, owner, project string, opts *PullRequestListOptions) ([]*GitPullRequest, int, error) {
+	URL := fmt.Sprintf("%s/%s/_apis/git/pullrequests?api-version=5.1-preview.1",
+		owner,
+		project,
+	)
 	URL, err := addOptions(URL, opts)
 
 	req, err := s.client.NewRequest("GET", URL, nil)
@@ -142,8 +145,10 @@ func (s *PullRequestsService) List(ctx context.Context, opts *PullRequestListOpt
 
 // Get returns a single pull request
 // utilising https://docs.microsoft.com/en-us/rest/api/vsts/git/pull%20requests/get%20pull%20requests%20by%20project
-func (s *PullRequestsService) Get(ctx context.Context, pullNum int, opts *PullRequestListOptions) (*GitPullRequest, int, error) {
-	URL := fmt.Sprintf("_apis/git/pullrequests/%d?api-version=5.1-preview.1",
+func (s *PullRequestsService) Get(ctx context.Context, owner, project string, pullNum int, opts *PullRequestListOptions) (*GitPullRequest, int, error) {
+	URL := fmt.Sprintf("%s/%s/_apis/git/pullrequests/%d?api-version=5.1-preview.1",
+		owner,
+		project,
 		pullNum,
 	)
 	URL, err := addOptions(URL, opts)
@@ -161,8 +166,10 @@ func (s *PullRequestsService) Get(ctx context.Context, pullNum int, opts *PullRe
 // Merge Completes a pull request
 // https://docs.microsoft.com/en-us/rest/api/azure/devops/git/pull%20requests/update?view=azure-devops-rest-5.1
 // pullRequest = EnableAutoCompleteOnAnExistingPullRequest(gitHttpClient, pullRequest, mergeCommitMessage);
-func (s *PullRequestsService) Merge(ctx context.Context, repoName string, pullNum int, id *IdentityRef, commitMsg string) (*GitPullRequest, int, error) {
-	URL := fmt.Sprintf("_apis/git/repositories/%s/pullrequests?api-version=5.1-preview.1",
+func (s *PullRequestsService) Merge(ctx context.Context, owner, project string, repoName string, pullNum int, id *IdentityRef, commitMsg string) (*GitPullRequest, int, error) {
+	URL := fmt.Sprintf("%s/%s/_apis/git/repositories/%s/pullrequests?api-version=5.1-preview.1",
+		owner,
+		project,
 		repoName,
 	)
 
@@ -256,8 +263,10 @@ type GitPullRequestCommentThreadContext struct {
 // ListCommits lists the commits in a pull request.
 // Azure Devops API docs: https://docs.microsoft.com/en-us/rest/api/azure/devops/git/pull%20request%20commits/get%20pull%20request%20commits
 //
-func (s *PullRequestsService) ListCommits(ctx context.Context, repo string, pullNum int) ([]*GitCommitRef, int, error) {
-	URL := fmt.Sprintf("_apis/git/repositories/%s/pullRequests/%d/commits?api-version=5.1-preview.1",
+func (s *PullRequestsService) ListCommits(ctx context.Context, owner, project, repo string, pullNum int) ([]*GitCommitRef, int, error) {
+	URL := fmt.Sprintf("%s/%s/_apis/git/repositories/%s/pullRequests/%d/commits?api-version=5.1-preview.1",
+		owner,
+		project,
 		repo,
 		pullNum,
 	)

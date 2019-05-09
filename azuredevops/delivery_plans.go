@@ -63,8 +63,11 @@ type DeliveryPlansListOptions struct {
 }
 
 // List returns a list of delivery plans
-func (s *DeliveryPlansService) List(ctx context.Context, opts *DeliveryPlansListOptions) ([]*DeliveryPlan, int, error) {
-	URL := fmt.Sprintf("_apis/work/plans?api-version=5.1-preview.1")
+func (s *DeliveryPlansService) List(ctx context.Context, owner string, project string, opts *DeliveryPlansListOptions) ([]*DeliveryPlan, int, error) {
+	URL := fmt.Sprintf("%s/%s/_apis/work/plans?api-version=5.1-preview.1",
+		owner,
+		project,
+	)
 	URL, err := addOptions(URL, opts)
 
 	request, err := s.client.NewRequest("GET", URL, nil)
@@ -78,9 +81,11 @@ func (s *DeliveryPlansService) List(ctx context.Context, opts *DeliveryPlansList
 }
 
 // GetTimeLine will fetch the details about a specific delivery plan
-func (s *DeliveryPlansService) GetTimeLine(ctx context.Context, ID string, startDate, endDate string) (*DeliveryPlanTimeLine, error) {
+func (s *DeliveryPlansService) GetTimeLine(ctx context.Context, owner string, project string, ID string, startDate, endDate string) (*DeliveryPlanTimeLine, error) {
 	URL := fmt.Sprintf(
-		"_apis/work/plans/%s/deliverytimeline?api-version=5.1-preview.1",
+		"%s/%s/_apis/work/plans/%s/deliverytimeline?api-version=5.1-preview.1",
+		owner,
+		project,
 		ID,
 	)
 

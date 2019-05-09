@@ -152,8 +152,11 @@ type BuildLogReference struct {
 
 // List returns list of the builds
 // utilising https://docs.microsoft.com/en-gb/rest/api/vsts/build/builds/list
-func (s *BuildsService) List(ctx context.Context, opts *BuildsListOptions) ([]*Build, error) {
-	URL := fmt.Sprintf("_apis/build/builds?api-version=5.1-preview.1")
+func (s *BuildsService) List(ctx context.Context, owner string, project string, opts *BuildsListOptions) ([]*Build, error) {
+	URL := fmt.Sprintf("%s/%s/_apis/build/builds?api-version=5.1-preview.1",
+		owner,
+		project,
+	)
 	URL, err := addOptions(URL, opts)
 
 	request, err := s.client.NewRequest("GET", URL, nil)
@@ -174,8 +177,11 @@ type QueueBuildOptions struct {
 
 // Queue inserts new build creation to queue
 // utilising https://docs.microsoft.com/en-us/rest/api/azure/devops/build/Builds/Queue
-func (s *BuildsService) Queue(ctx context.Context, build *Build, opts *QueueBuildOptions) error {
-	URL := fmt.Sprintf("_apis/build/builds?api-version=api-version=5.1-preview.5")
+func (s *BuildsService) Queue(ctx context.Context, owner string, project string, build *Build, opts *QueueBuildOptions) error {
+	URL := fmt.Sprintf("%s/%s/_apis/build/builds?api-version=api-version=5.1-preview.5",
+		owner,
+		project,
+	)
 	URL, err := addOptions(URL, opts)
 
 	if err != nil {

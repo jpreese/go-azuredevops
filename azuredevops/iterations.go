@@ -31,9 +31,11 @@ type Iteration struct {
 
 // List returns list of the iterations available to the user
 // utilising https://docs.microsoft.com/en-gb/rest/api/vsts/work/iterations/list
-func (s *IterationsService) List(ctx context.Context, team string) ([]Iteration, error) {
+func (s *IterationsService) List(ctx context.Context, owner, project, team string) ([]Iteration, error) {
 	URL := fmt.Sprintf(
-		"/%s/_apis/work/teamsettings/iterations?api-version=5.1-preview.1",
+		"%s/%s/%s/_apis/work/teamsettings/iterations?api-version=5.1-preview.1",
+		owner,
+		project,
 		url.PathEscape(team),
 	)
 
@@ -49,8 +51,8 @@ func (s *IterationsService) List(ctx context.Context, team string) ([]Iteration,
 
 // GetByName will search the iterations for the account and project
 // and return a single iteration if the names match
-func (s *IterationsService) GetByName(ctx context.Context, team string, name string) (*Iteration, error) {
-	iterations, err := s.List(ctx, team)
+func (s *IterationsService) GetByName(ctx context.Context, owner, project, team string, name string) (*Iteration, error) {
+	iterations, err := s.List(ctx, owner, project, team)
 	if err != nil {
 		return nil, err
 	}

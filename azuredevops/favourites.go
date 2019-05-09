@@ -26,9 +26,11 @@ type Favourite struct {
 }
 
 // List returns a list of the favourite items from for the user
-func (s *FavouritesService) List(ctx context.Context) ([]*Favourite, int, error) {
+func (s *FavouritesService) List(ctx context.Context, owner, project string) ([]*Favourite, int, error) {
 	URL := fmt.Sprintf(
-		"_apis/Favorite/Favorites?artifactType=%s",
+		"%s/%s/_apis/Favorite/Favorites?artifactType=%s",
+		owner,
+		project,
 		"Microsoft.TeamFoundation.Git.Repository", // @todo This needs fixing
 	)
 

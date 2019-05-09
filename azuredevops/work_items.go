@@ -107,8 +107,8 @@ type WorkItemUpdate struct {
 
 // GetForIteration will get a list of work items based on an iteration name
 // utilising https://docs.microsoft.com/en-gb/rest/api/vsts/wit/work%20items/list
-func (s *WorkItemsService) GetForIteration(ctx context.Context, team string, iteration Iteration) ([]*WorkItem, error) {
-	queryIds, err := s.GetIdsForIteration(ctx, team, iteration)
+func (s *WorkItemsService) GetForIteration(ctx context.Context, owner, project, team string, iteration Iteration) ([]*WorkItem, error) {
+	queryIds, err := s.GetIdsForIteration(ctx, owner, project, team, iteration)
 	if err != nil {
 		return nil, err
 	}
@@ -145,9 +145,11 @@ func (s *WorkItemsService) GetForIteration(ctx context.Context, team string, ite
 
 // GetIdsForIteration will return an array of ids for a given iteration
 // utilising https://docs.microsoft.com/en-gb/rest/api/vsts/work/iterations/get%20iteration%20work%20items
-func (s *WorkItemsService) GetIdsForIteration(ctx context.Context, team string, iteration Iteration) ([]int, error) {
+func (s *WorkItemsService) GetIdsForIteration(ctx context.Context, owner, project, team string, iteration Iteration) ([]int, error) {
 	URL := fmt.Sprintf(
-		"%s/_apis/work/teamsettings/iterations/%s/workitems?api-version=5.1-preview.1",
+		"%s/%s/%s/_apis/work/teamsettings/iterations/%s/workitems?api-version=5.1-preview.1",
+		owner,
+		project,
 		url.PathEscape(team),
 		iteration.ID,
 	)
@@ -172,9 +174,11 @@ func (s *WorkItemsService) GetIdsForIteration(ctx context.Context, team string, 
 
 // CreateComment Posts a comment to a work item
 // https://docs.microsoft.com/en-us/rest/api/azure/devops/wit/comments/add
-func (s *WorkItemsService) CreateComment(ctx context.Context, workItemID int, comment *WorkItemComment) (*WorkItemComment, *WorkItemComment, error) {
+func (s *WorkItemsService) CreateComment(ctx context.Context, owner, project string, workItemID int, comment *WorkItemComment) (*WorkItemComment, *WorkItemComment, error) {
 	URL := fmt.Sprintf(
-		"_apis/wit/workItems/%d/comments?api-version=5.1-preview.3",
+		"%s/%s/_apis/wit/workItems/%d/comments?api-version=5.1-preview.3",
+		owner,
+		project,
 		workItemID,
 	)
 

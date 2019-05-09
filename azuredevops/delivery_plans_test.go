@@ -96,7 +96,7 @@ func TestDeliveryPlansService_List(t *testing.T) {
 			})
 
 			options := &azuredevops.DeliveryPlansListOptions{}
-			plans, count, err := c.DeliveryPlans.List(context.Background(), options)
+			plans, count, err := c.DeliveryPlans.List(context.Background(), "AZURE_DEVOPS_OWNER", "AZURE_DEVOPS_PROJECT", options)
 			if err != nil {
 				t.Fatalf("returned error: %v", err)
 			}
@@ -134,7 +134,7 @@ func TestDeliveryPlansService_GetTimeLine(t *testing.T) {
 		fmt.Fprint(w, json)
 	})
 
-	timeline, err := c.DeliveryPlans.GetTimeLine(context.Background(), planID, "", "")
+	timeline, err := c.DeliveryPlans.GetTimeLine(context.Background(), "AZURE_DEVOPS_OWNER", "AZURE_DEVOPS_PROJECT", planID, "", "")
 	if err != nil {
 		t.Fatalf("returned error: %v", err)
 	}
@@ -200,7 +200,7 @@ func TestDeliveryPlansService_GetTimeLineDates(t *testing.T) {
 				fmt.Fprint(w, json)
 			})
 
-			_, err := c.DeliveryPlans.GetTimeLine(context.Background(), planID, tc.startDate, tc.endDate)
+			_, err := c.DeliveryPlans.GetTimeLine(context.Background(), "AZURE_DEVOPS_OWNER", "AZURE_DEVOPS_PROJECT", planID, tc.startDate, tc.endDate)
 			if err != nil {
 				t.Fatalf("returned error: %v", err)
 			}

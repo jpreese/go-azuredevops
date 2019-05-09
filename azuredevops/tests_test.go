@@ -146,7 +146,7 @@ func TestTestsService_List(t *testing.T) {
 			})
 
 			options := &azuredevops.TestsListOptions{}
-			tests, err := c.Tests.List(context.Background(), options)
+			tests, err := c.Tests.List(context.Background(), "AZURE_DEVOPS_OWNER", "AZURE_DEVOPS_PROJECT", options)
 			if err != nil {
 				t.Fatalf("returned error: %v", err)
 			}
@@ -194,7 +194,7 @@ func TestTestsService_ResultsList(t *testing.T) {
 			})
 
 			options := &azuredevops.TestResultsListOptions{RunID: "1"}
-			tests, err := c.Tests.ResultsList(context.Background(), options)
+			tests, err := c.Tests.ResultsList(context.Background(), "AZURE_DEVOPS_OWNER", "AZURE_DEVOPS_PROJECT", options)
 			if err != nil {
 				t.Fatalf("returned error: %v", err)
 			}

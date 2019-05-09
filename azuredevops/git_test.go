@@ -115,7 +115,7 @@ func TestGitService_ListRefs(t *testing.T) {
 			})
 
 			opts := azuredevops.GitRefListOptions{}
-			refs, count, err := c.Git.ListRefs(context.Background(), "vscode", "heads", &opts)
+			refs, count, err := c.Git.ListRefs(context.Background(), "AZURE_DEVOPS_OWNER", "AZURE_DEVOPS_PROJECT", "vscode", "heads", &opts)
 			if err != nil {
 				t.Fatalf("returned error: %v", err)
 			}
@@ -164,7 +164,7 @@ func TestGitService_Get(t *testing.T) {
 				fmt.Fprint(w, json)
 			})
 
-			resp, count, err := c.Git.GetRepository(context.Background(), "vscode")
+			resp, count, err := c.Git.GetRepository(context.Background(), "AZURE_DEVOPS_OWNER", "AZURE_DEVOPS_PROJECT", "vscode")
 			if err != nil {
 				t.Fatalf("returned error: %v", err)
 			}
@@ -225,7 +225,7 @@ func TestGitService_CreateStatus(t *testing.T) {
 				State:       &state,
 				TargetURL:   &target,
 			}
-			resp, count, err := c.Git.CreateStatus(context.Background(), "repo", "67cae2b029dff7eb3dc062b49403aaedca5bad8d", status)
+			resp, count, err := c.Git.CreateStatus(context.Background(), "AZURE_DEVOPS_OWNER", "AZURE_DEVOPS_PROJECT", "repo", "67cae2b029dff7eb3dc062b49403aaedca5bad8d", status)
 			if err != nil {
 				t.Fatalf("returned error: %v", err)
 			}

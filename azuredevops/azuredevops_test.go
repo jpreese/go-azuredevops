@@ -7,6 +7,7 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"os"
+	"reflect"
 	"testing"
 
 	"github.com/mcdafydd/go-azuredevops/azuredevops"
@@ -42,7 +43,7 @@ func setup() (client *azuredevops.Client, mux *http.ServeMux, serverURL string, 
 	server := httptest.NewServer(apiHandler)
 
 	// The client being tested and is configured to use test server.
-	client, err := azuredevops.NewClient("AZURE_DEVOPS_Account", "AZURE_DEVOPS_Project", "AZURE_DEVOPS_TOKEN", nil)
+	client, err := azuredevops.NewClient(nil)
 
 	if err != nil {
 		fmt.Errorf("Error requesting NewClient(): %v", err)
@@ -76,19 +77,32 @@ func testURL(t *testing.T, r *http.Request, want string) {
 }
 
 func Test_NewClient(t *testing.T) {
-	c, _ := azuredevops.NewClient("AZURE_DEVOPS_ACCOUNT", "AZURE_DEVOPS_Project", "AZURE_DEVOPS_TOKEN", nil)
+	baseURL, _ := url.Parse(azuredevops.DefaultBaseURL)
 
-	if c.Account != "AZURE_DEVOPS_ACCOUNT" {
-		t.Errorf("Client.Account = %s; expected %s", c.Account, "AZURE_DEVOPS_ACCOUNT")
+	got, _ := azuredevops.NewClient(nil)
+	want := azuredevops.Client{
+		BaseURL:          baseURL,
+		UserAgent:        azuredevops.UserAgent,
+		Account:          "",
+		Project:          "",
+		AuthToken:        "",
+		Boards:           &azuredevops.BoardsService{},
+		BuildDefinitions: &azuredevops.BuildDefinitionsService{},
+		Builds:           &azuredevops.BuildsService{},
+		DeliveryPlans:    &azuredevops.DeliveryPlansService{},
+		Favourites:       &azuredevops.FavouritesService{},
+		Git:              &azuredevops.GitService{},
+		Iterations:       &azuredevops.IterationsService{},
+		PullRequests:     &azuredevops.PullRequestsService{},
+		Teams:            &azuredevops.TeamsService{},
+		Tests:            &azuredevops.TestsService{},
+		WorkItems:        &azuredevops.WorkItemsService{},
 	}
 
-	if c.Project != "AZURE_DEVOPS_Project" {
-		t.Errorf("Client.Project = %s; expected %s", c.Project, "AZURE_DEVOPS_Project")
+	if !reflect.DeepEqual(got, want) {
+		t.Fatal("NewClient(): got = %#v, want = %#v", got, want)
 	}
-
-	if c.AuthToken != "AZURE_DEVOPS_TOKEN" {
-		t.Errorf("Client.Token = %s; expected %s", c.AuthToken, "AZURE_DEVOPS_TOKEN")
-	}
+	return
 }
 
 // Bool is a helper routine that allocates a new bool value

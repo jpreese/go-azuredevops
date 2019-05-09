@@ -68,8 +68,11 @@ type TeamProjectReference struct {
 // List returns list of the teams
 // https://docs.microsoft.com/en-us/rest/api/azure/devops/core/teams/get%20teams
 // GET https://dev.azure.com/{organization}/_apis/projects/{projectId}/teams?api-version=5.1-preview.2
-func (s *TeamsService) List(ctx context.Context, opts *TeamsListOptions) ([]*Team, int, error) {
-	URL := fmt.Sprintf("_apis/teams?api-version=5.1-preview.1")
+func (s *TeamsService) List(ctx context.Context, owner, project string, opts *TeamsListOptions) ([]*Team, int, error) {
+	URL := fmt.Sprintf("%s/%s/_apis/teams?api-version=5.1-preview.1",
+		owner,
+		project,
+	)
 	URL, err := addOptions(URL, opts)
 
 	u, _ := s.client.BaseURL.Parse(URL)

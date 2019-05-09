@@ -15,8 +15,10 @@ import (
 )
 
 const (
-	defaultBaseURL = "https://dev.azure.com"
-	userAgent      = "go-azuredevops"
+	// DefaultBaseURL root URI for Azure Devops
+	DefaultBaseURL string = "https://dev.azure.com/"
+	// UserAgent our HTTP client's user-agent
+	UserAgent string = "go-azuredevops"
 )
 
 // Client for interacting with the Azure DevOps API
@@ -53,33 +55,32 @@ type Client struct {
 // for you (such as that provided by the golang.org/x/oauth2 library).
 // The client's base URL is constructed from the supplied account and project.
 // Token is a personal access token.
-func NewClient(account string, project string, token string, httpClient *http.Client) (*Client, error) {
-	if account == "" {
-		return nil, fmt.Errorf("Missing valid account in call to NewClient(): account = %s", account)
-	}
-
-	if project == "" {
-		return nil, fmt.Errorf("Missing valid project in call to NewClient(): project = %s", project)
-	}
-
-	if token == "" {
-		return nil, fmt.Errorf("Missing personal access token in call to NewClient(): token = %s", token)
-	}
-
+func NewClient(httpClient *http.Client) (*Client, error) {
 	if httpClient == nil {
 		httpClient = http.DefaultClient
 	}
+	/*
+		// BaseURL
+		baseURLstr := fmt.Sprintf("%s/%s/", DefaultBaseURL, account)
+		baseURL, _ := url.Parse(baseURLstr)
+
+		//account string, project string, token string,
+
+		c := &Client{
+			client:    httpClient,
+			BaseURL:   *baseURL,
+			Account:   account,
+			Project:   project,
+			AuthToken: token,
+		}
+
+	*/
 
 	// BaseURL
-	baseURLstr := fmt.Sprintf("%s/%s/", defaultBaseURL, account)
-	baseURL, _ := url.Parse(baseURLstr)
-
+	baseURL, _ := url.Parse(DefaultBaseURL)
 	c := &Client{
-		client:    httpClient,
-		BaseURL:   *baseURL,
-		Account:   account,
-		Project:   project,
-		AuthToken: token,
+		client:  httpClient,
+		BaseURL: *baseURL,
 	}
 
 	c.Boards = &BoardsService{client: c}
@@ -178,7 +179,7 @@ func (c *Client) Execute(ctx context.Context, request *http.Request, r interface
 		// If the error type is *url.Error, sanitize its URL before returning.
 		if e, ok := err.(*url.Error); ok {
 			if url, err := url.Parse(e.URL); err == nil {
-				e.URL = url.String()
+				e.URL = sanitizeURL(url).String()
 				return nil, e
 			}
 		}
@@ -196,6 +197,55 @@ func (c *Client) Execute(ctx context.Context, request *http.Request, r interface
 	}
 
 	return response, nil
+}
+
+// BasicAuthTransport is an http.RoundTripper that authenticates all requests
+// using HTTP Basic Authentication with the provided username and password. It
+// additionally supports users who have two-factor authentication enabled on
+// their GitHub account.
+type BasicAuthTransport struct {
+	Username string // GitHub username
+	Password string // GitHub password
+	OTP      string // one-time password for users with two-factor auth enabled
+
+	// Transport is the underlying HTTP transport to use when making requests.
+	// It will default to http.DefaultTransport if nil.
+	Transport http.RoundTripper
+}
+
+// RoundTrip implements the RoundTripper interface.
+func (t *BasicAuthTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+	// To set extra headers, we must make a copy of the Request so
+	// that we don't modify the Request we were given. This is required by the
+	// specification of http.RoundTripper.
+	//
+	// Since we are going to modify only req.Header here, we only need a deep copy
+	// of req.Header.
+	req2 := new(http.Request)
+	*req2 = *req
+	req2.Header = make(http.Header, len(req.Header))
+	for k, s := range req.Header {
+		req2.Header[k] = append([]string(nil), s...)
+	}
+
+	req2.SetBasicAuth(t.Username, t.Password)
+	if t.OTP != "" {
+		req2.Header.Set(headerOTP, t.OTP)
+	}
+	return t.transport().RoundTrip(req2)
+}
+
+// Client returns an *http.Client that makes requests that are authenticated
+// using HTTP Basic Authentication.
+func (t *BasicAuthTransport) Client() *http.Client {
+	return &http.Client{Transport: t}
+}
+
+func (t *BasicAuthTransport) transport() http.RoundTripper {
+	if t.Transport != nil {
+		return t.Transport
+	}
+	return http.DefaultTransport
 }
 
 // addOptions adds the parameters in opt as URL query parameters to s. opt
@@ -224,3 +274,33 @@ func addOptions(s string, opt interface{}) (string, error) {
 	u.RawQuery = qs.Encode()
 	return u.String(), nil
 }
+
+// sanitizeURL redacts the client_secret parameter from the URL which may be
+// exposed to the user.
+func sanitizeURL(uri *url.URL) *url.URL {
+	if uri == nil {
+		return nil
+	}
+	params := uri.Query()
+	if len(params.Get("client_secret")) > 0 {
+		params.Set("client_secret", "REDACTED")
+		uri.RawQuery = params.Encode()
+	}
+	return uri
+}
+
+// Bool is a helper routine that allocates a new bool value
+// to store v and returns a pointer to it.
+func Bool(v bool) *bool { return &v }
+
+// Int is a helper routine that allocates a new int value
+// to store v and returns a pointer to it.
+func Int(v int) *int { return &v }
+
+// Int64 is a helper routine that allocates a new int64 value
+// to store v and returns a pointer to it.
+func Int64(v int64) *int64 { return &v }
+
+// String is a helper routine that allocates a new string value
+// to store v and returns a pointer to it.
+func String(v string) *string { return &v }
