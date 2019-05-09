@@ -81,7 +81,7 @@ func Test_NewClient(t *testing.T) {
 
 	got, _ := azuredevops.NewClient(nil)
 	want := azuredevops.Client{
-		BaseURL:          baseURL,
+		BaseURL:          *baseURL,
 		UserAgent:        azuredevops.UserAgent,
 		Account:          "",
 		Project:          "",

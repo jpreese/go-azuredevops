@@ -234,9 +234,11 @@ func TestPullRequestsService_Merge(t *testing.T) {
 				fmt.Fprint(w, json)
 			})
 
-			opt := &azuredevops.PullRequestListOptions{}
 			num := 1
-			response, count, err := c.PullRequests.Merge(context.Background(), "AZURE_DEVOPS_OWNER", "AZURE_DEVOPS_PROJECT", num, opt)
+			id := &azuredevops.IdentityRef{}
+			commitMsg := "COMMIT_MSG"
+
+			response, count, err := c.PullRequests.Merge(context.Background(), "AZURE_DEVOPS_OWNER", "AZURE_DEVOPS_PROJECT", "AZURE_DEVOPS_REPO", num, id, commitMsg)
 			if err != nil {
 				t.Fatalf("returned error: %v", err)
 			}
