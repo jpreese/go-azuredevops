@@ -228,10 +228,9 @@ func (t *BasicAuthTransport) RoundTrip(req *http.Request) (*http.Response, error
 		req2.Header[k] = append([]string(nil), s...)
 	}
 
-	req2.SetBasicAuth(t.Username, t.Password)
-	if t.OTP != "" {
-		req2.Header.Set(headerOTP, t.OTP)
-	}
+	//req2.SetBasicAuth(t.Username, t.Password)
+	req2.SetBasicAuth("", t.Password)
+
 	return t.transport().RoundTrip(req2)
 }
 
