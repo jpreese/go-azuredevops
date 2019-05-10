@@ -1,25 +1,29 @@
 # go-azuredevops
 
-**6 May 2019 Currently in development - may not be stable**
+**6 May 2019 Currently in development - API should be stable soon**
 
 [![GoDoc](https://godoc.org/github.com/mcdafydd/go-azuredevops/azuredevops?status.svg)](https://godoc.org/github.com/mcdafydd/go-azuredevops/azuredevops)
 [![Build Status](https://travis-ci.org/mcdafydd/go-azuredevops.png?branch=master)](https://travis-ci.org/mcdafydd/go-azuredevops)
 [![codecov](https://codecov.io/gh/mcdafydd/go-azuredevops/branch/master/graph/badge.svg)](https://codecov.io/gh/mcdafydd/go-azuredevops)
 [![Go Report Card](https://goreportcard.com/badge/github.com/mcdafydd/go-azuredevops?style=flat-square)](https://goreportcard.com/report/github.com/mcdafydd/go-azuredevops)
 
-This is a fork of [go-azuredevops](https://github.com/benmatselby/go-azuredevops), a Go client library for accessing the [Azure DevOps API](https://docs.microsoft.com/en-gb/rest/api/vsts/). 
+This is a fork of https://github.com/benmatselby/go-azuredevops, a Go library for accessing the [Azure DevOps API](https://docs.microsoft.com/en-gb/rest/api/vsts/).  As it develops, the library is looking more like of a port of [go-github](https://github.com/google/go-github).
+
+This is my first project in Go, so I'm learning as I code.
 
 ## Services
 
-There is partial implementation for the following services
+There is partial implementation for the following services:
 
 * Boards
 * Builds
 * Favourites
+* Git
 * Iterations
 * Pull Requests
 * Service Events (webhooks)
 * Tests
+* Users
 * Work Items
 
 ## Usage
@@ -28,16 +32,21 @@ For usage with a personal access token, create a token using the process describ
 
 https://docs.microsoft.com/en-us/azure/devops/integrate/get-started/authentication/pats?view=azure-devops
 
-Supply this token in calls to NewClient().
+Add the token to a basic auth transport with an empty username:
+
+```go
+tp := azuredevops.BasicAuthTransport{
+		Username: "",
+		Password: token,
+	}
+```
+
+Supply this token in calls to NewClient():
 
 ```go
 import "github.com/mcdafydd/go-azuredevops/azuredevops
-```
 
-Construct a new Azure DevOps Client
-
-```go
-v := azuredevops.NewClient(account, project, token, nil)
+client, _ := azuredevops.NewClient(tp.Client())
 ```
 
 Get a list of iterations
