@@ -108,7 +108,6 @@ func eventHandler(client *myClient, logger *log.Logger) http.Handler {
 			logger.Printf("Webhook auth failed in eventHandler: %s", err)
 			return
 		} else if err != nil {
-			// auth failed - return status code
 			logger.Printf("Err in eventHandler: %s", err)
 			return
 		}
@@ -120,7 +119,7 @@ func eventHandler(client *myClient, logger *log.Logger) http.Handler {
 		if event.PayloadType == azuredevops.PushEvent {
 			// If we pass the basic auth, just run the build
 			// without doing any other checks on the webhook
-			// payload //Name: &client.buildName,
+			// payload
 			buildDef := azuredevops.BuildDefinition{
 				ID: Int(1),
 			}
