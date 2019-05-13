@@ -11,9 +11,9 @@ import (
 	"bytes"
 	"encoding/json"
 	"net/http"
-	"reflect"
 	"testing"
 
+	"github.com/google/go-cmp/cmp"
 	"github.com/mcdafydd/go-azuredevops/azuredevops"
 )
 
@@ -29,8 +29,9 @@ func TestParseWebHook(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ParseWebHook: %v", err)
 	}
-	if want := &payload; !reflect.DeepEqual(got, want) {
-		t.Errorf("ParseWebHook(%#v) = %#v, want %#v", p, got, want)
+	if want := &payload; !cmp.Equal(got, want) {
+		diff := cmp.Diff(got, want)
+		t.Errorf("ParseWebHook error: %s", diff)
 	}
 }
 

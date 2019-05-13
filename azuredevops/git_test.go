@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"reflect"
 	"testing"
 
+	"github.com/google/go-cmp/cmp"
 	"github.com/mcdafydd/go-azuredevops/azuredevops"
 )
 
@@ -172,9 +172,11 @@ func TestGitService_Get(t *testing.T) {
 			if count > 0 {
 				want := &azuredevops.GitRepository{}
 
-				if !reflect.DeepEqual(resp, want) {
-					t.Errorf("Repositories.Get returned %+v, want %+v", resp, want)
+				if !cmp.Equal(resp, want) {
+					diff := cmp.Diff(got, want)
+					t.Errorf("Repositories.Gete error: %s", diff)
 				}
+
 			}
 
 		})
@@ -234,8 +236,9 @@ func TestGitService_CreateStatus(t *testing.T) {
 				if *resp.Description != tc.description {
 					t.Fatalf("expected git ref name %s, got %s", tc.description, *resp.Description)
 				}
-				if !reflect.DeepEqual(resp.Context, tc.gitContext) {
-					t.Errorf("Git.GetRef returned %+v, want %+v", tc.gitContext, resp.Context)
+				if !cmp.Equal(resp.Context, tc.gitContext) {
+					diff := cmp.Diff(resp.Context, tc.gitContext)
+					t.Errorf("Git.GetRef error: %s", diff)
 				}
 				if *resp.State != tc.state {
 					t.Fatalf("expected git ref name %s, got %s", tc.state, *resp.State)

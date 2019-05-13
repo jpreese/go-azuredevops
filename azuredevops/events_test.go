@@ -9,9 +9,9 @@ package azuredevops_test
 
 import (
 	"encoding/json"
-	"reflect"
 	"testing"
 
+	"github.com/google/go-cmp/cmp"
 	"github.com/mcdafydd/go-azuredevops/azuredevops"
 )
 
@@ -58,8 +58,10 @@ func TestParsePayload(t *testing.T) {
 		if err != nil {
 			t.Fatalf("ParsePayload: %v", err)
 		}
-		if want := test.payload; !reflect.DeepEqual(got, want) {
-			t.Errorf("ParsePayload(%#v, %#v) = got %#v, want %#v", test.eventType, test.payload, got, want)
+		if want := test.payload; !cmp.Equal(got, want) {
+			diff := cmp.Diff(got, want)
+			t.Errorf("ParsePayload error: %s", diff)
 		}
+
 	}
 }

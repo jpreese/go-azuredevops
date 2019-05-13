@@ -5,9 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"reflect"
 	"testing"
 
+	"github.com/google/go-cmp/cmp"
 	"github.com/mcdafydd/go-azuredevops/azuredevops"
 )
 
@@ -199,9 +199,6 @@ func TestWorkItems_CreateComment(t *testing.T) {
 		json.NewDecoder(r.Body).Decode(v)
 
 		testMethod(t, r, "POST")
-		/*if !reflect.DeepEqual(v, comment) {
-			t.Errorf("Request body = %+v, want %+v", v, comment)
-		}*/
 
 		fmt.Fprint(w, `{"id":1, "text": "TEST COMMENT"}`)
 	})
@@ -211,7 +208,8 @@ func TestWorkItems_CreateComment(t *testing.T) {
 		t.Errorf("WorkItems.CreateComment returned error: %v", err)
 	}
 
-	if !reflect.DeepEqual(got, want) {
-		t.Errorf("WorkItems.CreateComment returned %+v, want %+v", resp, want)
+	if !cmp.Equal(got, want) {
+		diff := cmp.Diff(got, want)
+		t.Errorf("WorkItems.CreateComment error: %s", diff)
 	}
 }
