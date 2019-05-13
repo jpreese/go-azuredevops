@@ -13,6 +13,7 @@ package azuredevops
 import (
 	"crypto/subtle"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -121,7 +122,7 @@ func ValidatePayload(r *http.Request, user, pass []byte) (payload []byte, err er
 	username, password, ok := r.BasicAuth()
 
 	if !ok || subtle.ConstantTimeCompare([]byte(user), []byte(username)) != 1 || subtle.ConstantTimeCompare([]byte(pass), []byte(password)) != 1 {
-		return nil, err
+		return nil, errors.New("ValidatePayload authentication failed")
 	}
 	//Authorization: Basic <credentials>
 	return payload, nil
@@ -135,13 +136,12 @@ func ValidatePayload(r *http.Request, user, pass []byte) (payload []byte, err er
 //     func (s *EventMonitor) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 //       payload, err := azuredevops.ValidatePayload(r, s.user, s.pass)
 //       if err != nil { ... }
-//       webhook, err := azuredevops.ParseWebHook(payload)
+//       event, err := azuredevops.ParseWebHook(payload)
 //       if err != nil { ... }
-//       event := webhook.(azuredevops.Event)
 //       switch event.PayloadType {
-//	 case azuredevops.WorkItemEvent:
-//		processWorkItemEvent(&event)
-//	 case azuredevops.PullRequestEvent:
+//	 	 case azuredevops.WorkItemEvent:
+//		        processWorkItemEvent(&event)
+//	     case azuredevops.PullRequestEvent:
 //              processPullRequestEvent(&event)
 //       ...
 //       }
