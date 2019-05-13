@@ -5,9 +5,8 @@
 // branch available in your repository.  It:
 // 0. Prompts the user for required inputs
 // 1. Creates a NewClient() using basic auth and personal access token
-// 2. Gets the logged in user's IdentityRef{}
-// 3. Creates a pull request
-// 4. Merges the pull request with the default no fast-forward
+// 2. Creates a pull request
+// 3. Merges the pull request with the default no fast-forward
 
 package main
 
