@@ -151,6 +151,7 @@ func (c *Client) NewRequest(method, urlStr string, body interface{}) (*http.Requ
 // ctx.Err() will be returned.
 func (c *Client) Execute(ctx context.Context, req *http.Request, r interface{}) (*http.Response, error) {
 	req = req.WithContext(ctx)
+	debugReq(req)
 	resp, err := c.client.Do(req)
 	if err != nil {
 		// If we got an error, and the context has been canceled,
