@@ -189,22 +189,26 @@ func (s *PullRequestsService) Get(ctx context.Context, owner, project string, pu
 // pull may be nil
 // https://docs.microsoft.com/en-us/rest/api/azure/devops/git/pull%20requests/update?view=azure-devops-rest-5.1
 func (s *PullRequestsService) Merge(ctx context.Context, owner, project string, repoName string, pullNum int, pull *GitPullRequest, completionOpts GitPullRequestCompletionOptions, id IdentityRef) (*GitPullRequest, *http.Response, error) {
-	URL := fmt.Sprintf("%s/%s/_apis/git/repositories/%s/pullrequests?api-version=5.1-preview.1",
+	URL := fmt.Sprintf("%s/%s/_apis/git/repositories/%s/pullrequests/%d?api-version=5.1-preview.1",
 		owner,
 		project,
 		repoName,
+		pullNum,
 	)
 
-	if pull == nil {
-		pull = new(GitPullRequest)
+	/* If pull not nil, prepare for merge
+	// otherwise create an empty GitPullRequest{}
+	if pull != nil {
 	}
+	*/
+
 	// Construct request body from supplied parameters
-	pull.AutoCompleteSetBy = &id
-	pull.CompletionOptions = &completionOpts
-	pull.PullRequestID = &pullNum
+	body := &GitPullRequest{}
+	body.AutoCompleteSetBy = &id
+	body.CompletionOptions = &completionOpts
 
 	// Now we're ready to make our API call to merge the pull request.
-	request, err := s.client.NewRequest("PATCH", URL, pull)
+	request, err := s.client.NewRequest("PATCH", URL, body)
 	if err != nil {
 		return nil, nil, err
 	}

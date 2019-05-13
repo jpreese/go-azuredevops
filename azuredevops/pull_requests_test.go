@@ -175,7 +175,7 @@ func TestPullRequestsService_Get(t *testing.T) {
 func TestPullRequestsService_Merge(t *testing.T) {
 	client, mux, _, teardown := setup()
 	defer teardown()
-	mux.HandleFunc("/o/p/_apis/git/repositories/r/pullrequests", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/o/p/_apis/git/repositories/r/pullrequests/22", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "PATCH")
 		w.Header().Set("Content-Type", "application/json")
 		fmt.Fprint(w, `{

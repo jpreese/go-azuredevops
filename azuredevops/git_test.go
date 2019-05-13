@@ -173,8 +173,8 @@ func TestGitService_Get(t *testing.T) {
 				want := &azuredevops.GitRepository{}
 
 				if !cmp.Equal(resp, want) {
-					diff := cmp.Diff(got, want)
-					t.Errorf("Repositories.Gete error: %s", diff)
+					diff := cmp.Diff(resp, want)
+					t.Errorf("Repositories.Get error: %s", diff)
 				}
 
 			}

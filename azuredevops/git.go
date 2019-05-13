@@ -179,14 +179,14 @@ type GitPullRequest struct {
 	Description           *string                          `json:"description,omitempty"`
 	ForkSource            *GitRef                          `json:"forkSource,omitempty"`
 	IsDraft               *bool                            `json:"isDraft,omitempty"`
-	Labels                *WebAPITagDefinition             `json:"labels,omitempty"`
+	Labels                []*WebAPITagDefinition           `json:"labels,omitempty"`
 	LastMergeCommit       *GitCommitRef                    `json:"lastMergeCommit,omitempty"`
 	LastMergeSourceCommit *GitCommitRef                    `json:"lastMergeSourceCommit,omitempty"`
 	LastMergeTargetCommit *GitCommitRef                    `json:"lastMergeTargetCommit,omitempty"`
 	MergeFailureMessage   *string                          `json:"mergeFailureMessage,omitempty"`
 	MergeFailureType      *string                          `json:"mergeFailureType,omitempty"`
 	MergeID               *string                          `json:"mergeId,omitempty"`
-	MergeOptions          *string                          `json:"mergeOptions,omitempty"`
+	MergeOptions          *GitPullRequestMergeOptions      `json:"mergeOptions,omitempty"`
 	MergeStatus           *string                          `json:"mergeStatus,omitempty"`
 	PullRequestID         *int                             `json:"pullRequestId,omitempty"`
 	Repository            *GitRepository                   `json:"repository,omitempty"`

@@ -203,7 +203,7 @@ func TestWorkItems_CreateComment(t *testing.T) {
 		fmt.Fprint(w, `{"id":1, "text": "TEST COMMENT"}`)
 	})
 
-	got, resp, err := client.WorkItems.CreateComment(context.Background(), "AZURE_DEVOPS_OWNER", "AZURE_DEVOPS_PROJECT", 1, want)
+	got, _, err := client.WorkItems.CreateComment(context.Background(), "AZURE_DEVOPS_OWNER", "AZURE_DEVOPS_PROJECT", 1, want)
 	if err != nil {
 		t.Errorf("WorkItems.CreateComment returned error: %v", err)
 	}

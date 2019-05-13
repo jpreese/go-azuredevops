@@ -1523,14 +1523,6 @@ func (g *GitPullRequest) GetIsDraft() bool {
 	return *g.IsDraft
 }
 
-// GetLabels returns the Labels field.
-func (g *GitPullRequest) GetLabels() *WebAPITagDefinition {
-	if g == nil {
-		return nil
-	}
-	return g.Labels
-}
-
 // GetLastMergeCommit returns the LastMergeCommit field.
 func (g *GitPullRequest) GetLastMergeCommit() *GitCommitRef {
 	if g == nil {
@@ -1587,12 +1579,12 @@ func (g *GitPullRequest) GetMergeID() string {
 	return *g.MergeID
 }
 
-// GetMergeOptions returns the MergeOptions field if it's non-nil, zero value otherwise.
-func (g *GitPullRequest) GetMergeOptions() string {
-	if g == nil || g.MergeOptions == nil {
-		return ""
+// GetMergeOptions returns the MergeOptions field.
+func (g *GitPullRequest) GetMergeOptions() *GitPullRequestMergeOptions {
+	if g == nil {
+		return nil
 	}
-	return *g.MergeOptions
+	return g.MergeOptions
 }
 
 // GetMergeStatus returns the MergeStatus field if it's non-nil, zero value otherwise.
@@ -2313,6 +2305,14 @@ func (g *GitUserDate) GetName() string {
 		return ""
 	}
 	return *g.Name
+}
+
+// GetValue returns the Value field if it's non-nil, zero value otherwise.
+func (g *GraphDescriptorResult) GetValue() string {
+	if g == nil || g.Value == nil {
+		return ""
+	}
+	return *g.Value
 }
 
 // GetDomain returns the Domain field if it's non-nil, zero value otherwise.
