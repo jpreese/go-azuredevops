@@ -1,6 +1,8 @@
 package azuredevops_test
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -10,6 +12,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/google/go-cmp/cmp"
 	"github.com/mcdafydd/go-azuredevops/azuredevops"
 )
 
@@ -46,12 +49,30 @@ func setup() (client *azuredevops.Client, mux *http.ServeMux, serverURL string, 
 	client, err := azuredevops.NewClient(nil)
 
 	if err != nil {
-		fmt.Errorf("Error requesting NewClient(): %v", err)
+		fmt.Printf("Error requesting NewClient(): %v", err)
 	}
 
 	url, _ := url.Parse(server.URL + baseURLPath + "/")
 	client.BaseURL = *url
 	return client, mux, server.URL, server.Close
+}
+
+type values map[string]string
+
+func testFormValues(t *testing.T, r *http.Request, values values) {
+	want := url.Values{}
+	for k, v := range values {
+		want.Set(k, v)
+	}
+
+	r.ParseForm()
+	// Remove the mandatory api-version request parameter, which is not
+	// returned in API responses
+	r.Form.Del("api-version")
+
+	if got := r.Form; !cmp.Equal(got, want) {
+		t.Errorf("Request parameters: %v, want %v", got, want)
+	}
 }
 
 func testMethod(t *testing.T, r *http.Request, want string) {
@@ -76,33 +97,43 @@ func testURL(t *testing.T, r *http.Request, want string) {
 	}
 }
 
-func Test_NewClient(t *testing.T) {
-	baseURL, _ := url.Parse(azuredevops.DefaultBaseURL)
+// Helper function to test that a value is marshalled to JSON as expected.
+func testJSONMarshal(t *testing.T, v interface{}, want string) {
+	j, err := json.Marshal(v)
+	if err != nil {
+		t.Errorf("Unable to marshal JSON for %v", v)
+	}
 
+	w := new(bytes.Buffer)
+	err = json.Compact(w, []byte(want))
+	if err != nil {
+		t.Errorf("String is not valid json: %s", want)
+	}
+
+	if w.String() != string(j) {
+		t.Errorf("json.Marshal(%q) returned %s, want %s", v, j, w)
+	}
+
+	// now go the other direction and make sure things unmarshal as expected
+	u := reflect.ValueOf(v).Interface()
+	if err := json.Unmarshal([]byte(want), u); err != nil {
+		t.Errorf("Unable to unmarshal JSON for %v", want)
+	}
+
+	if !cmp.Equal(v, u) {
+		t.Errorf("json.Unmarshal(%q) returned %s, want %s", want, u, v)
+	}
+}
+
+func TestNewClient(t *testing.T) {
 	got, _ := azuredevops.NewClient(nil)
-	want := azuredevops.Client{
-		BaseURL:          *baseURL,
-		UserAgent:        azuredevops.UserAgent,
-		Account:          "",
-		Project:          "",
-		AuthToken:        "",
-		Boards:           &azuredevops.BoardsService{},
-		BuildDefinitions: &azuredevops.BuildDefinitionsService{},
-		Builds:           &azuredevops.BuildsService{},
-		DeliveryPlans:    &azuredevops.DeliveryPlansService{},
-		Favourites:       &azuredevops.FavouritesService{},
-		Git:              &azuredevops.GitService{},
-		Iterations:       &azuredevops.IterationsService{},
-		PullRequests:     &azuredevops.PullRequestsService{},
-		Teams:            &azuredevops.TeamsService{},
-		Tests:            &azuredevops.TestsService{},
-		WorkItems:        &azuredevops.WorkItemsService{},
-	}
 
-	if !reflect.DeepEqual(got, want) {
-		t.Fatal("NewClient(): got = %#v, want = %#v", got, want)
+	if got, want := got.BaseURL.String(), "https://dev.azure.com/"; got != want {
+		t.Errorf("NewClient BaseURL is %v, want %v", got, want)
 	}
-	return
+	if got, want := got.UserAgent, "go-azuredevops"; got != want {
+		t.Errorf("NewClient UserAgent is %v, want %v", got, want)
+	}
 }
 
 // Bool is a helper routine that allocates a new bool value

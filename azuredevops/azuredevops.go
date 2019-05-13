@@ -8,6 +8,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"path"
 	"reflect"
 	"strings"
 
@@ -15,10 +16,10 @@ import (
 )
 
 const (
-	// DefaultBaseURL root URI for Azure Devops
-	DefaultBaseURL string = "https://dev.azure.com/"
-	// UserAgent our HTTP client's user-agent
-	UserAgent string = "go-azuredevops"
+	// defaultBaseURL root URI for Azure Devops
+	defaultBaseURL string = "https://dev.azure.com/"
+	// userAgent our HTTP client's user-agent
+	userAgent string = "go-azuredevops"
 )
 
 // Client for interacting with the Azure DevOps API
@@ -29,7 +30,7 @@ type Client struct {
 	BaseURL   url.URL
 	UserAgent string
 
-	// Account Required part of BaseURL
+	// Account Default tenant identifier
 	Account string
 	// Project Default project for api calls
 	Project   string
@@ -46,6 +47,7 @@ type Client struct {
 	PullRequests     *PullRequestsService
 	Teams            *TeamsService
 	Tests            *TestsService
+	Users            *UsersService
 	WorkItems        *WorkItemsService
 }
 
@@ -61,7 +63,7 @@ func NewClient(httpClient *http.Client) (*Client, error) {
 	}
 	/*
 		// BaseURL
-		baseURLstr := fmt.Sprintf("%s/%s/", DefaultBaseURL, account)
+		baseURLstr := fmt.Sprintf("%s/%s/", defaultBaseURL, account)
 		baseURL, _ := url.Parse(baseURLstr)
 
 		//account string, project string, token string,
@@ -77,10 +79,11 @@ func NewClient(httpClient *http.Client) (*Client, error) {
 	*/
 
 	// BaseURL
-	baseURL, _ := url.Parse(DefaultBaseURL)
+	baseURL, _ := url.Parse(defaultBaseURL)
 	c := &Client{
-		client:  httpClient,
-		BaseURL: *baseURL,
+		client:    httpClient,
+		BaseURL:   *baseURL,
+		UserAgent: userAgent,
 	}
 
 	c.Boards = &BoardsService{client: c}
@@ -108,22 +111,9 @@ func (c *Client) NewRequest(method, urlStr string, body interface{}) (*http.Requ
 		return nil, fmt.Errorf("BaseURL must have a trailing slash, but %q does not", c.BaseURL.String())
 	}
 
-	parsed, err := url.Parse(urlStr)
+	u, err := c.BaseURL.Parse(urlStr)
 	if err != nil {
 		return nil, err
-	}
-
-	u := new(url.URL)
-	// If caller supplies an absolute urlStr, pass it unmodified to http.NewRequest
-	if parsed.IsAbs() {
-		u = parsed
-	} else {
-		// If caller supplies a relative URI in urlStr, prepend client project name
-		s := fmt.Sprintf("%s/%s", url.PathEscape(c.Project), urlStr)
-		u, err = c.BaseURL.Parse(s)
-		if err != nil {
-			return nil, err
-		}
 	}
 
 	var buf io.ReadWriter
@@ -155,18 +145,13 @@ func (c *Client) NewRequest(method, urlStr string, body interface{}) (*http.Requ
 // JSON decoded and stored in the value pointed to by r, or returned as an
 // error if an API error has occurred. If r implements the io.Writer
 // interface, the raw response body will be written to r, without attempting to
-// first decode it. If rate limit is exceeded and reset time is in the future,
-// Do returns *RateLimitError immediately without making a network API call.
+// first decode it.
 //
 // The provided ctx must be non-nil. If it is canceled or times out,
 // ctx.Err() will be returned.
-// Execute runs all the http requests on the API
-func (c *Client) Execute(ctx context.Context, request *http.Request, r interface{}) (*http.Response, error) {
-	request = request.WithContext(ctx)
-	request.SetBasicAuth("", c.AuthToken)
-
-	//client := &http.Client{}
-	response, err := c.client.Do(request)
+func (c *Client) Execute(ctx context.Context, req *http.Request, r interface{}) (*http.Response, error) {
+	req = req.WithContext(ctx)
+	resp, err := c.client.Do(req)
 	if err != nil {
 		// If we got an error, and the context has been canceled,
 		// the context's error is probably more useful.
@@ -186,17 +171,27 @@ func (c *Client) Execute(ctx context.Context, request *http.Request, r interface
 
 		return nil, err
 	}
-	defer response.Body.Close()
+	defer resp.Body.Close()
 
-	if response.StatusCode != 200 && response.StatusCode != 201 {
-		return nil, fmt.Errorf("Request to %s responded with status %d", request.URL, response.StatusCode)
+	if resp.StatusCode != 200 && resp.StatusCode != 201 {
+		return nil, fmt.Errorf("Request to %s responded with status %d", req.URL, resp.StatusCode)
 	}
 
-	if err := json.NewDecoder(response.Body).Decode(&r); err != nil {
-		return nil, fmt.Errorf("Decoding json response from %s failed: %v", request.URL, err)
+	if r != nil {
+		if w, ok := r.(io.Writer); ok {
+			io.Copy(w, resp.Body)
+		} else {
+			decErr := json.NewDecoder(resp.Body).Decode(r)
+			if decErr == io.EOF {
+				decErr = nil // ignore EOF errors caused by empty response body
+			}
+			if decErr != nil {
+				err = decErr
+			}
+		}
 	}
 
-	return response, nil
+	return resp, err
 }
 
 // BasicAuthTransport is an http.RoundTripper that authenticates all requests
@@ -204,8 +199,8 @@ func (c *Client) Execute(ctx context.Context, request *http.Request, r interface
 // additionally supports users who have two-factor authentication enabled on
 // their GitHub account.
 type BasicAuthTransport struct {
-	Username string // GitHub username
-	Password string // GitHub password
+	Username string // Azure Devops username
+	Password string // Azure Devops password
 	OTP      string // one-time password for users with two-factor auth enabled
 
 	// Transport is the underlying HTTP transport to use when making requests.
@@ -272,6 +267,23 @@ func addOptions(s string, opt interface{}) (string, error) {
 
 	u.RawQuery = qs.Encode()
 	return u.String(), nil
+}
+
+// formatRef helper function for API calls that need a branch reference
+// as an input parameter.  Doesn't do much error checking.
+// Examples:
+// *ref = "mybranch" => *ref = "refs/heads/mybranch"
+// *ref = "refs/heads/abranch" => *ref = "refs/heads/abranch"
+func formatRef(ref *string) error {
+	matched, err := path.Match("refs/heads/*", *ref)
+	if matched && err == nil {
+		return nil
+	} else if err != nil {
+		return err
+	} else {
+		*ref = fmt.Sprintf("refs/heads/%s", *ref)
+		return nil
+	}
 }
 
 // sanitizeURL redacts the client_secret parameter from the URL which may be

@@ -75,6 +75,21 @@ type GitRefsResponse struct {
 	GitRefs []*GitRef `json:"value"`
 }
 
+// GitRefsUpdateResponse describes the git list refs update response
+type GitRefsUpdateResponse struct {
+	Count         int             `json:"count"`
+	GitRefsUpdate []*GitRefUpdate `json:"value"`
+}
+
+// UpdateRefsBody Request body for UpdateRefs()
+type UpdateRefsBody struct {
+	IsLocked     *bool   `json:"isLocked,omitempty"`
+	Name         *string `json:"name,omitempty"`
+	NewObjectID  *string `json:"newObjectId,omitempty"`
+	OldObjectID  *string `json:"oldObjectId,omitempty"`
+	RepositoryID *string `json:"repositoryId,omitempty"`
+}
+
 // GitStatusesResponse describes the git statuses response
 type GitStatusesResponse struct {
 	Count       int          `json:"count"`
@@ -97,7 +112,7 @@ type GitChange struct {
 // the response from the API
 type GitCommitChanges struct {
 	ChangeCounts *ChangeCountDictionary `json:"changeCounts,omitempty"`
-	Changes      *[]GitChange           `json:"changes,omitempty"`
+	Changes      []*GitChange           `json:"changes,omitempty"`
 }
 
 // GitCommitRef describes a single git commit reference
@@ -111,10 +126,10 @@ type GitCommitRef struct {
 	URL              *string                `json:"url,omitempty"`
 	ChangeCounts     *ChangeCountDictionary `json:"changeCounts,omitempty"`
 	Changes          *GitChange             `json:"changes,omitempty"`
-	Parents          *[]string              `json:"parents,omitempty"`
+	Parents          []*string              `json:"parents,omitempty"`
 	Push             *GitPushRef            `json:"push,omitempty"`
 	RemoteURL        *string                `json:"remoteUrl,omitempty"`
-	Statuses         *[]GitStatus           `json:"statuses,omitempty"`
+	Statuses         []*GitStatus           `json:"statuses,omitempty"`
 	WorkItems        *ResourceRef           `json:"workItems,omitempty"`
 }
 
@@ -128,7 +143,7 @@ type GitRef struct {
 	ObjectID       *string          `json:"objectId,omitempty"`
 	PeeledObjectID *string          `json:"peeledObjectId,omitempty"`
 	Repository     *GitRepository   `json:"repository,omitempty"`
-	Statuses       *[]GitStatus     `json:"statuses,omitempty"`
+	Statuses       []*GitStatus     `json:"statuses,omitempty"`
 	URL            *string          `json:"url,omitempty"`
 }
 
@@ -156,7 +171,7 @@ type GitPullRequest struct {
 	ClosedBy              *IdentityRef                     `json:"closedBy,omitempty"`
 	ClosedDate            *time.Time                       `json:"closedDate,omitempty"`
 	CodeReviewID          *int                             `json:"codeReviewId,omitempty"`
-	Commits               *[]GitCommitRef                  `json:"commits,omitempty"`
+	Commits               []*GitCommitRef                  `json:"commits,omitempty"`
 	CompletionOptions     *GitPullRequestCompletionOptions `json:"completionOptions,omitempty"`
 	CompletionQueueTime   *time.Time                       `json:"completionQueueTime,	omitempty"`
 	CreatedBy             *IdentityRef                     `json:"createdBy,omitempty"`
@@ -175,7 +190,7 @@ type GitPullRequest struct {
 	MergeStatus           *string                          `json:"mergeStatus,omitempty"`
 	PullRequestID         *int                             `json:"pullRequestId,omitempty"`
 	Repository            *GitRepository                   `json:"repository,omitempty"`
-	Reviewers             *[]IdentityRefWithVote           `json:"reviewers,omitempty"`
+	Reviewers             []*IdentityRefWithVote           `json:"reviewers,omitempty"`
 	RemoteURL             *string                          `json:"remoteUrl,omitempty"`
 	SourceRefName         *string                          `json:"sourceRefName,omitempty"`
 	Status                *string                          `json:"status,omitempty"`
@@ -183,7 +198,7 @@ type GitPullRequest struct {
 	TargetRefName         *string                          `json:"targetRefName,omitempty"`
 	Title                 *string                          `json:"title,omitempty"`
 	URL                   *string                          `json:"url,omitempty"`
-	WorkItemRefs          *[]ResourceRef                   `json:"workItemRefs,omitempty"`
+	WorkItemRefs          []*ResourceRef                   `json:"workItemRefs,omitempty"`
 }
 
 // GitPullRequestCompletionOptions describes preferences about how the pull
@@ -229,19 +244,19 @@ func (d GitPullRequestMergeStrategy) String() string {
 // GitPush describes a code push request event.
 type GitPush struct {
 	Links      *map[string]Link `json:"_links,omitempty"`
-	Commits    *[]GitCommitRef  `json:"commits,omitempty"`
+	Commits    []*GitCommitRef  `json:"commits,omitempty"`
 	Date       *time.Time       `json:"date,omitempty"`
 	PushID     *int             `json:"pushId,omitempty"`
 	PushedBy   *IdentityRef     `json:"pushedBy,omitempty"`
-	RefUpdates *[]GitRefUpdate  `json:"refUpdates,omitempty"`
+	RefUpdates []*GitRefUpdate  `json:"refUpdates,omitempty"`
 	Repository *GitRepository   `json:"repository,omitempty"`
 	URL        *string          `json:"url,omitempty"`
 }
 
 // GitPushRef Describes a push request
 type GitPushRef struct {
-	Commits    *[]GitCommitRef `json:"commits,omitempty"`
-	RefUpdates *[]GitRefUpdate `json:"refUpdates,omitempty"`
+	Commits    []*GitCommitRef `json:"commits,omitempty"`
+	RefUpdates []*GitRefUpdate `json:"refUpdates,omitempty"`
 	Repository *GitRepository  `json:"repository,omitempty"`
 }
 
@@ -267,7 +282,7 @@ type GitRepository struct {
 	Size             *int                  `json:"size,omitempty"`
 	SSHURL           *string               `json:"sshUrl,omitempty"`
 	URL              *string               `json:"url,omitempty"`
-	ValidRemoteURLs  *[]string             `json:"validRemoteUrls,omitempty"`
+	ValidRemoteURLs  []*string             `json:"validRemoteUrls,omitempty"`
 	WebURL           *string               `json:"webUrl,omitempty"`
 }
 
@@ -345,6 +360,36 @@ type GitUserDate struct {
 	Name  *string    `json:"name,omitempty"`
 	Email *string    `json:"email,omitempty"`
 	Date  *time.Time `json:"date,omitempty"`
+}
+
+// UpdateRefs returns a list of the references for a git repo
+func (s *GitService) UpdateRefs(ctx context.Context, owner, project, repo, refType string, opts *GitRefListOptions) ([]*GitRef, int, error) {
+	URL := fmt.Sprintf(
+		"%s/%s/_apis/git/repositories/%s/refs/%s?api-version=5.1-preview.1",
+		owner,
+		project,
+		repo,
+		refType,
+	)
+
+	URL, err := addOptions(URL, opts)
+
+	body := &UpdateRefsBody{
+		IsLocked:     Bool(false),
+		Name:         String("refs/heads/vsts-api-sample/answer-woman-flame"),
+		NewObjectID:  String(""),
+		OldObjectID:  String(""),
+		RepositoryID: String(repo),
+	}
+
+	request, err := s.client.NewRequest("POST", URL, body)
+	if err != nil {
+		return nil, 0, err
+	}
+	var response GitRefsResponse
+	_, err = s.client.Execute(ctx, request, &response)
+
+	return response.GitRefs, response.Count, err
 }
 
 // ListRefs returns a list of the references for a git repo

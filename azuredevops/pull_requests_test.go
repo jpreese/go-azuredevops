@@ -2,10 +2,13 @@ package azuredevops_test
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"testing"
 
+	"github.com/google/go-cmp/cmp"
 	"github.com/mcdafydd/go-azuredevops/azuredevops"
 )
 
@@ -74,188 +77,219 @@ const (
 )
 
 func TestPullRequestsService_List(t *testing.T) {
-	tt := []struct {
-		name     string
-		URL      string
-		title    string
-		response string
-	}{
-		{name: "happy", URL: pullrequestsListURL, response: pullrequestsResponse,
-			title: "A new feature"},
-		{name: "there are no items in the response", URL: pullrequestsListURL, response: "{}"},
+	client, mux, _, teardown := setup()
+	defer teardown()
+	mux.HandleFunc("/o/p/_apis/git/pullrequests", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "GET")
+		testFormValues(t, r, values{
+			"searchCriteria.status":        "active",
+			"searchCriteria.sourceRefName": "h",
+			"searchCriteria.targetRefName": "b",
+		})
+		w.Header().Set("Content-Type", "application/json")
+		fmt.Fprint(w, `{
+			"count": 1,
+			"value": [{
+				"pullRequestId": 22
+			}]
+			}`)
+	})
+
+	opt := &azuredevops.PullRequestListOptions{
+		Status:        "active",
+		SourceRefName: "h",
+		TargetRefName: "b",
 	}
 
-	for _, tc := range tt {
-		t.Run(tc.name, func(t *testing.T) {
-			c, mux, _, teardown := setup()
-			defer teardown()
+	got, _, err := client.PullRequests.List(context.Background(), "o", "p", opt)
+	if err != nil {
+		t.Errorf("PullRequests.List returned error: %v", err)
+	}
 
-			mux.HandleFunc(tc.URL, func(w http.ResponseWriter, r *http.Request) {
-				testMethod(t, r, "GET")
-				json := tc.response
-				fmt.Fprint(w, json)
-			})
-
-			opt := &azuredevops.PullRequestListOptions{}
-			response, count, err := c.PullRequests.List(context.Background(), "AZURE_DEVOPS_OWNER", "AZURE_DEVOPS_PROJECT", opt)
-			if err != nil {
-				t.Fatalf("returned error: %v", err)
-			}
-
-			if count != len(tt) {
-				t.Fatalf("expected count in response to be %d; got %d", len(tt), count)
-			}
-
-			if len(response) != len(tt) {
-				t.Fatalf("expected length of response to be 0; got %d", len(response))
-			}
-
-			if count > 0 {
-				if tc.title != *response[0].Title {
-					t.Fatalf("expected title to be %s; got %s", tc.title, *response[0].Title)
-				}
-			}
-		})
+	want := []*azuredevops.GitPullRequest{{PullRequestID: Int(22)}}
+	if !cmp.Equal(got, want) {
+		diff := cmp.Diff(got, want)
+		fmt.Printf(diff)
+		t.Errorf("PullRequests.List returned %+v, want %+v", got, want)
 	}
 }
 
 func TestPullRequestsService_ListCommits(t *testing.T) {
-	tt := []struct {
-		name     string
-		URL      string
-		comment  string
-		response string
-	}{
-		{name: "happy", URL: pullrequestsListURL, response: pullrequestsResponse,
-			comment: "A new feature"},
-		{name: "there are no items in the response", URL: pullrequestsListURL, response: "{}"},
+	client, mux, _, teardown := setup()
+	defer teardown()
+	mux.HandleFunc("/o/p/_apis/git/repositories/r/pullrequests/22/commits", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "GET")
+		w.Header().Set("Content-Type", "application/json")
+		fmt.Fprint(w, `{
+			"count": 1,
+			"value": [{
+				"commitId": "6ebe65c46761913eaf81476dc10aa6a743fb99a0",
+				"comment": "COMMENT"
+			}]
+			}`)
+	})
+
+	got, _, err := client.PullRequests.ListCommits(context.Background(), "o", "p", "r", 22)
+	if err != nil {
+		t.Errorf("PullRequests.ListCommits returned error: %v", err)
 	}
 
-	for _, tc := range tt {
-		t.Run(tc.name, func(t *testing.T) {
-			c, mux, _, teardown := setup()
-			defer teardown()
-
-			mux.HandleFunc(tc.URL, func(w http.ResponseWriter, r *http.Request) {
-				testMethod(t, r, "GET")
-				json := tc.response
-				fmt.Fprint(w, json)
-			})
-
-			response, count, err := c.PullRequests.ListCommits(context.Background(), "AZURE_DEVOPS_OWNER", "AZURE_DEVOPS_PROJECT", "test", 1)
-			if err != nil {
-				t.Fatalf("returned error: %v", err)
-			}
-
-			if count != len(tt) {
-				t.Fatalf("expected count in response to be %d; got %d", len(tt), count)
-			}
-
-			if len(response) != len(tt) {
-				t.Fatalf("expected length of response to be 0; got %d", len(response))
-			}
-
-			if count > 0 {
-				if tc.comment != *response[0].Comment {
-					t.Fatalf("expected title to be %s; got %s", tc.comment, *response[0].Comment)
-				}
-			}
-		})
+	want := []*azuredevops.GitCommitRef{{
+		CommitID: String("6ebe65c46761913eaf81476dc10aa6a743fb99a0"),
+		Comment:  String("COMMENT"),
+	}}
+	if !cmp.Equal(got, want) {
+		diff := cmp.Diff(got, want)
+		fmt.Printf(diff)
+		t.Errorf("PullRequests.ListCommits returned %+v, want %+v", got, want)
 	}
 }
 
 func TestPullRequestsService_Get(t *testing.T) {
-	tt := []struct {
-		name     string
-		URL      string
-		title    string
-		response string
-		count    int
-	}{
-		{name: "happy", URL: pullrequestsListURL, response: pullrequestsResponse, count: 1, title: "A new feature"},
-		{name: "there are no items in the response", URL: pullrequestsListURL, response: "{}", count: 0},
+	client, mux, _, teardown := setup()
+	defer teardown()
+	mux.HandleFunc("/o/p/_apis/git/pullrequests/22", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "GET")
+		w.Header().Set("Content-Type", "application/json")
+		fmt.Fprint(w, `{
+			"pullRequestId": 22
+		}`)
+	})
+
+	opts := &azuredevops.PullRequestListOptions{}
+	got, _, err := client.PullRequests.Get(context.Background(), "o", "p", 22, opts)
+	if err != nil {
+		t.Errorf("PullRequests.Get returned error: %v", err)
 	}
 
-	for _, tc := range tt {
-		t.Run(tc.name, func(t *testing.T) {
-			c, mux, _, teardown := setup()
-			defer teardown()
-
-			mux.HandleFunc(tc.URL, func(w http.ResponseWriter, r *http.Request) {
-				testMethod(t, r, "GET")
-				json := tc.response
-				fmt.Fprint(w, json)
-			})
-
-			opt := &azuredevops.PullRequestListOptions{}
-			num := 1
-			response, count, err := c.PullRequests.Get(context.Background(), "AZURE_DEVOPS_OWNER", "AZURE_DEVOPS_PROJECT", num, opt)
-			if err != nil {
-				t.Fatalf("returned error: %v", err)
-			}
-
-			if count != tc.count {
-				t.Fatalf("expected count in response to be %d; got %d", tc.count, count)
-			}
-			/*
-				if len(response) != tc.count {
-					t.Fatalf("expected length of response to be 0; got %d", len(response))
-				}
-			*/
-			if count > 0 {
-				if tc.title != *response.Title {
-					t.Fatalf("expected title to be %s; got %s", tc.title, *response.Title)
-				}
-			}
-		})
+	want := &azuredevops.GitPullRequest{
+		PullRequestID: Int(22),
+	}
+	if !cmp.Equal(got, want) {
+		diff := cmp.Diff(got, want)
+		fmt.Printf(diff)
+		t.Errorf("PullRequests.Get returned %+v, want %+v", got, want)
 	}
 }
 
 func TestPullRequestsService_Merge(t *testing.T) {
-	tt := []struct {
-		name     string
-		URL      string
-		title    string
-		response string
-		count    int
-	}{
-		{name: "happy", URL: pullrequestsListURL, response: pullrequestsResponse, count: 1, title: "A new feature"},
-		{name: "there are no items in the response", URL: pullrequestsListURL, response: "{}", count: 0},
+	client, mux, _, teardown := setup()
+	defer teardown()
+	mux.HandleFunc("/o/p/_apis/git/repositories/r/pullrequests", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "PATCH")
+		w.Header().Set("Content-Type", "application/json")
+		fmt.Fprint(w, `{
+			"status": "completed",
+			"autoCompleteSetBy": {
+				"id": "54d125f7-69f7-4191-904f-c5b96b6261c8",
+				"displayName": "Jamal Hartnett",
+				"uniqueName": "fabrikamfiber4@hotmail.com",
+				"url": "https://vssps.dev.azure.com/fabrikam/_apis/Identities/54d125f7-69f7-4191-904f-c5b96b6261c8",
+				"imageUrl": "https://dev.azure.com/fabrikam/DefaultCollection/_api/_common/identityImage?id=54d125f7-69f7-4191-904f-c5b96b6261c8"
+			},
+			"pullRequestId": 22,
+			"completionOptions": {
+				"bypassPolicy":false,
+				"bypassReason":"",
+				"deleteSourceBranch":false,
+				"mergeCommitMessage":"TEST MERGE COMMIT MESSAGE",
+				"mergeStrategy":"noFastForward",
+				"squashMerge":false,
+				"transitionWorkItems":true,
+				"triggeredByAutoComplete":false
+			}
+		}`)
+	})
+
+	// Set default pull request completion options
+	empty := ""
+	mcm := azuredevops.NoFastForward.String()
+	twi := new(bool)
+	*twi = true
+	completionOpts := azuredevops.GitPullRequestCompletionOptions{
+		BypassPolicy:            new(bool),
+		BypassReason:            &empty,
+		DeleteSourceBranch:      new(bool),
+		MergeCommitMessage:      String("TEST MERGE COMMIT MESSAGE"),
+		MergeStrategy:           &mcm,
+		SquashMerge:             new(bool),
+		TransitionWorkItems:     twi,
+		TriggeredByAutoComplete: new(bool),
 	}
 
-	for _, tc := range tt {
-		t.Run(tc.name, func(t *testing.T) {
-			c, mux, _, teardown := setup()
-			defer teardown()
+	id := azuredevops.IdentityRef{
+		ID:          String("54d125f7-69f7-4191-904f-c5b96b6261c8"),
+		DisplayName: String("Jamal Hartnett"),
+		UniqueName:  String("fabrikamfiber4@hotmail.com"),
+		URL:         String("https://vssps.dev.azure.com/fabrikam/_apis/Identities/54d125f7-69f7-4191-904f-c5b96b6261c8"),
+		ImageURL:    String("https://dev.azure.com/fabrikam/DefaultCollection/_api/_common/identityImage?id=54d125f7-69f7-4191-904f-c5b96b6261c8"),
+	}
 
-			mux.HandleFunc(tc.URL, func(w http.ResponseWriter, r *http.Request) {
-				testMethod(t, r, "GET")
-				json := tc.response
-				fmt.Fprint(w, json)
-			})
+	got, _, err := client.PullRequests.Merge(context.Background(), "o", "p", "r", 22, nil, completionOpts, id)
+	if err != nil {
+		t.Errorf("PullRequests.Merge returned error: %v", err)
+	}
 
-			num := 1
-			id := &azuredevops.IdentityRef{}
-			commitMsg := "COMMIT_MSG"
+	want := &azuredevops.GitPullRequest{
+		Status:            String("completed"),
+		PullRequestID:     Int(22),
+		CompletionOptions: &completionOpts,
+		AutoCompleteSetBy: &id,
+	}
+	if !cmp.Equal(got, want) {
+		diff := cmp.Diff(got, want)
+		t.Errorf("PullRequests.Merge error: %s", diff)
+	}
+}
 
-			response, count, err := c.PullRequests.Merge(context.Background(), "AZURE_DEVOPS_OWNER", "AZURE_DEVOPS_PROJECT", "AZURE_DEVOPS_REPO", num, id, commitMsg)
-			if err != nil {
-				t.Fatalf("returned error: %v", err)
-			}
+func TestPullRequestsService_Create(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
+	mux.HandleFunc("/o/p/_apis/git/repositories/r/pullrequests", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "POST")
+		w.Header().Set("Content-Type", "application/json")
+		b, _ := ioutil.ReadAll(r.Body)
+		parsed := &azuredevops.GitPullRequest{}
+		json.Unmarshal(b, parsed)
+		if parsed.GetSourceRefName() != "refs/heads/mytopic" {
+			t.Errorf("GetSourceRefName error: %v", parsed.GetSourceRefName())
+		}
+		if parsed.GetTargetRefName() != "refs/heads/master" {
+			t.Errorf("GetTargetRefName returned error: %v", parsed.GetTargetRefName())
+		}
+		fmt.Fprint(w, `{
+			"pullRequestId": 10,
+			"title": "TEST PULL REQUEST TITLE",
+			"description": "TEST PULL REQUEST DESCRIPTION",
+			"sourceRefName": "refs/heads/mytopic",
+			"targetRefName": "refs/heads/master",
+			"mergeStatus": "succeeded"
+		}`)
+	})
 
-			if count != tc.count {
-				t.Fatalf("expected count in response to be %d; got %d", tc.count, count)
-			}
-			/*
-				if len(response) != tc.count {
-					t.Fatalf("expected length of response to be 0; got %d", len(response))
-				}
-			*/
-			if count > 0 {
-				if tc.title != *response.Title {
-					t.Fatalf("expected title to be %s; got %s", tc.title, *response.Title)
-				}
-			}
-		})
+	pull := &azuredevops.GitPullRequest{
+		Title:         String("TEST PULL REQUEST TITLE"),
+		Description:   String("TEST PULL REQUEST DESCRIPTION"),
+		SourceRefName: String("mytopic"),
+		TargetRefName: String("refs/heads/master"),
+	}
+
+	got, _, err := client.PullRequests.Create(context.Background(), "o", "p", "r", pull)
+	if err != nil {
+		t.Errorf("PullRequests.Create returned error: %v", err)
+	}
+
+	want := &azuredevops.GitPullRequest{
+		PullRequestID: Int(10),
+		Title:         String("TEST PULL REQUEST TITLE"),
+		Description:   String("TEST PULL REQUEST DESCRIPTION"),
+		SourceRefName: String("refs/heads/mytopic"),
+		TargetRefName: String("refs/heads/master"),
+		MergeStatus:   String("succeeded"),
+	}
+	if !cmp.Equal(got, want) {
+		diff := cmp.Diff(got, want)
+		fmt.Printf(diff)
+		t.Errorf("PullRequests.Create returned %+v, want %+v", got, want)
 	}
 }
