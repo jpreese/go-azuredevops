@@ -3,6 +3,7 @@ package azuredevops
 import (
 	"context"
 	"fmt"
+	"net/http"
 )
 
 // BuildsService handles communication with the builds methods on the API
@@ -25,18 +26,18 @@ type TaskOrchestrationPlanReference struct {
 
 // Build Represents a build.
 type Build struct {
-	Definition          *BuildDefinition      `json:"definition,omitempty"`
-	Controller          *BuildController      `json:"controller,omitempty"`
-	LastChangedBy       *IdentityRef          `json:"lastChangedBy,omitempty"`
-	DeletedBy           *IdentityRef          `json:"deletedBy,omitempty"`
-	BuildNumber         *string               `json:"buildNumber,omitempty"`
-	FinishTime          *string               `json:"finishTime,omitempty"`
-	Branch              *string               `json:"sourceBranch,omitempty"`
-	Repository          *BuildRepository      `json:"repository,omitempty"`
-	Demands             []*BuildDemand        `json:"demands,omitempty"`
-	Logs                *BuildLogReference    `json:"logs,omitempty"`
-	Project             *TeamProjectReference `json:"project,omitempty"`
-	Properties          map[string]string
+	Definition          *BuildDefinition                  `json:"definition,omitempty"`
+	Controller          *BuildController                  `json:"controller,omitempty"`
+	LastChangedBy       *IdentityRef                      `json:"lastChangedBy,omitempty"`
+	DeletedBy           *IdentityRef                      `json:"deletedBy,omitempty"`
+	BuildNumber         *string                           `json:"buildNumber,omitempty"`
+	FinishTime          *string                           `json:"finishTime,omitempty"`
+	SourceBranch        *string                           `json:"sourceBranch,omitempty"`
+	Repository          *BuildRepository                  `json:"repository,omitempty"`
+	Demands             []*BuildDemand                    `json:"demands,omitempty"`
+	Logs                *BuildLogReference                `json:"logs,omitempty"`
+	Project             *TeamProjectReference             `json:"project,omitempty"`
+	Properties          map[string]string                 `json:"properties,omitempty"`
 	Priority            *string                           `json:"priority,omitempty"`
 	OrchestrationPlan   *TaskOrchestrationPlanReference   `json:"orchestrationPlan,omitempty"`
 	Plans               []*TaskOrchestrationPlanReference `json:"plans,omitempty"`
@@ -176,25 +177,27 @@ type QueueBuildOptions struct {
 }
 
 // Queue inserts new build creation to queue
+// Requires build ID number in build.definition
+// Example body:
+// {"definition": {"id": 1}, "sourceBranch": "refs/heads/master"}
 // utilising https://docs.microsoft.com/en-us/rest/api/azure/devops/build/Builds/Queue
-func (s *BuildsService) Queue(ctx context.Context, owner string, project string, build *Build, opts *QueueBuildOptions) error {
-	URL := fmt.Sprintf("%s/%s/_apis/build/builds?api-version=api-version=5.1-preview.5",
+func (s *BuildsService) Queue(ctx context.Context, owner string, project string, build *Build, opts *QueueBuildOptions) (*Build, *http.Response, error) {
+	URL := fmt.Sprintf("%s/%s/_apis/build/builds?api-version=5.1-preview.5",
 		owner,
 		project,
 	)
 	URL, err := addOptions(URL, opts)
 
 	if err != nil {
-		return err
+		return nil, nil, err
 	}
 
 	request, err := s.client.NewRequest("POST", URL, build)
-
 	if err != nil {
-		return err
+		return nil, nil, err
 	}
+	r := new(Build)
+	resp, err := s.client.Execute(ctx, request, r)
 
-	_, err = s.client.Execute(ctx, request, build)
-
-	return err
+	return r, resp, err
 }

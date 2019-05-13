@@ -118,7 +118,7 @@ func TestBuildsService_Queue(t *testing.T) {
 
 		options := &azuredevops.QueueBuildOptions{}
 
-		err := c.Builds.Queue(context.Background(), "AZURE_DEVOPS_OWNER", "AZURE_DEVOPS_PROJECT", requestBuild, options)
+		_, _, err := c.Builds.Queue(context.Background(), "AZURE_DEVOPS_OWNER", "AZURE_DEVOPS_PROJECT", requestBuild, options)
 
 		if err != nil {
 			t.Fatalf("returned error: %v", err)

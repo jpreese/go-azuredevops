@@ -32,8 +32,8 @@ type BuildRepository struct {
 
 // BuildDefinition represents a build definition
 type BuildDefinition struct {
-	ID         *int             `json:"id"`
-	Name       *string          `json:"name"`
+	ID         *int             `json:"id,omitempty"`
+	Name       *string          `json:"name,omitempty"`
 	Repository *BuildRepository `json:"repository,omitempty"`
 }
 
