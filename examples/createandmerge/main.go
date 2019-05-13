@@ -116,7 +116,7 @@ func (client *myClient) merge(pull *azuredevops.GitPullRequest, id *azuredevops.
 		TriggeredByAutoComplete: new(bool),
 	}
 
-	merge, resp, err := client.c.PullRequests.Merge(context.Background(),
+	merge, _, err := client.c.PullRequests.Merge(context.Background(),
 		client.org,
 		client.project,
 		client.repo,
