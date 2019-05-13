@@ -4,11 +4,11 @@
 // from Azure Devops.  Use a tool like ngrok to test locally.
 // This code:
 // 0. Prompts the user for input
-// 1. Creates a NewClient() using basic auth and personal access token
+// 1. Creates an API client using basic auth and personal access token
 // 2. Sets up a web server on port 9000
-// 3. Gets the logged in user's IdentityRef{}
-// 4. Creates a pull request
-// 5. Merges the pull request with the default no fast-forward
+// 3. Listens for azuredevops.PushEvent webhooks
+// 4. Upon receiving a webhook, validates Basic user/pass
+// 5. Queues the supplied build ID number if webhook is valid
 package main
 
 import (
