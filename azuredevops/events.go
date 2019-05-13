@@ -86,11 +86,9 @@ func (e *Event) ParsePayload() (payload interface{}, err error) {
 
 	err = json.Unmarshal(e.RawPayload, &payload)
 	if err != nil {
-		fmt.Printf("JSON ERR: %#v \n\n %#v \n\n", payload, err)
+		fmt.Printf("JSON unmarshal err: %#v \n\n %#v \n\n", payload, err)
 		return payload, err
 	}
-	fmt.Printf("JSON AFTER: %#v \n\n %#v \n\n", payload, err)
-
 	e.Resource = payload
 	return payload, nil
 }

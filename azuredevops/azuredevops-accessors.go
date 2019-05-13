@@ -211,14 +211,6 @@ func (b *BoardRow) GetName() string {
 	return *b.Name
 }
 
-// GetBranch returns the Branch field if it's non-nil, zero value otherwise.
-func (b *Build) GetBranch() string {
-	if b == nil || b.Branch == nil {
-		return ""
-	}
-	return *b.Branch
-}
-
 // GetBuildNumber returns the BuildNumber field if it's non-nil, zero value otherwise.
 func (b *Build) GetBuildNumber() string {
 	if b == nil || b.BuildNumber == nil {
@@ -417,6 +409,14 @@ func (b *Build) GetRetainedByRelease() bool {
 		return false
 	}
 	return *b.RetainedByRelease
+}
+
+// GetSourceBranch returns the SourceBranch field if it's non-nil, zero value otherwise.
+func (b *Build) GetSourceBranch() string {
+	if b == nil || b.SourceBranch == nil {
+		return ""
+	}
+	return *b.SourceBranch
 }
 
 // GetStartTime returns the StartTime field if it's non-nil, zero value otherwise.
