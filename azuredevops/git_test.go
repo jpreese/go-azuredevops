@@ -227,26 +227,68 @@ func TestGitService_CreateStatus(t *testing.T) {
 				State:       &state,
 				TargetURL:   &target,
 			}
-			resp, count, err := c.Git.CreateStatus(context.Background(), "AZURE_DEVOPS_OWNER", "AZURE_DEVOPS_PROJECT", "repo", "67cae2b029dff7eb3dc062b49403aaedca5bad8d", status)
+			r, _, err := c.Git.CreateStatus(context.Background(), "AZURE_DEVOPS_OWNER", "AZURE_DEVOPS_PROJECT", "repo", "67cae2b029dff7eb3dc062b49403aaedca5bad8d", status)
 			if err != nil {
 				t.Fatalf("returned error: %v", err)
 			}
 
-			if count > 0 {
-				if *resp.Description != tc.description {
-					t.Fatalf("expected git ref name %s, got %s", tc.description, *resp.Description)
-				}
-				if !cmp.Equal(resp.Context, tc.gitContext) {
-					diff := cmp.Diff(resp.Context, tc.gitContext)
-					t.Errorf("Git.GetRef error: %s", diff)
-				}
-				if *resp.State != tc.state {
-					t.Fatalf("expected git ref name %s, got %s", tc.state, *resp.State)
-				}
-				if *resp.TargetURL != tc.targetUrl {
-					t.Fatalf("expected git ref object id %s, got %s", tc.targetUrl, *resp.TargetURL)
-				}
+			if *r.Description != tc.description {
+				t.Fatalf("expected git ref name %s, got %s", tc.description, *r.Description)
+			}
+			if !cmp.Equal(r.Context, tc.gitContext) {
+				diff := cmp.Diff(r.Context, tc.gitContext)
+				t.Errorf("Git.GetRef error: %s", diff)
+			}
+			if *r.State != tc.state {
+				t.Fatalf("expected git ref name %s, got %s", tc.state, *r.State)
+			}
+			if *r.TargetURL != tc.targetUrl {
+				t.Fatalf("expected git ref object id %s, got %s", tc.targetUrl, *r.TargetURL)
 			}
 		})
+	}
+}
+
+// azuredevops.VersionControlChangeType
+func TestGitService_GetChanges(t *testing.T) {
+	changeMap := map[string]int{
+		azuredevops.Add.String(): 0,
+	}
+
+	changes := &azuredevops.GitChange{
+		ChangeID:   Int(1),
+		ChangeType: String(azuredevops.Add.String()),
+	}
+	changesList := []*azuredevops.GitChange{changes}
+	want := &azuredevops.GitCommitChanges{
+		ChangeCounts: &changeMap,
+		Changes:      changesList,
+	}
+
+	client, mux, _, teardown := setup()
+	defer teardown()
+	mux.HandleFunc("/o/p/_apis/git/repositories/r/commits/67cae2b029dff7eb3dc062b49403aaedca5bad8d/changes", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "GET")
+		w.Header().Set("Content-Type", "application/json")
+		fmt.Fprint(w, `{
+			"changeCounts": {
+				"add": 0
+			},
+			"changes": [{
+				"changeId": 1,
+				"changeType": "add"
+			}]
+			}`)
+	})
+
+	got, _, err := client.Git.GetChanges(context.Background(), "o", "p", "r", "67cae2b029dff7eb3dc062b49403aaedca5bad8d")
+	if err != nil {
+		t.Fatalf("returned error: %v", err)
+	}
+
+	if !cmp.Equal(got, want) {
+		diff := cmp.Diff(got, want)
+		fmt.Printf(diff)
+		t.Errorf("Git.GetChanges returned %+v, want %+v", got, want)
 	}
 }

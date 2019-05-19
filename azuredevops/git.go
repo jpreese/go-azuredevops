@@ -3,6 +3,7 @@ package azuredevops
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"net/url"
 	"time"
 )
@@ -111,26 +112,26 @@ type GitChange struct {
 // GitCommitChanges is a list of GitCommitRefs and count of all changes describes in
 // the response from the API
 type GitCommitChanges struct {
-	ChangeCounts *ChangeCountDictionary `json:"changeCounts,omitempty"`
-	Changes      []*GitChange           `json:"changes,omitempty"`
+	ChangeCounts *map[string]int `json:"changeCounts,omitempty"`
+	Changes      []*GitChange    `json:"changes,omitempty"`
 }
 
 // GitCommitRef describes a single git commit reference
 type GitCommitRef struct {
-	Links            *map[string]Link       `json:"_links,omitempty"`
-	CommitID         *string                `json:"commitId,omitempty"`
-	Author           *GitUserDate           `json:"author,omitempty"`
-	Committer        *GitUserDate           `json:"committer,omitempty"`
-	Comment          *string                `json:"comment,omitempty"`
-	CommentTruncated *bool                  `json:"commentTruncated,omitempty"`
-	URL              *string                `json:"url,omitempty"`
-	ChangeCounts     *ChangeCountDictionary `json:"changeCounts,omitempty"`
-	Changes          *GitChange             `json:"changes,omitempty"`
-	Parents          []*string              `json:"parents,omitempty"`
-	Push             *GitPushRef            `json:"push,omitempty"`
-	RemoteURL        *string                `json:"remoteUrl,omitempty"`
-	Statuses         []*GitStatus           `json:"statuses,omitempty"`
-	WorkItems        *ResourceRef           `json:"workItems,omitempty"`
+	Links            *map[string]Link `json:"_links,omitempty"`
+	CommitID         *string          `json:"commitId,omitempty"`
+	Author           *GitUserDate     `json:"author,omitempty"`
+	Committer        *GitUserDate     `json:"committer,omitempty"`
+	Comment          *string          `json:"comment,omitempty"`
+	CommentTruncated *bool            `json:"commentTruncated,omitempty"`
+	URL              *string          `json:"url,omitempty"`
+	ChangeCounts     *map[string]int  `json:"changeCounts,omitempty"`
+	Changes          *GitChange       `json:"changes,omitempty"`
+	Parents          []*string        `json:"parents,omitempty"`
+	Push             *GitPushRef      `json:"push,omitempty"`
+	RemoteURL        *string          `json:"remoteUrl,omitempty"`
+	Statuses         []*GitStatus     `json:"statuses,omitempty"`
+	WorkItems        *ResourceRef     `json:"workItems,omitempty"`
 }
 
 // GitRef provides information about a git/fork ref.
@@ -435,10 +436,31 @@ func (s *GitService) GetRepository(ctx context.Context, owner, project, repoName
 
 }
 
+// GetChanges Return a single GitRepository
+// https://docs.microsoft.com/en-us/rest/api/azure/devops/git/commits/get%20changes?view=azure-devops-rest-5.1
+func (s *GitService) GetChanges(ctx context.Context, owner, project, repoName, commitID string) (*GitCommitChanges, *http.Response, error) {
+	URL := fmt.Sprintf(
+		"%s/%s/_apis/git/repositories/%s/commits/%s/changes?api-version=5.1-preview.1",
+		owner,
+		project,
+		repoName,
+		commitID,
+	)
+
+	req, err := s.client.NewRequest("GET", URL, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+	r := new(GitCommitChanges)
+	resp, err := s.client.Execute(ctx, req, r)
+
+	return r, resp, err
+}
+
 // CreateStatus creates a new status for a repository at the specified
 // reference. Ref can be a SHA, a branch name, or a tag name.
 // https://docs.microsoft.com/en-us/rest/api/azure/devops/git/statuses/create?view=azure-devops-rest-5.0
-func (s *GitService) CreateStatus(ctx context.Context, owner, project, repoName, ref string, status GitStatus) (*GitStatus, int, error) {
+func (s *GitService) CreateStatus(ctx context.Context, owner, project, repoName, ref string, status GitStatus) (*GitStatus, *http.Response, error) {
 	URL := fmt.Sprintf(
 		"%s/%s/_apis/git/repositories/%s/commits/%s/statuses?api-version=5.1-preview.1",
 		owner,
@@ -449,10 +471,10 @@ func (s *GitService) CreateStatus(ctx context.Context, owner, project, repoName,
 
 	request, err := s.client.NewRequest("POST", URL, status)
 	if err != nil {
-		return nil, 0, err
+		return nil, nil, err
 	}
-	var response GitStatus
-	_, err = s.client.Execute(ctx, request, &response)
+	r := new(GitStatus)
+	resp, err := s.client.Execute(ctx, request, r)
 
-	return &response, 1, err
+	return r, resp, err
 }
