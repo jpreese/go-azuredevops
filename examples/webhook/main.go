@@ -104,7 +104,8 @@ func eventHandler(client *myClient, logger *log.Logger) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		payload, err := azuredevops.ValidatePayload(r, []byte(client.whUser), []byte(client.whPass))
 		if payload == nil && err != nil {
-			// auth failed - return status code
+			w.WriteHeader(http.StatusUnauthorized)
+			fmt.Fprintln(w, "Authentication failed")
 			logger.Printf("Webhook auth failed in eventHandler: %s", err)
 			return
 		} else if err != nil {
