@@ -114,6 +114,22 @@ type PullRequestsCommitsResponse struct {
 	GitCommitRefs []*GitCommitRef `json:"value"`
 }
 
+// PullRequestGetOptions describes what the request to the API should look like
+type PullRequestGetOptions struct {
+	IncludeCommits      bool   `url:"includeCommits,omitempty"`
+	IncludeWorkItemRefs bool   `url:"includeWorkItemRefs,omitempty"`
+	Project             string `url:"project,omitempty"`
+	Organization        string `url:"organization,omitempty"`
+	RepositoryID        string `url:"repositoryId,omitempty"`
+	// maxCommentLength Not used.
+	MaxCommentLength int `url:"maxCommentLength,omitempty"`
+	PullRequestID    int `url:"pullRequestId,omitempty"`
+	// $skip Not used.
+	Skip int `url:"$skip,omitempty"`
+	// $top Not used.
+	Top int `url:"$top,omitempty"`
+}
+
 // PullRequestsListResponse describes a pull requests list response
 type PullRequestsListResponse struct {
 	Count           int               `json:"count"`
@@ -173,6 +189,28 @@ func (s *PullRequestsService) Get(ctx context.Context, owner, project string, pu
 		project,
 		pullNum,
 	)
+	URL, err := addOptions(URL, opts)
+
+	req, err := s.client.NewRequest("GET", URL, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+	r := new(GitPullRequest)
+	resp, err := s.client.Execute(ctx, req, r)
+
+	return r, resp, err
+}
+
+// GetWithRepo returns a single pull request with additional information
+// https://docs.microsoft.com/en-us/rest/api/azure/devops/git/pull%20requests/get%20pull%20request?view=azure-devops-rest-5.1
+func (s *PullRequestsService) GetWithRepo(ctx context.Context, owner, project, repo string, pullNum int, opts *PullRequestGetOptions) (*GitPullRequest, *http.Response, error) {
+	URL := fmt.Sprintf("%s/%s/_apis/git/repositories/%s/pullrequests/%d?api-version=5.1-preview.1",
+		owner,
+		project,
+		repo,
+		pullNum,
+	)
+
 	URL, err := addOptions(URL, opts)
 
 	req, err := s.client.NewRequest("GET", URL, nil)

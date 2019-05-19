@@ -174,15 +174,81 @@ func TestWorkItems_GetForIteration(t *testing.T) {
 			})
 
 			iteration := azuredevops.Iteration{ID: "1"}
-			workItems, err := c.WorkItems.GetForIteration(context.Background(), "AZURE_DEVOPS_OWNER", "AZURE_DEVOPS_PROJECT", "AZURE_DEVOPS_TEAM", iteration)
+			got, _, err := c.WorkItems.GetForIteration(context.Background(), "AZURE_DEVOPS_OWNER", "AZURE_DEVOPS_PROJECT", "AZURE_DEVOPS_TEAM", iteration)
 			if err != nil {
 				t.Fatalf("returned error: %v", err)
 			}
 
-			if len(workItems) != tc.expectedWorkItems {
-				t.Fatalf("expected %d work items; got %d", tc.expectedWorkItems, len(workItems))
+			if len(got) != tc.expectedWorkItems {
+				t.Fatalf("expected %d work items; got %d", tc.expectedWorkItems, len(got))
 			}
 		})
+	}
+}
+
+func TestWorkItems_GetComment(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
+
+	comment := "TEST COMMENT"
+	want := &azuredevops.WorkItemComment{ID: Int(1), Text: String(comment)}
+
+	mux.HandleFunc("/o/p/_apis/wit/workItems/1/comments/", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "GET")
+
+		fmt.Fprint(w, `{"id":1, "text": "TEST COMMENT"}`)
+	})
+
+	opts := azuredevops.WorkItemCommentListOptions{}
+	got, _, err := client.WorkItems.GetComment(context.Background(), "o", "p", 1, 1, &opts)
+	if err != nil {
+		t.Errorf("WorkItems.GetComment returned error: %v", err)
+	}
+
+	if !cmp.Equal(got, want) {
+		diff := cmp.Diff(got, want)
+		t.Errorf("WorkItems.GetComment error: %s", diff)
+	}
+}
+
+func TestWorkItems_ListComments(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
+
+	commentText := "TEST COMMENT"
+	witID := 1
+	comment := &azuredevops.WorkItemComment{ID: &witID, Text: &commentText}
+	comments := []*azuredevops.WorkItemComment{comment}
+	want := &azuredevops.WorkItemCommentList{
+		TotalCount: Int(1),
+		Count:      Int(1),
+		Comments:   comments,
+	}
+
+	mux.HandleFunc("/o/p/_apis/wit/workItems/1/comments", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "GET")
+
+		fmt.Fprint(w, `{
+			"totalCount": 1,
+			"count": 1,
+			"comments": [{
+				"id": 1,
+				"text": "TEST COMMENT"
+			}]
+		}`)
+	})
+
+	opts := azuredevops.WorkItemCommentListOptions{
+		IDs: []int{1, 2, 3},
+	}
+	got, _, err := client.WorkItems.ListComments(context.Background(), "o", "p", witID, &opts)
+	if err != nil {
+		t.Errorf("WorkItems.ListComments returned error: %v", err)
+	}
+
+	if !cmp.Equal(got, want) {
+		diff := cmp.Diff(got, want)
+		t.Errorf("WorkItems.ListComments error: %s", diff)
 	}
 }
 
@@ -194,7 +260,7 @@ func TestWorkItems_CreateComment(t *testing.T) {
 	id := 1
 	want := &azuredevops.WorkItemComment{ID: &id, Text: &comment}
 
-	mux.HandleFunc("/AZURE_DEVOPS_Project/_apis/wit/workItems/1/comments", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/o/p/_apis/wit/workItems/1/comments", func(w http.ResponseWriter, r *http.Request) {
 		v := new(azuredevops.WorkItemComment)
 		json.NewDecoder(r.Body).Decode(v)
 
@@ -203,7 +269,7 @@ func TestWorkItems_CreateComment(t *testing.T) {
 		fmt.Fprint(w, `{"id":1, "text": "TEST COMMENT"}`)
 	})
 
-	got, _, err := client.WorkItems.CreateComment(context.Background(), "AZURE_DEVOPS_OWNER", "AZURE_DEVOPS_PROJECT", 1, want)
+	got, _, err := client.WorkItems.CreateComment(context.Background(), "o", "p", 1, want)
 	if err != nil {
 		t.Errorf("WorkItems.CreateComment returned error: %v", err)
 	}

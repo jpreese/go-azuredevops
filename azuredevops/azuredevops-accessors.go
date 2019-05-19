@@ -1227,12 +1227,12 @@ func (g *GitChange) GetURL() string {
 	return *g.URL
 }
 
-// GetChangeCounts returns the ChangeCounts field.
-func (g *GitCommitChanges) GetChangeCounts() *ChangeCountDictionary {
-	if g == nil {
-		return nil
+// GetChangeCounts returns the ChangeCounts field if it's non-nil, zero value otherwise.
+func (g *GitCommitChanges) GetChangeCounts() map[string]int {
+	if g == nil || g.ChangeCounts == nil {
+		return map[string]int{}
 	}
-	return g.ChangeCounts
+	return *g.ChangeCounts
 }
 
 // GetAuthor returns the Author field.
@@ -1243,12 +1243,12 @@ func (g *GitCommitRef) GetAuthor() *GitUserDate {
 	return g.Author
 }
 
-// GetChangeCounts returns the ChangeCounts field.
-func (g *GitCommitRef) GetChangeCounts() *ChangeCountDictionary {
-	if g == nil {
-		return nil
+// GetChangeCounts returns the ChangeCounts field if it's non-nil, zero value otherwise.
+func (g *GitCommitRef) GetChangeCounts() map[string]int {
+	if g == nil || g.ChangeCounts == nil {
+		return map[string]int{}
 	}
-	return g.ChangeCounts
+	return *g.ChangeCounts
 }
 
 // GetChanges returns the Changes field.
@@ -3249,6 +3249,54 @@ func (w *WorkItemComment) GetWorkItemID() int {
 		return 0
 	}
 	return *w.WorkItemID
+}
+
+// GetContinuationToken returns the ContinuationToken field if it's non-nil, zero value otherwise.
+func (w *WorkItemCommentList) GetContinuationToken() string {
+	if w == nil || w.ContinuationToken == nil {
+		return ""
+	}
+	return *w.ContinuationToken
+}
+
+// GetCount returns the Count field if it's non-nil, zero value otherwise.
+func (w *WorkItemCommentList) GetCount() int {
+	if w == nil || w.Count == nil {
+		return 0
+	}
+	return *w.Count
+}
+
+// GetLinks returns the Links field if it's non-nil, zero value otherwise.
+func (w *WorkItemCommentList) GetLinks() map[string]Link {
+	if w == nil || w.Links == nil {
+		return map[string]Link{}
+	}
+	return *w.Links
+}
+
+// GetNextPage returns the NextPage field if it's non-nil, zero value otherwise.
+func (w *WorkItemCommentList) GetNextPage() string {
+	if w == nil || w.NextPage == nil {
+		return ""
+	}
+	return *w.NextPage
+}
+
+// GetTotalCount returns the TotalCount field if it's non-nil, zero value otherwise.
+func (w *WorkItemCommentList) GetTotalCount() int {
+	if w == nil || w.TotalCount == nil {
+		return 0
+	}
+	return *w.TotalCount
+}
+
+// GetURL returns the URL field if it's non-nil, zero value otherwise.
+func (w *WorkItemCommentList) GetURL() string {
+	if w == nil || w.URL == nil {
+		return ""
+	}
+	return *w.URL
 }
 
 // GetRel returns the Rel field if it's non-nil, zero value otherwise.

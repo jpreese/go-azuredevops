@@ -293,3 +293,33 @@ func TestPullRequestsService_Create(t *testing.T) {
 		t.Errorf("PullRequests.Create returned %+v, want %+v", got, want)
 	}
 }
+
+func TestPullRequestsService_GetWithRepo(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
+	mux.HandleFunc("/o/p/_apis/git/repository/r/pullrequests/22", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "GET")
+		w.Header().Set("Content-Type", "application/json")
+		fmt.Fprint(w, `{
+			"pullRequestId": 22
+		}`)
+	})
+
+	opts := &azuredevops.PullRequestGetOptions{
+		RepositoryID:        "",
+		IncludeWorkItemRefs: true,
+	}
+	got, _, err := client.PullRequests.GetWithRepo(context.Background(), "o", "p", "r", 22, opts)
+	if err != nil {
+		t.Errorf("PullRequests.Get returned error: %v", err)
+	}
+
+	want := &azuredevops.GitPullRequest{
+		PullRequestID: Int(22),
+	}
+	if !cmp.Equal(got, want) {
+		diff := cmp.Diff(got, want)
+		fmt.Printf(diff)
+		t.Errorf("PullRequests.Get returned %+v, want %+v", got, want)
+	}
+}

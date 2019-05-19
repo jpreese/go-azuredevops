@@ -3,6 +3,7 @@ package azuredevops
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
@@ -22,7 +23,7 @@ type IterationWorkItems struct {
 	URL               *string          `json:"url,omitempty"`
 }
 
-// WorkItemComment Describes a response to CreateComment()
+// WorkItemComment Describes a response to CreateComment
 type WorkItemComment struct {
 	CreatedBy    *IdentityRef `json:"createdBy,omitempty"`
 	CreatedDate  *time.Time   `json:"createdDate,omitempty"`
@@ -33,6 +34,26 @@ type WorkItemComment struct {
 	URL          *string      `json:"url,omitempty"`
 	Version      *int         `json:"version,omitempty"`
 	WorkItemID   *int         `json:"workItemId,omitempty"`
+}
+
+// WorkItemCommentList Represents a list of work item comments.
+type WorkItemCommentList struct {
+	Links             *map[string]Link   `json:"_links,omitempty"`
+	Comments          []*WorkItemComment `json:"comments,omitempty"`
+	ContinuationToken *string            `json:"continuationToken,omitempty"`
+	Count             *int               `json:"count,omitempty"`
+	NextPage          *string            `json:"nextPage,omitempty"`
+	TotalCount        *int               `json:"totalCount,omitempty"`
+	URL               *string            `json:"url,omitempty"`
+}
+
+// WorkItemCommentListOptions URI parameters for ListComments
+// Valid Expand strings are:
+// all, mentions, none, reactions, renderedText, renderedTextOnly
+type WorkItemCommentListOptions struct {
+	IDs            []int  `url:"ids,omitempty"`
+	IncludeDeleted bool   `url:"includeDeleted,omitempty"`
+	Expand         string `url:"$expand,omitempty"`
 }
 
 // WorkItemLink A link between two work items.
@@ -107,10 +128,10 @@ type WorkItemUpdate struct {
 
 // GetForIteration will get a list of work items based on an iteration name
 // utilising https://docs.microsoft.com/en-gb/rest/api/vsts/wit/work%20items/list
-func (s *WorkItemsService) GetForIteration(ctx context.Context, owner, project, team string, iteration Iteration) ([]*WorkItem, error) {
-	queryIds, err := s.GetIdsForIteration(ctx, owner, project, team, iteration)
+func (s *WorkItemsService) GetForIteration(ctx context.Context, owner, project, team string, iteration Iteration) ([]*WorkItem, *http.Response, error) {
+	queryIds, _, err := s.GetIdsForIteration(ctx, owner, project, team, iteration)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	var workIds []string
@@ -132,20 +153,20 @@ func (s *WorkItemsService) GetForIteration(ctx context.Context, owner, project, 
 		strings.Join(fields, ","),
 	)
 
-	request, err := s.client.NewRequest("GET", URL, nil)
+	req, err := s.client.NewRequest("GET", URL, nil)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	var response WorkItemListResponse
-	_, err = s.client.Execute(ctx, request, &response)
+	r := new(WorkItemListResponse)
+	resp, err := s.client.Execute(ctx, req, r)
 
-	return response.WorkItems, err
+	return r.WorkItems, resp, err
 }
 
 // GetIdsForIteration will return an array of ids for a given iteration
 // utilising https://docs.microsoft.com/en-gb/rest/api/vsts/work/iterations/get%20iteration%20work%20items
-func (s *WorkItemsService) GetIdsForIteration(ctx context.Context, owner, project, team string, iteration Iteration) ([]int, error) {
+func (s *WorkItemsService) GetIdsForIteration(ctx context.Context, owner, project, team string, iteration Iteration) ([]int, *http.Response, error) {
 	URL := fmt.Sprintf(
 		"%s/%s/%s/_apis/work/teamsettings/iterations/%s/workitems?api-version=5.1-preview.1",
 		owner,
@@ -154,27 +175,27 @@ func (s *WorkItemsService) GetIdsForIteration(ctx context.Context, owner, projec
 		iteration.ID,
 	)
 
-	request, err := s.client.NewRequest("GET", URL, nil)
+	req, err := s.client.NewRequest("GET", URL, nil)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	var response IterationWorkItems
+	r := new(IterationWorkItems)
 
-	_, err = s.client.Execute(ctx, request, &response)
+	resp, err := s.client.Execute(ctx, req, r)
 
 	var queryIds []int
-	for index := 0; index < len(response.WorkItemRelations); index++ {
-		relationship := (response.WorkItemRelations)[index]
+	for index := 0; index < len(r.WorkItemRelations); index++ {
+		relationship := (r.WorkItemRelations)[index]
 		queryIds = append(queryIds, *relationship.Target.ID)
 	}
 
-	return queryIds, err
+	return queryIds, resp, err
 }
 
-// CreateComment Posts a comment to a work item
-// https://docs.microsoft.com/en-us/rest/api/azure/devops/wit/comments/add
-func (s *WorkItemsService) CreateComment(ctx context.Context, owner, project string, workItemID int, comment *WorkItemComment) (*WorkItemComment, *WorkItemComment, error) {
+// ListComments Lists all comments on a work item
+// https://docs.microsoft.com/en-us/rest/api/azure/devops/wit/comments/get%20comment?view=azure-devops-rest-5.1#comment
+func (s *WorkItemsService) ListComments(ctx context.Context, owner, project string, workItemID int, opts *WorkItemCommentListOptions) (*WorkItemCommentList, *http.Response, error) {
 	URL := fmt.Sprintf(
 		"%s/%s/_apis/wit/workItems/%d/comments?api-version=5.1-preview.3",
 		owner,
@@ -182,14 +203,61 @@ func (s *WorkItemsService) CreateComment(ctx context.Context, owner, project str
 		workItemID,
 	)
 
-	response := WorkItemComment{}
+	URL, err := addOptions(URL, opts)
 
-	request, err := s.client.NewRequest("POST", URL, &response)
+	r := new(WorkItemCommentList)
+
+	req, err := s.client.NewRequest("GET", URL, nil)
 	if err != nil {
-		return nil, &response, err
+		return nil, nil, err
 	}
 
-	_, err = s.client.Execute(ctx, request, &response)
+	resp, err := s.client.Execute(ctx, req, r)
 
-	return comment, &response, nil
+	return r, resp, err
+}
+
+// GetComment Gets a work item comment
+// https://docs.microsoft.com/en-us/rest/api/azure/devops/wit/comments/get%20comments%20batch?view=azure-devops-rest-5.1#commentlist
+func (s *WorkItemsService) GetComment(ctx context.Context, owner, project string, workItemID, commentID int, opts *WorkItemCommentListOptions) (*WorkItemComment, *http.Response, error) {
+	URL := fmt.Sprintf(
+		"%s/%s/_apis/wit/workItems/%d/comments/%d?api-version=5.1-preview.3",
+		owner,
+		project,
+		workItemID,
+		commentID,
+	)
+
+	r := new(WorkItemComment)
+
+	req, err := s.client.NewRequest("GET", URL, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	resp, err := s.client.Execute(ctx, req, r)
+
+	return r, resp, err
+}
+
+// CreateComment Posts a comment to a work item
+// https://docs.microsoft.com/en-us/rest/api/azure/devops/wit/comments/add
+func (s *WorkItemsService) CreateComment(ctx context.Context, owner, project string, workItemID int, comment *WorkItemComment) (*WorkItemComment, *http.Response, error) {
+	URL := fmt.Sprintf(
+		"%s/%s/_apis/wit/workItems/%d/comments?api-version=5.1-preview.3",
+		owner,
+		project,
+		workItemID,
+	)
+
+	r := new(WorkItemComment)
+
+	req, err := s.client.NewRequest("POST", URL, comment)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	resp, err := s.client.Execute(ctx, req, r)
+
+	return r, resp, err
 }

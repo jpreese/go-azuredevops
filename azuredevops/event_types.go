@@ -8,9 +8,6 @@
 
 package azuredevops
 
-// ChangeCountDictionary maps the number of changes to each type
-type ChangeCountDictionary *map[VersionControlChangeType]int
-
 // ItemContent
 type ItemContent struct {
 	Content     *string          `json:"content,omitempty"`
