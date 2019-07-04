@@ -1,6 +1,19 @@
 # go-azuredevops
 
-**6 May 2019 Currently in development - API should be stable soon**
+## Status - 4 Jul 2019
+
+I'm working on this library to provide an interface between [Atlantis](https://runatlantis.io) and Azure Devops.  This is my first project in Go.  I'm happy to try and address issues and PRs in my spare time if you see areas that could use improvement. 
+
+My next steps:
+
+- Getting all the tests to run again
+- Getting the library to a place where it is relatively stable
+
+What I'd like to work on before calling it "good" for my needs:
+
+- Document and test OAuth instead of a personal access token
+- Add some integration tests with a public Azure Devops repo
+
 
 [![GoDoc](https://godoc.org/github.com/mcdafydd/go-azuredevops/azuredevops?status.svg)](https://godoc.org/github.com/mcdafydd/go-azuredevops/azuredevops)
 [![Build Status](https://travis-ci.org/mcdafydd/go-azuredevops.png?branch=master)](https://travis-ci.org/mcdafydd/go-azuredevops)
@@ -8,8 +21,6 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/mcdafydd/go-azuredevops?style=flat-square)](https://goreportcard.com/report/github.com/mcdafydd/go-azuredevops)
 
 This is a fork of https://github.com/benmatselby/go-azuredevops, a Go library for accessing the [Azure DevOps API](https://docs.microsoft.com/en-gb/rest/api/vsts/).  As it develops, the library is looking more like of a port of [go-github](https://github.com/google/go-github).
-
-This is my first project in Go, so I'm learning as I code.
 
 ## Services
 
@@ -76,7 +87,7 @@ This library is re-using a lot of the code and style from the [go-github](https:
 * Debate on whether nillable fields are important for receiving structs, especially when also using separate request structs.  Other popular libraries also use pointers approach, but it is often viewed as a big ugly. [google/go-github#537](https://github.com/google/go-github/issues/537)
 * Large receiving struct types should return []*Type, not []Type [google/go-github#375](https://github.com/google/go-github/pull/375)
 * Use omitempty in receiving struct JSON tags
-* Pass context in API functions and Do() [google/go-github#526](https://github.com/google/go-github/issues/526#issuecomment-280985393)  **UNDER DEVELOPMENT AS OF 6 MAY 2019**
+* Pass context in API functions and Do() [google/go-github#526](https://github.com/google/go-github/issues/526#issuecomment-280985393) 
 
 An exception to the pointer members are the count/value receiving structs used for responses containing multiple entities.
 
