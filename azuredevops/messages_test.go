@@ -18,18 +18,23 @@ import (
 )
 
 func TestParseWebHook(t *testing.T) {
-	payload := azuredevops.Event{
-		EventType: "git.pullrequest.created",
-	}
-	p, err := json.Marshal(payload)
-	if err != nil {
-		t.Fatalf("Marshal(%#v): %v", payload, err)
-	}
-	got, err := azuredevops.ParseWebHook(p)
+	payload := `{
+		"eventType":"git.pullrequest.created",
+		"resource":{
+			"isDraft":true
+		}
+	}`
+	got, err := azuredevops.ParseWebHook([]byte(payload))
 	if err != nil {
 		t.Fatalf("ParseWebHook: %v", err)
 	}
-	if want := &payload; !cmp.Equal(got, want) {
+	got.Resource = nil
+	want := &azuredevops.Event{}
+	err = json.Unmarshal([]byte(payload), &want)
+	if err != nil {
+		t.Fatalf("ParseWebHook: %v", err)
+	}
+	if !cmp.Equal(got, want) {
 		diff := cmp.Diff(got, want)
 		t.Errorf("ParseWebHook error: %s", diff)
 	}
@@ -83,18 +88,24 @@ func TestSubscriptionID(t *testing.T) {
 func TestValidatePayload(t *testing.T) {
 	user := "testuser"
 	pass := "testpass"
-	want := []byte("testpayload")
+	want := []byte(`{"payload":"test"}`)
 
-	req, err := http.NewRequest("POST", "http://localhost", nil)
-	if err != nil {
-		t.Fatalf("ValidatePayload: %v", err)
+	body := struct {
+		Payload string `json:"payload"`
+	}{
+		Payload: "test",
 	}
+	v, _ := json.Marshal(body)
+	buf := bytes.NewBuffer(v)
+	req, err := http.NewRequest("POST", "http://localhost/event", buf)
+	req.Header.Set("Content-Type", "application/json")
 	req.SetBasicAuth(user, pass)
+	if err != nil {
+		t.Fatalf("NewRequest: %v", err)
+	}
 	got, _ := azuredevops.ValidatePayload(req, []byte(user), []byte(pass))
 
 	if !bytes.Equal(got, want) {
 		t.Fatalf("ValidatePayload: %v", err)
 	}
 }
-
-// *** add tests for all supported content-types

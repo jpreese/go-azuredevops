@@ -6,8 +6,8 @@ I'm working on this library to provide an interface between [Atlantis](https://r
 
 My next steps:
 
+- Make all function parameters and return values follow the same pattern
 - Getting all the tests to run again
-- Getting the library to a place where it is relatively stable
 
 What I'd like to work on before calling it "good" for my needs:
 

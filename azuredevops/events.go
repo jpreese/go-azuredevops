@@ -84,6 +84,12 @@ func (e *Event) ParsePayload() (payload interface{}, err error) {
 		return payload, errors.New("Unknown EventType in webhook payload")
 	}
 
+	if len(e.RawPayload) == 0 {
+		msg := "JSON zero byte resource field in payload"
+		fmt.Printf("%s: %#v \n\n", msg, e)
+		return nil, errors.New(msg)
+	}
+
 	err = json.Unmarshal(e.RawPayload, &payload)
 	if err != nil {
 		fmt.Printf("JSON unmarshal err: %#v \n\n %#v \n\n", payload, err)

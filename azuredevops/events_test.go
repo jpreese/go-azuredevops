@@ -9,6 +9,7 @@ package azuredevops_test
 
 import (
 	"encoding/json"
+	"errors"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -19,30 +20,56 @@ func TestParsePayload(t *testing.T) {
 	tests := []struct {
 		payload   interface{}
 		eventType string
+		want      interface{}
+		err       error
 	}{
 		{
 			payload:   &azuredevops.GitPullRequest{},
 			eventType: "git.pullrequest.created",
+			want:      &azuredevops.GitPullRequest{},
+			err:       nil,
 		},
 		{
 			payload:   &azuredevops.GitPullRequest{},
 			eventType: "git.pullrequest.merged",
+			want:      &azuredevops.GitPullRequest{},
+			err:       nil,
 		},
 		{
 			payload:   &azuredevops.GitPullRequest{},
 			eventType: "git.pullrequest.updated",
+			want:      &azuredevops.GitPullRequest{},
+			err:       nil,
 		},
 		{
 			payload:   &azuredevops.GitPush{},
 			eventType: "git.push",
+			want:      &azuredevops.GitPush{},
+			err:       nil,
 		},
 		{
 			payload:   &azuredevops.WorkItem{},
 			eventType: "workitem.commented",
+			want:      &azuredevops.WorkItem{},
+			err:       nil,
 		},
 		{
 			payload:   &azuredevops.WorkItemUpdate{},
 			eventType: "workitem.updated",
+			want:      &azuredevops.WorkItemUpdate{},
+			err:       nil,
+		},
+		{
+			payload:   nil,
+			eventType: "git.pullrequest.created",
+			want:      nil,
+			err:       nil,
+		},
+		{
+			payload:   "{}",
+			eventType: "",
+			want:      nil,
+			err:       errors.New("Unknown EventType in webhook payload"),
 		},
 	}
 
@@ -54,11 +81,12 @@ func TestParsePayload(t *testing.T) {
 		if err != nil {
 			t.Fatalf("Marshal(%#v): %v", test.payload, err)
 		}
+		want := test.want
 		got, err := event.ParsePayload()
-		if err != nil {
+		if err != nil && test.err.Error() != err.Error() {
 			t.Fatalf("ParsePayload: %v", err)
 		}
-		if want := test.payload; !cmp.Equal(got, want) {
+		if !cmp.Equal(got, want) {
 			diff := cmp.Diff(got, want)
 			t.Errorf("ParsePayload error: %s", diff)
 		}
