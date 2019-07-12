@@ -16,8 +16,9 @@ import (
 )
 
 const (
-	// Default API URLs
-	DefaultBaseURL      string = "https://dev.azure.com/"
+	// DefaultBaseURL is the default URI base for most Azure Devops REST API endpoints
+	DefaultBaseURL string = "https://dev.azure.com/"
+	// DefaultVsspsBaseURL is the default URI base for some Azure Devops REST API endpoints
 	DefaultVsspsBaseURL string = "https://vssps.dev.azure.com/"
 	// userAgent our HTTP client's user-agent
 	userAgent string = "go-azuredevops"

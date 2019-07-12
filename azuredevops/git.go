@@ -261,7 +261,7 @@ type GitPushRef struct {
 	Repository *GitRepository  `json:"repository,omitempty"`
 }
 
-// GitRefUpdate
+// GitRefUpdate Describes a ref update
 type GitRefUpdate struct {
 	IsLocked     *bool   `json:"isLocked,omitempty"`
 	Name         *string `json:"name,omitempty"`
@@ -287,7 +287,7 @@ type GitRepository struct {
 	WebURL           *string               `json:"webUrl,omitempty"`
 }
 
-// GitRepositoryRef
+// GitRepositoryRef describes a repository ref
 type GitRepositoryRef struct {
 	Collection *TeamProjectCollectionReference `json:"collection,omitempty"`
 	ID         *string                         `json:"id,omitempty"`
@@ -316,6 +316,7 @@ func (d GitStatusState) String() string {
 	return [...]string{"notSet", "pending", "succeeded", "failed", "error", "notApplicable"}[d]
 }
 
+// GitStatus describes a git status entity
 type GitStatus struct {
 	Links        *map[string]Link  `json:"_links,omitempty"`
 	Context      *GitStatusContext `json:"context,omitempty"`
@@ -350,7 +351,7 @@ type GitStatusContext struct {
 	Name  *string `json:"name,omitempty"`
 }
 
-// GitTemplate
+// GitTemplate describes a git template
 type GitTemplate struct {
 	Name *string `json:"name,omitempty"`
 	Type *string `json:"type,omitempty"`

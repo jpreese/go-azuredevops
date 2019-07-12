@@ -13,6 +13,7 @@ type UsersService struct {
 	client *Client
 }
 
+// GraphGroup is the parent struct describing a Microsoft Graph group for Azure Devops
 type GraphGroup struct {
 	GraphMember
 	/**
@@ -31,6 +32,7 @@ type GraphGroup struct {
 	SpecialType         *string `json:"specialType,omitempty"`
 }
 
+// GraphMember is a child of the GraphUser struct
 type GraphMember struct {
 	GraphSubject
 	/**
@@ -103,6 +105,7 @@ type GraphSubject struct {
 	SubjectKind *string `json:"subjectKind,omitempty"`
 }
 
+// GraphUser is the parent struct describing a Microsoft Graph user for Azure Devops
 type GraphUser struct {
 	GraphMember
 	IsDeletedInOrigin  *bool      `json:"isDeletedOrigin,omitempty"`

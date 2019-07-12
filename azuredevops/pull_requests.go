@@ -307,6 +307,7 @@ type Comment struct {
 	UsersLiked             []*IdentityRef   `json:"usersLiked,omitempty"`
 }
 
+// CommentPosition describes a comment position
 type CommentPosition struct {
 	Line   *int `json:"line,omitempty"`
 	Offset *int `json:"offset,omitempty"`

@@ -8,13 +8,13 @@
 
 package azuredevops
 
-// ItemContent
+// ItemContent describes an item
 type ItemContent struct {
 	Content     *string          `json:"content,omitempty"`
 	ContentType *ItemContentType `json:"contentType,omitempty"`
 }
 
-// ItemContentType
+// ItemContentType describes an item content type
 type ItemContentType struct {
 	Base64Encoded *string `json:"base64Encoded,omitempty"`
 	RawText       *string `json:"rawText,omitempty"`
