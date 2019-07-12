@@ -3,6 +3,7 @@ package azuredevops
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"time"
 )
 
@@ -68,7 +69,7 @@ type TeamProjectReference struct {
 // List returns list of the teams
 // https://docs.microsoft.com/en-us/rest/api/azure/devops/core/teams/get%20teams
 // GET https://dev.azure.com/{organization}/_apis/projects/{projectId}/teams?api-version=5.1-preview.2
-func (s *TeamsService) List(ctx context.Context, owner, project string, opts *TeamsListOptions) ([]*Team, int, error) {
+func (s *TeamsService) List(ctx context.Context, owner, project string, opts *TeamsListOptions) ([]*Team, *http.Response, error) {
 	URL := fmt.Sprintf("%s/%s/_apis/teams?api-version=5.1-preview.1",
 		owner,
 		project,
@@ -76,12 +77,12 @@ func (s *TeamsService) List(ctx context.Context, owner, project string, opts *Te
 	URL, err := addOptions(URL, opts)
 
 	u, _ := s.client.BaseURL.Parse(URL)
-	request, err := s.client.NewRequest("GET", u.String(), nil)
+	req, err := s.client.NewRequest("GET", u.String(), nil)
 	if err != nil {
-		return nil, 0, err
+		return nil, nil, err
 	}
-	var response TeamsListResponse
-	_, err = s.client.Execute(ctx, request, &response)
+	r := new(TeamsListResponse)
+	resp, err := s.client.Execute(ctx, req, r)
 
-	return response.Teams, response.Count, err
+	return r.Teams, resp, err
 }

@@ -153,21 +153,21 @@ type BuildLogReference struct {
 
 // List returns list of the builds
 // utilising https://docs.microsoft.com/en-gb/rest/api/vsts/build/builds/list
-func (s *BuildsService) List(ctx context.Context, owner string, project string, opts *BuildsListOptions) ([]*Build, error) {
+func (s *BuildsService) List(ctx context.Context, owner string, project string, opts *BuildsListOptions) ([]*Build, *http.Response, error) {
 	URL := fmt.Sprintf("%s/%s/_apis/build/builds?api-version=5.1-preview.1",
 		owner,
 		project,
 	)
 	URL, err := addOptions(URL, opts)
 
-	request, err := s.client.NewRequest("GET", URL, nil)
+	req, err := s.client.NewRequest("GET", URL, nil)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	var response BuildsListResponse
-	_, err = s.client.Execute(ctx, request, &response)
+	r := new(BuildsListResponse)
+	resp, err := s.client.Execute(ctx, req, r)
 
-	return response.Builds, err
+	return r.Builds, resp, err
 }
 
 // QueueBuildOptions describes what the request to the API should look like
@@ -192,12 +192,12 @@ func (s *BuildsService) Queue(ctx context.Context, owner string, project string,
 		return nil, nil, err
 	}
 
-	request, err := s.client.NewRequest("POST", URL, build)
+	req, err := s.client.NewRequest("POST", URL, build)
 	if err != nil {
 		return nil, nil, err
 	}
 	r := new(Build)
-	resp, err := s.client.Execute(ctx, request, r)
+	resp, err := s.client.Execute(ctx, req, r)
 
 	return r, resp, err
 }

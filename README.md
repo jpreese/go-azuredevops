@@ -93,6 +93,9 @@ An exception to the pointer members are the count/value receiving structs used f
 
 May add separate request structs soon.
 
+### Debugging
+Add `-tags debug` to your go build to get some extra debug logging.
+
 ## References
 * [Microsoft Azure Devops Rest API](https://github.com/MicrosoftDocs/vsts-rest-api-specs)
 * [Microsoft NodeJS Azure Devops Client](https://github.com/Microsoft/azure-devops-node-api)

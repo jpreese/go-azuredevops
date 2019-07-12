@@ -61,7 +61,7 @@ func TestBoardsService_List(t *testing.T) {
 				fmt.Fprint(w, json)
 			})
 
-			boards, err := c.Boards.List(context.Background(), "o", "p", "t")
+			boards, _, err := c.Boards.List(context.Background(), "o", "p", "t")
 			if err != nil {
 				t.Fatalf("returned error: %v", err)
 			}
@@ -89,7 +89,7 @@ func TestBuildsService_List_ResponseDecodeFailure(t *testing.T) {
 		fmt.Fprint(w, json)
 	})
 
-	_, err := c.Boards.List(context.Background(), "o", "p", "t")
+	_, _, err := c.Boards.List(context.Background(), "o", "p", "t")
 	if err == nil {
 		t.Fatalf("expected error decoding the response, did not get one")
 	}
@@ -105,7 +105,7 @@ func TestBuildsService_List_CallFailureForBuildingURL(t *testing.T) {
 		fmt.Fprint(w, json)
 	})
 
-	_, err := c.Boards.List(context.Background(), "o", "p", "t")
+	_, _, err := c.Boards.List(context.Background(), "o", "p", "t")
 	if err != nil && !strings.Contains(err.Error(), "404") {
 		t.Fatalf("expected 404 error, got %s", err.Error())
 	}
@@ -145,7 +145,7 @@ func TestBuildsService_Get(t *testing.T) {
 				fmt.Fprint(w, json)
 			})
 
-			board, err := c.Boards.Get(context.Background(), "o", "p", "t", tc.boardId)
+			board, _, err := c.Boards.Get(context.Background(), "o", "p", "t", tc.boardId)
 			if err != nil {
 				t.Fatalf("returned error: %v", err)
 			}
@@ -179,7 +179,7 @@ func TestBuildsService_Get_ResponseDecodeFailure(t *testing.T) {
 		fmt.Fprint(w, json)
 	})
 
-	_, err := c.Boards.Get(context.Background(), "o", "p", "t", "b5f5e386-fd86-4459-af9a-72f881bd1b23")
+	_, _, err := c.Boards.Get(context.Background(), "o", "p", "t", "b5f5e386-fd86-4459-af9a-72f881bd1b23")
 	if err == nil {
 		t.Fatalf("expected error decoding the response, did not get one")
 	}

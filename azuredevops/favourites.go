@@ -3,6 +3,7 @@ package azuredevops
 import (
 	"context"
 	"fmt"
+	"net/http"
 )
 
 // FavouritesService handles communication with the favourites methods on the API
@@ -26,7 +27,7 @@ type Favourite struct {
 }
 
 // List returns a list of the favourite items from for the user
-func (s *FavouritesService) List(ctx context.Context, owner, project string) ([]*Favourite, int, error) {
+func (s *FavouritesService) List(ctx context.Context, owner, project string) ([]*Favourite, *http.Response, error) {
 	URL := fmt.Sprintf(
 		"%s/%s/_apis/Favorite/Favorites?artifactType=%s",
 		owner,
@@ -35,12 +36,12 @@ func (s *FavouritesService) List(ctx context.Context, owner, project string) ([]
 	)
 
 	u, _ := s.client.BaseURL.Parse(URL)
-	request, err := s.client.NewRequest("GET", u.String(), nil)
+	req, err := s.client.NewRequest("GET", u.String(), nil)
 	if err != nil {
-		return nil, 0, err
+		return nil, nil, err
 	}
-	var response FavouritesResponse
-	_, err = s.client.Execute(ctx, request, &response)
+	r := new(FavouritesResponse)
+	resp, err := s.client.Execute(ctx, req, r)
 
-	return response.Favourites, response.Count, err
+	return r.Favourites, resp, err
 }

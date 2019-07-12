@@ -146,7 +146,7 @@ func TestTestsService_List(t *testing.T) {
 			})
 
 			options := &azuredevops.TestsListOptions{}
-			tests, err := c.Tests.List(context.Background(), "o", "p", options)
+			tests, _, err := c.Tests.List(context.Background(), "o", "p", options)
 			if err != nil {
 				t.Fatalf("returned error: %v", err)
 			}

@@ -365,7 +365,7 @@ type GitUserDate struct {
 }
 
 // UpdateRefs returns a list of the references for a git repo
-func (s *GitService) UpdateRefs(ctx context.Context, owner, project, repo, refType string, opts *GitRefListOptions) ([]*GitRef, int, error) {
+func (s *GitService) UpdateRefs(ctx context.Context, owner, project, repo, refType string, opts *GitRefListOptions) ([]*GitRef, *http.Response, error) {
 	URL := fmt.Sprintf(
 		"%s/%s/_apis/git/repositories/%s/refs/%s?api-version=5.1-preview.1",
 		owner,
@@ -384,18 +384,18 @@ func (s *GitService) UpdateRefs(ctx context.Context, owner, project, repo, refTy
 		RepositoryID: String(repo),
 	}
 
-	request, err := s.client.NewRequest("POST", URL, body)
+	req, err := s.client.NewRequest("POST", URL, body)
 	if err != nil {
-		return nil, 0, err
+		return nil, nil, err
 	}
-	var response GitRefsResponse
-	_, err = s.client.Execute(ctx, request, &response)
+	r := new(GitRefsResponse)
+	resp, err := s.client.Execute(ctx, req, r)
 
-	return response.GitRefs, response.Count, err
+	return r.GitRefs, resp, err
 }
 
 // ListRefs returns a list of the references for a git repo
-func (s *GitService) ListRefs(ctx context.Context, owner, project, repo, refType string, opts *GitRefListOptions) ([]*GitRef, int, error) {
+func (s *GitService) ListRefs(ctx context.Context, owner, project, repo, refType string, opts *GitRefListOptions) ([]*GitRef, *http.Response, error) {
 	URL := fmt.Sprintf(
 		"%s/%s/_apis/git/repositories/%s/refs/%s?api-version=5.1-preview.1",
 		owner,
@@ -406,19 +406,19 @@ func (s *GitService) ListRefs(ctx context.Context, owner, project, repo, refType
 
 	URL, err := addOptions(URL, opts)
 
-	request, err := s.client.NewRequest("GET", URL, nil)
+	req, err := s.client.NewRequest("GET", URL, nil)
 	if err != nil {
-		return nil, 0, err
+		return nil, nil, err
 	}
-	var response GitRefsResponse
-	_, err = s.client.Execute(ctx, request, &response)
+	r := new(GitRefsResponse)
+	resp, err := s.client.Execute(ctx, req, r)
 
-	return response.GitRefs, response.Count, err
+	return r.GitRefs, resp, err
 }
 
 // GetRepository Return a single GitRepository
 // https://docs.microsoft.com/en-us/rest/api/azure/devops/git/repositories/get%20repository?view=azure-devops-rest-5.1
-func (s *GitService) GetRepository(ctx context.Context, owner, project, repoName string) (*GitRepository, int, error) {
+func (s *GitService) GetRepository(ctx context.Context, owner, project, repoName string) (*GitRepository, *http.Response, error) {
 	URL := fmt.Sprintf(
 		"%s/%s/_apis/git/repositories/%s?api-version=5.1-preview.1",
 		owner,
@@ -426,14 +426,14 @@ func (s *GitService) GetRepository(ctx context.Context, owner, project, repoName
 		repoName,
 	)
 
-	request, err := s.client.NewRequest("GET", URL, nil)
+	req, err := s.client.NewRequest("GET", URL, nil)
 	if err != nil {
-		return nil, 0, err
+		return nil, nil, err
 	}
-	var response GitRepository
-	_, err = s.client.Execute(ctx, request, &response)
+	r := new(GitRepository)
+	resp, err := s.client.Execute(ctx, req, r)
 
-	return &response, 1, err
+	return r, resp, err
 
 }
 
@@ -470,12 +470,12 @@ func (s *GitService) CreateStatus(ctx context.Context, owner, project, repoName,
 		url.QueryEscape(ref),
 	)
 
-	request, err := s.client.NewRequest("POST", URL, status)
+	req, err := s.client.NewRequest("POST", URL, status)
 	if err != nil {
 		return nil, nil, err
 	}
 	r := new(GitStatus)
-	resp, err := s.client.Execute(ctx, request, r)
+	resp, err := s.client.Execute(ctx, req, r)
 
 	return r, resp, err
 }

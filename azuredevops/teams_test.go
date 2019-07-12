@@ -56,20 +56,16 @@ func TestTeamsService_List(t *testing.T) {
 			})
 
 			opt := &azuredevops.TeamsListOptions{}
-			response, count, err := c.Teams.List(context.Background(), "o", "p", opt)
+			response, _, err := c.Teams.List(context.Background(), "o", "p", opt)
 			if err != nil {
 				t.Fatalf("returned error: %v", err)
-			}
-
-			if count != tc.count {
-				t.Fatalf("expected count in response to be %d; got %d", tc.count, count)
 			}
 
 			if len(response) != tc.count {
 				t.Fatalf("expected length of response to be 0; got %d", len(response))
 			}
 
-			if count > 0 {
+			if len(response) > 0 {
 				if tc.title != *response[0].Name {
 					t.Fatalf("expected name to be %s; got %s", tc.title, *response[0].Name)
 				}

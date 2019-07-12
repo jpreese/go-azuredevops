@@ -3,6 +3,7 @@ package azuredevops
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"time"
 )
 
@@ -63,25 +64,25 @@ type DeliveryPlansListOptions struct {
 }
 
 // List returns a list of delivery plans
-func (s *DeliveryPlansService) List(ctx context.Context, owner string, project string, opts *DeliveryPlansListOptions) ([]*DeliveryPlan, int, error) {
+func (s *DeliveryPlansService) List(ctx context.Context, owner string, project string, opts *DeliveryPlansListOptions) ([]*DeliveryPlan, *http.Response, error) {
 	URL := fmt.Sprintf("%s/%s/_apis/work/plans?api-version=5.1-preview.1",
 		owner,
 		project,
 	)
 	URL, err := addOptions(URL, opts)
 
-	request, err := s.client.NewRequest("GET", URL, nil)
+	req, err := s.client.NewRequest("GET", URL, nil)
 	if err != nil {
-		return nil, 0, err
+		return nil, nil, err
 	}
-	var response DeliveryPlansListResponse
-	_, err = s.client.Execute(ctx, request, &response)
+	r := new(DeliveryPlansListResponse)
+	resp, err := s.client.Execute(ctx, req, r)
 
-	return response.DeliveryPlans, response.Count, err
+	return r.DeliveryPlans, resp, err
 }
 
 // GetTimeLine will fetch the details about a specific delivery plan
-func (s *DeliveryPlansService) GetTimeLine(ctx context.Context, owner string, project string, ID string, startDate, endDate string) (*DeliveryPlanTimeLine, error) {
+func (s *DeliveryPlansService) GetTimeLine(ctx context.Context, owner string, project string, ID string, startDate, endDate string) (*DeliveryPlanTimeLine, *http.Response, error) {
 	URL := fmt.Sprintf(
 		"%s/%s/_apis/work/plans/%s/deliverytimeline?api-version=5.1-preview.1",
 		owner,
@@ -97,12 +98,12 @@ func (s *DeliveryPlansService) GetTimeLine(ctx context.Context, owner string, pr
 
 	URL = fmt.Sprintf(URL+"&startDate=%s&endDate=%s", startDate, endDate)
 
-	request, err := s.client.NewRequest("GET", URL, nil)
+	req, err := s.client.NewRequest("GET", URL, nil)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	var response DeliveryPlanTimeLine
-	_, err = s.client.Execute(ctx, request, &response)
+	r := new(DeliveryPlanTimeLine)
+	resp, err := s.client.Execute(ctx, req, r)
 
-	return &response, err
+	return r, resp, err
 }

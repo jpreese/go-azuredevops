@@ -60,7 +60,7 @@ func TestBuildsService_List(t *testing.T) {
 			})
 
 			options := &azuredevops.BuildsListOptions{}
-			builds, err := c.Builds.List(context.Background(), "o", "p", options)
+			builds, _, err := c.Builds.List(context.Background(), "o", "p", options)
 			if err != nil {
 				t.Fatalf("returned error: %v", err)
 			}

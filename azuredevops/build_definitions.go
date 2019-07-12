@@ -3,6 +3,7 @@ package azuredevops
 import (
 	"context"
 	"fmt"
+	"net/http"
 )
 
 // BuildDefinitionsService handles communication with the build definitions methods on the API
@@ -45,19 +46,19 @@ type BuildDefinitionsListOptions struct {
 
 // List returns a list of build definitions
 // utilising https://docs.microsoft.com/en-gb/rest/api/vsts/build/definitions/list
-func (s *BuildDefinitionsService) List(ctx context.Context, owner string, project string, opts *BuildDefinitionsListOptions) ([]*BuildDefinition, error) {
+func (s *BuildDefinitionsService) List(ctx context.Context, owner string, project string, opts *BuildDefinitionsListOptions) ([]*BuildDefinition, *http.Response, error) {
 	URL := fmt.Sprintf("%s/%s/_apis/build/definitions?api-version=5.1-preview.1",
 		owner,
 		project,
 	)
 	URL, err := addOptions(URL, opts)
 
-	request, err := s.client.NewRequest("GET", URL, nil)
+	req, err := s.client.NewRequest("GET", URL, nil)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	var response BuildDefinitionsListResponse
-	_, err = s.client.Execute(ctx, request, &response)
+	r := new(BuildDefinitionsListResponse)
+	resp, err := s.client.Execute(ctx, req, r)
 
-	return response.BuildDefinitions, err
+	return r.BuildDefinitions, resp, err
 }

@@ -53,7 +53,7 @@ func TestFavouritesService_List(t *testing.T) {
 				fmt.Fprint(w, json)
 			})
 
-			favourites, count, err := c.Favourites.List(context.Background(), "o", "p")
+			favourites, _, err := c.Favourites.List(context.Background(), "o", "p")
 			if err != nil {
 				t.Fatalf("returned error: %v", err)
 			}
@@ -71,9 +71,6 @@ func TestFavouritesService_List(t *testing.T) {
 				t.Fatalf("expected length of artifacts to be %d; got %d", tc.count, len(favourites))
 			}
 
-			if count != tc.count {
-				t.Fatalf("expected artifact count to be %d; got %d", tc.count, count)
-			}
 		})
 	}
 }

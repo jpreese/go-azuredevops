@@ -96,7 +96,7 @@ func TestDeliveryPlansService_List(t *testing.T) {
 			})
 
 			options := &azuredevops.DeliveryPlansListOptions{}
-			plans, count, err := c.DeliveryPlans.List(context.Background(), "o", "p", options)
+			plans, _, err := c.DeliveryPlans.List(context.Background(), "o", "p", options)
 			if err != nil {
 				t.Fatalf("returned error: %v", err)
 			}
@@ -114,10 +114,6 @@ func TestDeliveryPlansService_List(t *testing.T) {
 			if len(plans) != tc.count {
 				t.Fatalf("expected length of delivery plans to be %d; got %d", tc.count, len(plans))
 			}
-
-			if tc.count != count {
-				t.Fatalf("expected delivery plan count to be %d; got %d", tc.count, count)
-			}
 		})
 	}
 }
@@ -134,7 +130,7 @@ func TestDeliveryPlansService_GetTimeLine(t *testing.T) {
 		fmt.Fprint(w, json)
 	})
 
-	timeline, err := c.DeliveryPlans.GetTimeLine(context.Background(), "o", "p", planID, "", "")
+	timeline, _, err := c.DeliveryPlans.GetTimeLine(context.Background(), "o", "p", planID, "", "")
 	if err != nil {
 		t.Fatalf("returned error: %v", err)
 	}
@@ -200,7 +196,7 @@ func TestDeliveryPlansService_GetTimeLineDates(t *testing.T) {
 				fmt.Fprint(w, json)
 			})
 
-			_, err := c.DeliveryPlans.GetTimeLine(context.Background(), "o", "p", planID, tc.startDate, tc.endDate)
+			_, _, err := c.DeliveryPlans.GetTimeLine(context.Background(), "o", "p", planID, tc.startDate, tc.endDate)
 			if err != nil {
 				t.Fatalf("returned error: %v", err)
 			}

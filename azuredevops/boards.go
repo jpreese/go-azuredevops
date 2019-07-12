@@ -3,6 +3,7 @@ package azuredevops
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"net/url"
 )
 
@@ -84,7 +85,7 @@ type FieldReference struct {
 
 // List returns list of the boards
 // utilising https://docs.microsoft.com/en-gb/rest/api/vsts/work/boards/list
-func (s *BoardsService) List(ctx context.Context, owner, project, team string) ([]*BoardReference, error) {
+func (s *BoardsService) List(ctx context.Context, owner, project, team string) ([]*BoardReference, *http.Response, error) {
 	URL := fmt.Sprintf(
 		"%s/%s/%s/_apis/work/boards?api-version=5.1-preview.1",
 		owner,
@@ -92,18 +93,18 @@ func (s *BoardsService) List(ctx context.Context, owner, project, team string) (
 		url.PathEscape(team),
 	)
 
-	request, err := s.client.NewRequest("GET", URL, nil)
+	req, err := s.client.NewRequest("GET", URL, nil)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	var response ListBoardsResponse
-	_, err = s.client.Execute(ctx, request, &response)
+	r := new(ListBoardsResponse)
+	resp, err := s.client.Execute(ctx, req, r)
 
-	return response.BoardReferences, err
+	return r.BoardReferences, resp, err
 }
 
 // Get returns a single board utilising https://docs.microsoft.com/en-gb/rest/api/vsts/work/boards/get
-func (s *BoardsService) Get(ctx context.Context, owner, project, team, id string) (*Board, error) {
+func (s *BoardsService) Get(ctx context.Context, owner, project, team, id string) (*Board, *http.Response, error) {
 	URL := fmt.Sprintf(
 		"%s/%s/%s/_apis/work/boards/%s?api-version=5.1-preview.1",
 		owner,
@@ -112,12 +113,12 @@ func (s *BoardsService) Get(ctx context.Context, owner, project, team, id string
 		id,
 	)
 
-	request, err := s.client.NewRequest("GET", URL, nil)
+	req, err := s.client.NewRequest("GET", URL, nil)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	var response Board
-	_, err = s.client.Execute(ctx, request, &response)
+	r := new(Board)
+	resp, err := s.client.Execute(ctx, req, r)
 
-	return &response, err
+	return r, resp, err
 }

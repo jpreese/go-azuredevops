@@ -3,6 +3,7 @@ package azuredevops
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"time"
 )
 
@@ -46,21 +47,21 @@ type TestsListOptions struct {
 
 // List returns list of the tests
 // utilising https://docs.microsoft.com/en-gb/rest/api/vsts/test/runs/list
-func (s *TestsService) List(ctx context.Context, owner, project string, opts *TestsListOptions) ([]*Test, error) {
+func (s *TestsService) List(ctx context.Context, owner, project string, opts *TestsListOptions) ([]*Test, *http.Response, error) {
 	URL := fmt.Sprintf("%s/%s/_apis/test/runs?api-version=4.1",
 		owner,
 		project,
 	)
 	URL, err := addOptions(URL, opts)
 
-	request, err := s.client.NewRequest("GET", URL, nil)
+	req, err := s.client.NewRequest("GET", URL, nil)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	var response TestListResponse
-	_, err = s.client.Execute(ctx, request, &response)
+	r := new(TestListResponse)
+	resp, err := s.client.Execute(ctx, req, r)
 
-	return response.Tests, err
+	return r.Tests, resp, err
 }
 
 // TestResultsListResponse is the wrapper around the main response for the List of Tests

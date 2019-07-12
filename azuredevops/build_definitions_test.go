@@ -52,7 +52,7 @@ func TestBuildDefinitionsService_List(t *testing.T) {
 			})
 
 			options := &azuredevops.BuildDefinitionsListOptions{}
-			buildDefs, err := c.BuildDefinitions.List(context.Background(), "o", "p", options)
+			buildDefs, _, err := c.BuildDefinitions.List(context.Background(), "o", "p", options)
 			if err != nil {
 				t.Fatalf("returned error: %v", err)
 			}
