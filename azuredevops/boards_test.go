@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	boardListURL      = "/AZURE_DEVOPS_Project/AZURE_DEVOPS_TEAM/_apis/work/boards"
+	boardListURL      = "/o/p/t/_apis/work/boards"
 	boardListResponse = `{
 		"value": [
 			{
@@ -22,7 +22,7 @@ const (
 			}
 		]
 	}`
-	boardGetURL      = "/AZURE_DEVOPS_Project/AZURE_DEVOPS_TEAM/_apis/work/boards/de70b6e6-7cf3-4075-bbe8-8de651f37149"
+	boardGetURL      = "/o/p/t/_apis/work/boards/de70b6e6-7cf3-4075-bbe8-8de651f37149"
 	boardGetResponse = `{
 		"id": "de70b6e6-7cf3-4075-bbe8-8de651f37149",
 		"name": "Iteration x",
@@ -61,7 +61,7 @@ func TestBoardsService_List(t *testing.T) {
 				fmt.Fprint(w, json)
 			})
 
-			boards, err := c.Boards.List(context.Background(), "AZURE_DEVOPS_OWNER", "AZURE_DEVOPS_PROJECT", "AZURE_DEVOPS_TEAM")
+			boards, err := c.Boards.List(context.Background(), "o", "p", "t")
 			if err != nil {
 				t.Fatalf("returned error: %v", err)
 			}
@@ -89,7 +89,7 @@ func TestBuildsService_List_ResponseDecodeFailure(t *testing.T) {
 		fmt.Fprint(w, json)
 	})
 
-	_, err := c.Boards.List(context.Background(), "AZURE_DEVOPS_OWNER", "AZURE_DEVOPS_PROJECT", "AZURE_DEVOPS_TEAM")
+	_, err := c.Boards.List(context.Background(), "o", "p", "t")
 	if err == nil {
 		t.Fatalf("expected error decoding the response, did not get one")
 	}
@@ -105,7 +105,7 @@ func TestBuildsService_List_CallFailureForBuildingURL(t *testing.T) {
 		fmt.Fprint(w, json)
 	})
 
-	_, err := c.Boards.List(context.Background(), "", "", "")
+	_, err := c.Boards.List(context.Background(), "o", "p", "t")
 	if err != nil && !strings.Contains(err.Error(), "404") {
 		t.Fatalf("expected 404 error, got %s", err.Error())
 	}
@@ -145,7 +145,7 @@ func TestBuildsService_Get(t *testing.T) {
 				fmt.Fprint(w, json)
 			})
 
-			board, err := c.Boards.Get(context.Background(), "AZURE_DEVOPS_OWNER", "AZURE_DEVOPS_PROJECT", "AZURE_DEVOPS_TEAM", tc.boardId)
+			board, err := c.Boards.Get(context.Background(), "o", "p", "t", tc.boardId)
 			if err != nil {
 				t.Fatalf("returned error: %v", err)
 			}
@@ -179,24 +179,8 @@ func TestBuildsService_Get_ResponseDecodeFailure(t *testing.T) {
 		fmt.Fprint(w, json)
 	})
 
-	_, err := c.Boards.Get(context.Background(), "AZURE_DEVOPS_OWNER", "AZURE_DEVOPS_PROJECT", "AZURE_DEVOPS_TEAM", "b5f5e386-fd86-4459-af9a-72f881bd1b23")
+	_, err := c.Boards.Get(context.Background(), "o", "p", "t", "b5f5e386-fd86-4459-af9a-72f881bd1b23")
 	if err == nil {
 		t.Fatalf("expected error decoding the response, did not get one")
-	}
-}
-
-func TestBuildsService_Get_CallFailureForBuildingURL(t *testing.T) {
-	c, mux, _, teardown := setup()
-	defer teardown()
-
-	mux.HandleFunc(boardGetURL, func(w http.ResponseWriter, r *http.Request) {
-		testMethod(t, r, "GET")
-		json := "{}"
-		fmt.Fprint(w, json)
-	})
-
-	_, err := c.Boards.Get(context.Background(), "AZURE_DEVOPS_OWNER", "AZURE_DEVOPS_PROJECT", "AZURE_DEVOPS_TEAM", "b5f5e386-fd86-4459-af9a-72f881bd1b23")
-	if err != nil && !strings.Contains(err.Error(), "404") {
-		t.Fatalf("expected 404 error, got %s", err.Error())
 	}
 }

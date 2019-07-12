@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	listURL      = "/AZURE_DEVOPS_Project/AZURE_DEVOPS_TEAM/_apis/work/teamsettings/iterations"
+	listURL      = "/o/p/t/_apis/work/teamsettings/iterations"
 	listResponse = `{
 		"value": [
 		{
@@ -48,14 +48,14 @@ func TestIterationService_GetByName(t *testing.T) {
 				fmt.Fprint(w, json)
 			})
 
-			iteration, err := c.Iterations.GetByName(context.Background(), "AZURE_DEVOPS_OWNER", "AZURE_DEVOPS_PROJECT", "AZURE_DEVOPS_TEAM", tc.iteration)
+			iteration, _, err := c.Iterations.GetByName(context.Background(), "o", "p", "t", tc.iteration)
 			if err != nil {
 				t.Fatalf("returned error: %v", err)
 			}
 
 			if tc.found {
-				if iteration.Name != tc.iteration {
-					t.Fatalf("expected name iteration name %s; got %s", tc.iteration, iteration.Name)
+				if *iteration.Name != tc.iteration {
+					t.Fatalf("expected name iteration name %s; got %s", tc.iteration, *iteration.Name)
 				}
 			}
 
@@ -91,15 +91,15 @@ func TestIterationService_List(t *testing.T) {
 				fmt.Fprint(w, json)
 			})
 
-			iterations, err := c.Iterations.List(context.Background(), "AZURE_DEVOPS_OWNER", "AZURE_DEVOPS_PROJECT", "AZURE_DEVOPS_TEAM")
+			iterations, _, err := c.Iterations.List(context.Background(), "o", "p", "t")
 			if err != nil {
 				t.Fatalf("returned error: %v", err)
 			}
 
 			// We know we got some data back
 			if tc.iterationIndex >= 0 {
-				if iterations[tc.iterationIndex].Name != tc.iterationName {
-					t.Fatalf("expected iteration name %s; got %s", tc.iterationName, iterations[tc.iterationIndex].Name)
+				if *iterations[tc.iterationIndex].Name != tc.iterationName {
+					t.Fatalf("expected iteration name %s; got %s", tc.iterationName, *iterations[tc.iterationIndex].Name)
 				}
 			} else {
 				// We are testing the fact we didn't get data back

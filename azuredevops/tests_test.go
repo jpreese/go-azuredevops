@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	testListURL      = "/AZURE_DEVOPS_Project/_apis/test/runs"
+	testListURL      = "/o/p/_apis/test/runs"
 	testListResponse = `{
 		"value": [
 		  {
@@ -53,7 +53,7 @@ const (
 		"count": 2
 		}`
 
-	testResultsListURL      = "/AZURE_DEVOPS_Project/_apis/test/Runs/1/results"
+	testResultsListURL      = "/o/p/_apis/test/Runs/1/results"
 	testResultsListResponse = `{
 			"count": 1,
 			"value": [
@@ -146,17 +146,17 @@ func TestTestsService_List(t *testing.T) {
 			})
 
 			options := &azuredevops.TestsListOptions{}
-			tests, err := c.Tests.List(context.Background(), "AZURE_DEVOPS_OWNER", "AZURE_DEVOPS_PROJECT", options)
+			tests, err := c.Tests.List(context.Background(), "o", "p", options)
 			if err != nil {
 				t.Fatalf("returned error: %v", err)
 			}
 
 			if tc.index > -1 {
-				if tests[tc.index].State != &tc.state {
+				if *tests[tc.index].State != tc.state {
 					t.Fatalf("expected state %s, got %s", tc.state, *tests[tc.index].State)
 				}
 
-				if tests[tc.index].Revision != &tc.revision {
+				if *tests[tc.index].Revision != tc.revision {
 					t.Fatalf("expected revision %d, got %d", tc.revision, tests[tc.index].Revision)
 				}
 			}
@@ -194,7 +194,7 @@ func TestTestsService_ResultsList(t *testing.T) {
 			})
 
 			options := &azuredevops.TestResultsListOptions{RunID: "1"}
-			tests, err := c.Tests.ResultsList(context.Background(), "AZURE_DEVOPS_OWNER", "AZURE_DEVOPS_PROJECT", options)
+			tests, err := c.Tests.ResultsList(context.Background(), "o", "p", options)
 			if err != nil {
 				t.Fatalf("returned error: %v", err)
 			}

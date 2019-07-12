@@ -80,10 +80,10 @@ const (
 			"url": "https://fabrikam.visualstudio.com/_apis/wit/workItems/300"
 		  }
 		]
-	  }
+	}
 	`
 	// Pulled from https://docs.microsoft.com/en-gb/rest/api/vsts/work/iterations/get%20iteration%20work%20items
-	getIdsURL      = "/AZURE_DEVOPS_Project/AZURE_DEVOPS_TEAM/_apis/work/teamsettings/iterations/1/workitems"
+	getIdsURL      = "/o/p/t/_apis/work/teamsettings/iterations/a589a806-bf11-4d4f-a031-c19813331553/workitems"
 	getIdsResponse = `{
 		"workItemRelations": [
 		  {
@@ -115,8 +115,7 @@ const (
 			"href": "https://fabrikam.visualstudio.com/Fabrikam-Fiber/_apis/work/teamsettings/iterations/a589a806-bf11-4d4f-a031-c19813331553"
 		  }
 		}
-	  }
-	`
+	}`
 
 	commentResponse = `{
 		"workItemId" : 1,
@@ -124,13 +123,13 @@ const (
 		"version" : 1,
 		"id" : 4222704,
 		"createdDate" : "0001-01-01 00:00:00 +0000 UTC",
-		"modifiedDate" : "0001-01-01 00:00:00 +0000 UTC",
+		"modifiedDate" : "0001-01-01 00:00:00 +0000 UTC"
  }`
 )
 
 func TestWorkItems_GetForIteration(t *testing.T) {
-	actualIdsURL := fmt.Sprintf("/AZURE_DEVOPS_Project/AZURE_DEVOPS_TEAM/_apis/work/teamsettings/iterations/1/workitems?api-version=5.1-preview.1")
-	actualGetURL := fmt.Sprintf("/AZURE_DEVOPS_Project/_apis/wit/workitems?ids=1,3&fields=System.Id,System.Title,System.State,System.WorkItemType,Microsoft.VSTS.Scheduling.StoryPoints,System.BoardColumn,System.CreatedBy,System.AssignedTo,System.Tags&api-version=5.1-preview.1")
+	actualIdsURL := fmt.Sprintf("/o/p/t/_apis/work/teamsettings/iterations/a589a806-bf11-4d4f-a031-c19813331553/workitems?api-version=5.1-preview.1")
+	actualGetURL := fmt.Sprintf("/o/p/_apis/wit/workitems?ids=1,3&fields=System.Id,System.Title,System.State,System.WorkItemType,Microsoft.VSTS.Scheduling.StoryPoints,System.BoardColumn,System.CreatedBy,System.AssignedTo,System.Tags&api-version=5.1-preview.1")
 
 	tt := []struct {
 		name              string
@@ -146,6 +145,7 @@ func TestWorkItems_GetForIteration(t *testing.T) {
 		{
 			name:              "we get ids and we get iterations",
 			idsBaseURL:        getIdsURL,
+			getBaseURL:        "/o/p/_apis/wit/workitems",
 			actualIdsURL:      actualIdsURL,
 			actualGetURL:      actualGetURL,
 			idsResponse:       getIdsResponse,
@@ -166,15 +166,15 @@ func TestWorkItems_GetForIteration(t *testing.T) {
 				json := tc.idsResponse
 				fmt.Fprint(w, json)
 			})
-			mux.HandleFunc("/testing/AZURE_DEVOPS_Project/_apis/wit/workitems", func(w http.ResponseWriter, r *http.Request) {
+			mux.HandleFunc(tc.getBaseURL, func(w http.ResponseWriter, r *http.Request) {
 				testMethod(t, r, "GET")
 				testURL(t, r, tc.actualGetURL)
 				json := tc.getResponse
 				fmt.Fprint(w, json)
 			})
 
-			iteration := azuredevops.Iteration{ID: "1"}
-			got, _, err := c.WorkItems.GetForIteration(context.Background(), "AZURE_DEVOPS_OWNER", "AZURE_DEVOPS_PROJECT", "AZURE_DEVOPS_TEAM", iteration)
+			iteration := azuredevops.Iteration{ID: String("a589a806-bf11-4d4f-a031-c19813331553")}
+			got, _, err := c.WorkItems.GetForIteration(context.Background(), "o", "p", "t", iteration)
 			if err != nil {
 				t.Fatalf("returned error: %v", err)
 			}
@@ -187,20 +187,20 @@ func TestWorkItems_GetForIteration(t *testing.T) {
 }
 
 func TestWorkItems_GetComment(t *testing.T) {
-	client, mux, _, teardown := setup()
+	c, mux, _, teardown := setup()
 	defer teardown()
 
 	comment := "TEST COMMENT"
 	want := &azuredevops.WorkItemComment{ID: Int(1), Text: String(comment)}
 
-	mux.HandleFunc("/o/p/_apis/wit/workItems/1/comments/", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/o/p/_apis/wit/workItems/1/comments/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
 
 		fmt.Fprint(w, `{"id":1, "text": "TEST COMMENT"}`)
 	})
 
 	opts := azuredevops.WorkItemCommentListOptions{}
-	got, _, err := client.WorkItems.GetComment(context.Background(), "o", "p", 1, 1, &opts)
+	got, _, err := c.WorkItems.GetComment(context.Background(), "o", "p", 1, 1, &opts)
 	if err != nil {
 		t.Errorf("WorkItems.GetComment returned error: %v", err)
 	}
@@ -212,12 +212,11 @@ func TestWorkItems_GetComment(t *testing.T) {
 }
 
 func TestWorkItems_ListComments(t *testing.T) {
-	client, mux, _, teardown := setup()
+	c, mux, _, teardown := setup()
 	defer teardown()
 
 	commentText := "TEST COMMENT"
-	witID := 1
-	comment := &azuredevops.WorkItemComment{ID: &witID, Text: &commentText}
+	comment := &azuredevops.WorkItemComment{ID: Int(1), Text: &commentText}
 	comments := []*azuredevops.WorkItemComment{comment}
 	want := &azuredevops.WorkItemCommentList{
 		TotalCount: Int(1),
@@ -241,7 +240,7 @@ func TestWorkItems_ListComments(t *testing.T) {
 	opts := azuredevops.WorkItemCommentListOptions{
 		IDs: []int{1, 2, 3},
 	}
-	got, _, err := client.WorkItems.ListComments(context.Background(), "o", "p", witID, &opts)
+	got, _, err := c.WorkItems.ListComments(context.Background(), "o", "p", 1, &opts)
 	if err != nil {
 		t.Errorf("WorkItems.ListComments returned error: %v", err)
 	}
@@ -253,7 +252,7 @@ func TestWorkItems_ListComments(t *testing.T) {
 }
 
 func TestWorkItems_CreateComment(t *testing.T) {
-	client, mux, _, teardown := setup()
+	c, mux, _, teardown := setup()
 	defer teardown()
 
 	comment := "TEST COMMENT"
@@ -269,7 +268,7 @@ func TestWorkItems_CreateComment(t *testing.T) {
 		fmt.Fprint(w, `{"id":1, "text": "TEST COMMENT"}`)
 	})
 
-	got, _, err := client.WorkItems.CreateComment(context.Background(), "o", "p", 1, want)
+	got, _, err := c.WorkItems.CreateComment(context.Background(), "o", "p", 1, want)
 	if err != nil {
 		t.Errorf("WorkItems.CreateComment returned error: %v", err)
 	}

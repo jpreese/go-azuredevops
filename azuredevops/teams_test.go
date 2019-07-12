@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	teamsListURL      = "_apis/teams"
+	teamsListURL      = "/o/p/_apis/teams"
 	teamsListResponse = `{
 		"value": [
 		  {
@@ -56,7 +56,7 @@ func TestTeamsService_List(t *testing.T) {
 			})
 
 			opt := &azuredevops.TeamsListOptions{}
-			response, count, err := c.Teams.List(context.Background(), "AZURE_DEVOPS_OWNER", "AZURE_DEVOPS_PROJECT", opt)
+			response, count, err := c.Teams.List(context.Background(), "o", "p", opt)
 			if err != nil {
 				t.Fatalf("returned error: %v", err)
 			}
@@ -70,7 +70,7 @@ func TestTeamsService_List(t *testing.T) {
 			}
 
 			if count > 0 {
-				if &tc.title != response[0].Name {
+				if tc.title != *response[0].Name {
 					t.Fatalf("expected name to be %s; got %s", tc.title, *response[0].Name)
 				}
 			}

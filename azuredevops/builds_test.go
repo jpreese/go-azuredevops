@@ -11,8 +11,8 @@ import (
 )
 
 const (
-	buildListURL      = "/AZURE_DEVOPS_Project/_apis/build/builds"
-	queueBuildURL     = "/AZURE_DEVOPS_Project/_apis/build/builds"
+	buildListURL      = "/o/p/_apis/build/builds"
+	queueBuildURL     = "/o/p/_apis/build/builds"
 	buildListResponse = `{
 		"value": [
 			{
@@ -60,21 +60,21 @@ func TestBuildsService_List(t *testing.T) {
 			})
 
 			options := &azuredevops.BuildsListOptions{}
-			builds, err := c.Builds.List(context.Background(), "AZURE_DEVOPS_OWNER", "AZURE_DEVOPS_PROJECT", options)
+			builds, err := c.Builds.List(context.Background(), "o", "p", options)
 			if err != nil {
 				t.Fatalf("returned error: %v", err)
 			}
 
 			if tc.index > -1 {
-				if builds[tc.index].Result != &tc.result {
+				if *builds[tc.index].Result != tc.result {
 					t.Fatalf("expected result %s, got %s", tc.result, *builds[tc.index].Result)
 				}
 
-				if builds[tc.index].Status != &tc.status {
+				if *builds[tc.index].Status != tc.status {
 					t.Fatalf("expected status %s, got %s", tc.status, *builds[tc.index].Status)
 				}
 
-				if builds[tc.index].Definition.Name != &tc.definitionName {
+				if *builds[tc.index].Definition.Name != tc.definitionName {
 					t.Fatalf("expected definition name %s, got %s", tc.definitionName, *builds[tc.index].Definition.Name)
 				}
 			}
@@ -118,21 +118,21 @@ func TestBuildsService_Queue(t *testing.T) {
 
 		options := &azuredevops.QueueBuildOptions{}
 
-		_, _, err := c.Builds.Queue(context.Background(), "AZURE_DEVOPS_OWNER", "AZURE_DEVOPS_PROJECT", requestBuild, options)
+		_, _, err := c.Builds.Queue(context.Background(), "o", "p", requestBuild, options)
 
 		if err != nil {
 			t.Fatalf("returned error: %v", err)
 		}
 
-		if requestBuild.Result != responseBuild.Result {
+		if *requestBuild.Result != *responseBuild.Result {
 			t.Fatalf("expected result %s, got %s", *responseBuild.Result, *requestBuild.Result)
 		}
 
-		if requestBuild.Status != responseBuild.Status {
+		if *requestBuild.Status != *responseBuild.Status {
 			t.Fatalf("expected status %s, got %s", *responseBuild.Status, *requestBuild.Status)
 		}
 
-		if requestBuild.Definition.Name != responseBuild.Definition.Name {
+		if *requestBuild.Definition.Name != *responseBuild.Definition.Name {
 			t.Fatalf("expected definition name %s, got %s", *responseBuild.Definition.Name, *requestBuild.Definition.Name)
 		}
 	})

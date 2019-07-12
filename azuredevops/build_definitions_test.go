@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	buildDefinitionListURL      = "/AZURE_DEVOPS_Project/_apis/build/definitions"
+	buildDefinitionListURL      = "/o/p/_apis/build/definitions"
 	buildDefinitionListResponse = `{
 		"value": [
 			{
@@ -52,17 +52,17 @@ func TestBuildDefinitionsService_List(t *testing.T) {
 			})
 
 			options := &azuredevops.BuildDefinitionsListOptions{}
-			buildDefs, err := c.BuildDefinitions.List(context.Background(), "AZURE_DEVOPS_OWNER", "AZURE_DEVOPS_PROJECT", options)
+			buildDefs, err := c.BuildDefinitions.List(context.Background(), "o", "p", options)
 			if err != nil {
 				t.Fatalf("returned error: %v", err)
 			}
 
 			if tc.index > -1 {
-				if buildDefs[tc.index].ID != &tc.defId {
+				if *buildDefs[tc.index].ID != tc.defId {
 					t.Fatalf("expected build definition id %d, got %d", tc.defId, buildDefs[tc.index].ID)
 				}
 
-				if buildDefs[tc.index].Name != &tc.defName {
+				if *buildDefs[tc.index].Name != tc.defName {
 					t.Fatalf("expected build definition name %s, got %s", tc.defName, *buildDefs[tc.index].Name)
 				}
 			}

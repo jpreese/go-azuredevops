@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	favouritesListURL      = "/_apis/Favorite/Favorites"
+	favouritesListURL      = "/o/p/_apis/Favorite/Favorites"
 	favouritesListResponse = `{
 		"value": [
 			{
@@ -53,7 +53,7 @@ func TestFavouritesService_List(t *testing.T) {
 				fmt.Fprint(w, json)
 			})
 
-			favourites, count, err := c.Favourites.List(context.Background(), "AZURE_DEVOPS_OWNER", "AZURE_DEVOPS_PROJECT")
+			favourites, count, err := c.Favourites.List(context.Background(), "o", "p")
 			if err != nil {
 				t.Fatalf("returned error: %v", err)
 			}

@@ -77,7 +77,7 @@ const (
 )
 
 func TestPullRequestsService_List(t *testing.T) {
-	client, mux, _, teardown := setup()
+	c, mux, _, teardown := setup()
 	defer teardown()
 	mux.HandleFunc("/o/p/_apis/git/pullrequests", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
@@ -101,7 +101,7 @@ func TestPullRequestsService_List(t *testing.T) {
 		TargetRefName: "b",
 	}
 
-	got, _, err := client.PullRequests.List(context.Background(), "o", "p", opt)
+	got, _, err := c.PullRequests.List(context.Background(), "o", "p", opt)
 	if err != nil {
 		t.Errorf("PullRequests.List returned error: %v", err)
 	}
@@ -115,7 +115,7 @@ func TestPullRequestsService_List(t *testing.T) {
 }
 
 func TestPullRequestsService_ListCommits(t *testing.T) {
-	client, mux, _, teardown := setup()
+	c, mux, _, teardown := setup()
 	defer teardown()
 	mux.HandleFunc("/o/p/_apis/git/repositories/r/pullrequests/22/commits", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
@@ -129,7 +129,7 @@ func TestPullRequestsService_ListCommits(t *testing.T) {
 			}`)
 	})
 
-	got, _, err := client.PullRequests.ListCommits(context.Background(), "o", "p", "r", 22)
+	got, _, err := c.PullRequests.ListCommits(context.Background(), "o", "p", "r", 22)
 	if err != nil {
 		t.Errorf("PullRequests.ListCommits returned error: %v", err)
 	}
@@ -146,7 +146,7 @@ func TestPullRequestsService_ListCommits(t *testing.T) {
 }
 
 func TestPullRequestsService_Get(t *testing.T) {
-	client, mux, _, teardown := setup()
+	c, mux, _, teardown := setup()
 	defer teardown()
 	mux.HandleFunc("/o/p/_apis/git/pullrequests/22", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
@@ -157,7 +157,7 @@ func TestPullRequestsService_Get(t *testing.T) {
 	})
 
 	opts := &azuredevops.PullRequestListOptions{}
-	got, _, err := client.PullRequests.Get(context.Background(), "o", "p", 22, opts)
+	got, _, err := c.PullRequests.Get(context.Background(), "o", "p", 22, opts)
 	if err != nil {
 		t.Errorf("PullRequests.Get returned error: %v", err)
 	}
@@ -173,7 +173,7 @@ func TestPullRequestsService_Get(t *testing.T) {
 }
 
 func TestPullRequestsService_Merge(t *testing.T) {
-	client, mux, _, teardown := setup()
+	c, mux, _, teardown := setup()
 	defer teardown()
 	mux.HandleFunc("/o/p/_apis/git/repositories/r/pullrequests/22", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "PATCH")
@@ -225,7 +225,7 @@ func TestPullRequestsService_Merge(t *testing.T) {
 		ImageURL:    String("https://dev.azure.com/fabrikam/DefaultCollection/_api/_common/identityImage?id=54d125f7-69f7-4191-904f-c5b96b6261c8"),
 	}
 
-	got, _, err := client.PullRequests.Merge(context.Background(), "o", "p", "r", 22, nil, completionOpts, id)
+	got, _, err := c.PullRequests.Merge(context.Background(), "o", "p", "r", 22, nil, completionOpts, id)
 	if err != nil {
 		t.Errorf("PullRequests.Merge returned error: %v", err)
 	}
@@ -243,7 +243,7 @@ func TestPullRequestsService_Merge(t *testing.T) {
 }
 
 func TestPullRequestsService_Create(t *testing.T) {
-	client, mux, _, teardown := setup()
+	c, mux, _, teardown := setup()
 	defer teardown()
 	mux.HandleFunc("/o/p/_apis/git/repositories/r/pullrequests", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
@@ -274,7 +274,7 @@ func TestPullRequestsService_Create(t *testing.T) {
 		TargetRefName: String("refs/heads/master"),
 	}
 
-	got, _, err := client.PullRequests.Create(context.Background(), "o", "p", "r", pull)
+	got, _, err := c.PullRequests.Create(context.Background(), "o", "p", "r", pull)
 	if err != nil {
 		t.Errorf("PullRequests.Create returned error: %v", err)
 	}
@@ -295,9 +295,9 @@ func TestPullRequestsService_Create(t *testing.T) {
 }
 
 func TestPullRequestsService_GetWithRepo(t *testing.T) {
-	client, mux, _, teardown := setup()
+	c, mux, _, teardown := setup()
 	defer teardown()
-	mux.HandleFunc("/o/p/_apis/git/repository/r/pullrequests/22", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/o/p/_apis/git/repositories/r/pullrequests/22", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
 		w.Header().Set("Content-Type", "application/json")
 		fmt.Fprint(w, `{
@@ -309,7 +309,7 @@ func TestPullRequestsService_GetWithRepo(t *testing.T) {
 		RepositoryID:        "",
 		IncludeWorkItemRefs: true,
 	}
-	got, _, err := client.PullRequests.GetWithRepo(context.Background(), "o", "p", "r", 22, opts)
+	got, _, err := c.PullRequests.GetWithRepo(context.Background(), "o", "p", "r", 22, opts)
 	if err != nil {
 		t.Errorf("PullRequests.Get returned error: %v", err)
 	}

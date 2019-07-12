@@ -102,7 +102,7 @@ type CommentVersionRef struct {
 
 // WorkItemReference Contains reference to a work item.
 type WorkItemReference struct {
-	ID  *int    `json:"id,omitempty,string"`
+	ID  *int    `json:"id,omitempty"`
 	URL *string `json:"url,omitempty"`
 }
 
@@ -129,14 +129,15 @@ type WorkItemUpdate struct {
 // GetForIteration will get a list of work items based on an iteration name
 // utilising https://docs.microsoft.com/en-gb/rest/api/vsts/wit/work%20items/list
 func (s *WorkItemsService) GetForIteration(ctx context.Context, owner, project, team string, iteration Iteration) ([]*WorkItem, *http.Response, error) {
-	queryIds, _, err := s.GetIdsForIteration(ctx, owner, project, team, iteration)
+	iterationWorkItems, resp, err := s.GetIdsForIteration(ctx, owner, project, team, iteration)
 	if err != nil {
-		return nil, nil, err
+		return nil, resp, err
 	}
 
 	var workIds []string
-	for index := 0; index < len(queryIds); index++ {
-		workIds = append(workIds, strconv.Itoa(queryIds[index]))
+	for index := 0; index < len(iterationWorkItems.WorkItemRelations); index++ {
+		relationship := (iterationWorkItems.WorkItemRelations)[index]
+		workIds = append(workIds, strconv.Itoa(*relationship.Target.ID))
 	}
 
 	// https://docs.microsoft.com/en-us/rest/api/vsts/wit/work%20item%20types%20field/list
@@ -148,7 +149,9 @@ func (s *WorkItemsService) GetForIteration(ctx context.Context, owner, project, 
 
 	// Now we want to pad out the fields for the work items
 	URL := fmt.Sprintf(
-		"_apis/wit/workitems?ids=%s&fields=%s&api-version=5.1-preview.1",
+		"%s/%s/_apis/wit/workitems?ids=%s&fields=%s&api-version=5.1-preview.1",
+		owner,
+		project,
 		strings.Join(workIds, ","),
 		strings.Join(fields, ","),
 	)
@@ -159,20 +162,20 @@ func (s *WorkItemsService) GetForIteration(ctx context.Context, owner, project, 
 	}
 
 	r := new(WorkItemListResponse)
-	resp, err := s.client.Execute(ctx, req, r)
+	resp, err = s.client.Execute(ctx, req, r)
 
 	return r.WorkItems, resp, err
 }
 
 // GetIdsForIteration will return an array of ids for a given iteration
 // utilising https://docs.microsoft.com/en-gb/rest/api/vsts/work/iterations/get%20iteration%20work%20items
-func (s *WorkItemsService) GetIdsForIteration(ctx context.Context, owner, project, team string, iteration Iteration) ([]int, *http.Response, error) {
+func (s *WorkItemsService) GetIdsForIteration(ctx context.Context, owner, project, team string, iteration Iteration) (*IterationWorkItems, *http.Response, error) {
 	URL := fmt.Sprintf(
 		"%s/%s/%s/_apis/work/teamsettings/iterations/%s/workitems?api-version=5.1-preview.1",
 		owner,
 		project,
 		url.PathEscape(team),
-		iteration.ID,
+		*iteration.ID,
 	)
 
 	req, err := s.client.NewRequest("GET", URL, nil)
@@ -184,13 +187,7 @@ func (s *WorkItemsService) GetIdsForIteration(ctx context.Context, owner, projec
 
 	resp, err := s.client.Execute(ctx, req, r)
 
-	var queryIds []int
-	for index := 0; index < len(r.WorkItemRelations); index++ {
-		relationship := (r.WorkItemRelations)[index]
-		queryIds = append(queryIds, *relationship.Target.ID)
-	}
-
-	return queryIds, resp, err
+	return r, resp, err
 }
 
 // ListComments Lists all comments on a work item

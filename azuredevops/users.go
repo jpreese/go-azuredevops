@@ -18,17 +18,17 @@ type GraphGroup struct {
 	/**
 	 * A short phrase to help human readers disambiguate groups with similar names
 	 */
-	description         *string `json:"description,omitempty"`
-	isCrossProject      *bool   `json:"isCrossProject,omitempty"`
-	isDeleted           *bool   `json:"isDeleted,omitempty"`
-	isGlobalScope       *bool   `json:"isGlobalScope,omitempty"`
-	isRestrictedVisible *bool   `json:"isRestrictedVisible,omitempty"`
-	localScopeID        *string `json:"localScopeId,omitempty"`
-	scopeID             *string `json:"scopeId,omitempty"`
-	scopeName           *string `json:"scopeName,omitempty"`
-	scopeType           *string `json:"scopeType,omitempty"`
-	securingHostID      *string `json:"securingHostId,omitempty"`
-	specialType         *string `json:"specialType,omitempty"`
+	Description         *string `json:"description,omitempty"`
+	IsCrossProject      *bool   `json:"isCrossProject,omitempty"`
+	IsDeleted           *bool   `json:"isDeleted,omitempty"`
+	IsGlobalScope       *bool   `json:"isGlobalScope,omitempty"`
+	IsRestrictedVisible *bool   `json:"isRestrictedVisible,omitempty"`
+	LocalScopeID        *string `json:"localScopeId,omitempty"`
+	ScopeID             *string `json:"scopeId,omitempty"`
+	ScopeName           *string `json:"scopeName,omitempty"`
+	ScopeType           *string `json:"scopeType,omitempty"`
+	SecuringHostID      *string `json:"securingHostId,omitempty"`
+	SpecialType         *string `json:"specialType,omitempty"`
 }
 
 type GraphMember struct {
@@ -85,33 +85,33 @@ type GraphSubject struct {
 	 * [Internal Use Only] The legacy descriptor is here in case you need to
 	 * access old version IMS using identity descriptor.
 	 */
-	LegacyDescriptor *string `json:legacyDescriptor,omitempty"`
+	LegacyDescriptor *string `json:"legacyDescriptor,omitempty"`
 	/**
 	 * The type of source provider for the origin identifier (ex:AD, AAD, MSA)
 	 */
-	Origin *string `json:origin,omitempty"`
+	Origin *string `json:"origin,omitempty"`
 	/**
 	 * The unique identifier from the system of origin. Typically a sid, object
 	 * id or Guid. Linking and unlinking operations can cause this value to
 	 * change for a user because the user is not backed by a different provider
 	 * and has a different unique id in the new provider.
 	 */
-	OriginID *string `json:originId,omitempty"`
+	OriginID *string `json:"originId,omitempty"`
 	/**
 	 * This field identifies the type of the graph subject (ex: Group, Scope, User).
 	 */
-	SubjectKind *string `json:subjectKind,omitempty"`
+	SubjectKind *string `json:"subjectKind,omitempty"`
 }
 
 type GraphUser struct {
 	GraphMember
-	IsDeletedInOrigin  *bool      `json:isDeletedOrigin,omitempty"`
-	MetadataUpdateDate *time.Time `json:metadataUpdateDate,omitempty"`
+	IsDeletedInOrigin  *bool      `json:"isDeletedOrigin,omitempty"`
+	MetadataUpdateDate *time.Time `json:"metadataUpdateDate,omitempty"`
 	/**
 	* The meta type of the user in the origin, such as "member", "guest",
 	* etc. See UserMetaType for the set of possible values.
 	 */
-	MetaType *string `json:metaType,omitempty"`
+	MetaType *string `json:"metaType,omitempty"`
 }
 
 // GraphUsersListResponse describes what a response from the Users.List()
@@ -123,37 +123,39 @@ type GraphUsersListResponse struct {
 
 // Get returns information about a single user in an org
 // https://docs.microsoft.com/en-us/rest/api/azure/devops/graph/users/get
-func (s *UsersService) Get(ctx context.Context, owner, descriptor string) (*GraphUser, error) {
-	URL := fmt.Sprintf("https://vssps.dev.azure.com/%s/_apis/graph/users/%s?api-version=5.1-preview.1",
+func (s *UsersService) Get(ctx context.Context, owner, descriptor string) (*GraphUser, *http.Response, error) {
+	URL := fmt.Sprintf("%s%s/_apis/graph/users/%s?api-version=5.1-preview.1",
+		s.client.VsspsBaseURL.String(),
 		owner,
 		descriptor,
 	)
 
 	request, err := s.client.NewRequest("GET", URL, nil)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	var response GraphUser
-	_, err = s.client.Execute(ctx, request, &response)
+	var r GraphUser
+	resp, err := s.client.Execute(ctx, request, &r)
 
-	return &response, err
+	return &r, resp, err
 }
 
 // List returns a list of users in an org
 // utilising https://docs.microsoft.com/en-us/rest/api/azure/devops/graph/users/list
-func (s *UsersService) List(ctx context.Context, owner string) ([]*GraphUser, error) {
-	URL := fmt.Sprintf("https://vssps.dev.azure.com/%s/_apis/graph/users?api-version=5.1-preview.1",
+func (s *UsersService) List(ctx context.Context, owner string) ([]*GraphUser, *http.Response, error) {
+	URL := fmt.Sprintf("%s%s/_apis/graph/users?api-version=5.1-preview.1",
+		s.client.VsspsBaseURL.String(),
 		owner,
 	)
 
 	request, err := s.client.NewRequest("GET", URL, nil)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	var response GraphUsersListResponse
-	_, err = s.client.Execute(ctx, request, &response)
+	var r GraphUsersListResponse
+	resp, err := s.client.Execute(ctx, request, &r)
 
-	return response.GraphUsers, err
+	return r.GraphUsers, resp, err
 }
 
 // GraphDescriptorResult Returns user descriptor and links related to the
@@ -167,7 +169,8 @@ type GraphDescriptorResult struct {
 // criteria
 // https://docs.microsoft.com/en-us/rest/api/azure/devops/graph/descriptors/get?view=azure-devops-rest-5.1
 func (s *UsersService) GetDescriptors(ctx context.Context, owner, storageKey string) (*GraphDescriptorResult, *http.Response, error) {
-	URL := fmt.Sprintf("https://vssps.dev.azure.com/%s/_apis/graph/descriptors/%s?api-version=5.1-preview.1",
+	URL := fmt.Sprintf("%s%s/_apis/graph/descriptors/%s?api-version=5.1-preview.1",
+		s.client.VsspsBaseURL.String(),
 		owner,
 		storageKey,
 	)

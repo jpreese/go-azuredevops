@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	deliveryPlansListURL      = "/AZURE_DEVOPS_Project/_apis/work/plans"
+	deliveryPlansListURL      = "/o/p/_apis/work/plans"
 	deliveryPlansListResponse = `{
 		"value": [
 			{
@@ -31,7 +31,7 @@ const (
 		],
 		"count": 2
 	}`
-	deliveryPlanGetURL              = "/AZURE_DEVOPS_Project/_apis/work/plans/7154147c-43ca-44a9-9df0-2fa0a7f9d6b2/deliverytimeline"
+	deliveryPlanGetURL              = "/o/p/_apis/work/plans/7154147c-43ca-44a9-9df0-2fa0a7f9d6b2/deliverytimeline"
 	deliveryPlanGetTimeLineResponse = `
 	{
 		"id": "7154147c-43ca-44a9-9df0-2fa0a7f9d6b2",
@@ -96,7 +96,7 @@ func TestDeliveryPlansService_List(t *testing.T) {
 			})
 
 			options := &azuredevops.DeliveryPlansListOptions{}
-			plans, count, err := c.DeliveryPlans.List(context.Background(), "AZURE_DEVOPS_OWNER", "AZURE_DEVOPS_PROJECT", options)
+			plans, count, err := c.DeliveryPlans.List(context.Background(), "o", "p", options)
 			if err != nil {
 				t.Fatalf("returned error: %v", err)
 			}
@@ -134,7 +134,7 @@ func TestDeliveryPlansService_GetTimeLine(t *testing.T) {
 		fmt.Fprint(w, json)
 	})
 
-	timeline, err := c.DeliveryPlans.GetTimeLine(context.Background(), "AZURE_DEVOPS_OWNER", "AZURE_DEVOPS_PROJECT", planID, "", "")
+	timeline, err := c.DeliveryPlans.GetTimeLine(context.Background(), "o", "p", planID, "", "")
 	if err != nil {
 		t.Fatalf("returned error: %v", err)
 	}
@@ -147,7 +147,7 @@ func TestDeliveryPlansService_GetTimeLine(t *testing.T) {
 		t.Fatalf("expected delivery plan to have team[0].Name of %s, got %s", "Team One", *timeline.Teams[0].Name)
 	}
 
-	if timeline.Teams[0].Iterations[0].Name != "Iteration One" {
+	if *timeline.Teams[0].Iterations[0].Name != "Iteration One" {
 		t.Fatalf(
 			"expected delivery plan to have team[0].Iterations[0].Name of %s, got %s",
 			"Iteration One",
@@ -175,13 +175,13 @@ func TestDeliveryPlansService_GetTimeLineDates(t *testing.T) {
 			name:        "no start date defaults to today with end of 65 days",
 			startDate:   "",
 			endDate:     time.Now().AddDate(0, 0, 65).Format("2006-01-02"),
-			expectedURL: "/AZURE_DEVOPS_Project/_apis/work/plans/7154147c-43ca-44a9-9df0-2fa0a7f9d6b2/deliverytimeline?api-version=5.1-preview.1&startDate=" + time.Now().Format("2006-01-02") + "&endDate=" + time.Now().AddDate(0, 0, 65).Format("2006-01-02"),
+			expectedURL: "/o/p/_apis/work/plans/7154147c-43ca-44a9-9df0-2fa0a7f9d6b2/deliverytimeline?api-version=5.1-preview.1&startDate=" + time.Now().Format("2006-01-02") + "&endDate=" + time.Now().AddDate(0, 0, 65).Format("2006-01-02"),
 		},
 		{
 			name:        "if start date specified use start and end dates",
 			startDate:   "2010-01-01",
 			endDate:     "2010-03-07",
-			expectedURL: "/AZURE_DEVOPS_Project/_apis/work/plans/7154147c-43ca-44a9-9df0-2fa0a7f9d6b2/deliverytimeline?api-version=5.1-preview.1&startDate=2010-01-01&endDate=2010-03-07",
+			expectedURL: "/o/p/_apis/work/plans/7154147c-43ca-44a9-9df0-2fa0a7f9d6b2/deliverytimeline?api-version=5.1-preview.1&startDate=2010-01-01&endDate=2010-03-07",
 		},
 	}
 
@@ -200,7 +200,7 @@ func TestDeliveryPlansService_GetTimeLineDates(t *testing.T) {
 				fmt.Fprint(w, json)
 			})
 
-			_, err := c.DeliveryPlans.GetTimeLine(context.Background(), "AZURE_DEVOPS_OWNER", "AZURE_DEVOPS_PROJECT", planID, tc.startDate, tc.endDate)
+			_, err := c.DeliveryPlans.GetTimeLine(context.Background(), "o", "p", planID, tc.startDate, tc.endDate)
 			if err != nil {
 				t.Fatalf("returned error: %v", err)
 			}
