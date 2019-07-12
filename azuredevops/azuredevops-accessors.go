@@ -2315,6 +2315,94 @@ func (g *GraphDescriptorResult) GetValue() string {
 	return *g.Value
 }
 
+// GetDescription returns the Description field if it's non-nil, zero value otherwise.
+func (g *GraphGroup) GetDescription() string {
+	if g == nil || g.Description == nil {
+		return ""
+	}
+	return *g.Description
+}
+
+// GetIsCrossProject returns the IsCrossProject field if it's non-nil, zero value otherwise.
+func (g *GraphGroup) GetIsCrossProject() bool {
+	if g == nil || g.IsCrossProject == nil {
+		return false
+	}
+	return *g.IsCrossProject
+}
+
+// GetIsDeleted returns the IsDeleted field if it's non-nil, zero value otherwise.
+func (g *GraphGroup) GetIsDeleted() bool {
+	if g == nil || g.IsDeleted == nil {
+		return false
+	}
+	return *g.IsDeleted
+}
+
+// GetIsGlobalScope returns the IsGlobalScope field if it's non-nil, zero value otherwise.
+func (g *GraphGroup) GetIsGlobalScope() bool {
+	if g == nil || g.IsGlobalScope == nil {
+		return false
+	}
+	return *g.IsGlobalScope
+}
+
+// GetIsRestrictedVisible returns the IsRestrictedVisible field if it's non-nil, zero value otherwise.
+func (g *GraphGroup) GetIsRestrictedVisible() bool {
+	if g == nil || g.IsRestrictedVisible == nil {
+		return false
+	}
+	return *g.IsRestrictedVisible
+}
+
+// GetLocalScopeID returns the LocalScopeID field if it's non-nil, zero value otherwise.
+func (g *GraphGroup) GetLocalScopeID() string {
+	if g == nil || g.LocalScopeID == nil {
+		return ""
+	}
+	return *g.LocalScopeID
+}
+
+// GetScopeID returns the ScopeID field if it's non-nil, zero value otherwise.
+func (g *GraphGroup) GetScopeID() string {
+	if g == nil || g.ScopeID == nil {
+		return ""
+	}
+	return *g.ScopeID
+}
+
+// GetScopeName returns the ScopeName field if it's non-nil, zero value otherwise.
+func (g *GraphGroup) GetScopeName() string {
+	if g == nil || g.ScopeName == nil {
+		return ""
+	}
+	return *g.ScopeName
+}
+
+// GetScopeType returns the ScopeType field if it's non-nil, zero value otherwise.
+func (g *GraphGroup) GetScopeType() string {
+	if g == nil || g.ScopeType == nil {
+		return ""
+	}
+	return *g.ScopeType
+}
+
+// GetSecuringHostID returns the SecuringHostID field if it's non-nil, zero value otherwise.
+func (g *GraphGroup) GetSecuringHostID() string {
+	if g == nil || g.SecuringHostID == nil {
+		return ""
+	}
+	return *g.SecuringHostID
+}
+
+// GetSpecialType returns the SpecialType field if it's non-nil, zero value otherwise.
+func (g *GraphGroup) GetSpecialType() string {
+	if g == nil || g.SpecialType == nil {
+		return ""
+	}
+	return *g.SpecialType
+}
+
 // GetDomain returns the Domain field if it's non-nil, zero value otherwise.
 func (g *GraphMember) GetDomain() string {
 	if g == nil || g.Domain == nil {
@@ -2577,6 +2665,54 @@ func (i *ItemContentType) GetRawText() string {
 		return ""
 	}
 	return *i.RawText
+}
+
+// GetEndDate returns the EndDate field if it's non-nil, zero value otherwise.
+func (i *Iteration) GetEndDate() string {
+	if i == nil || i.EndDate == nil {
+		return ""
+	}
+	return *i.EndDate
+}
+
+// GetID returns the ID field if it's non-nil, zero value otherwise.
+func (i *Iteration) GetID() string {
+	if i == nil || i.ID == nil {
+		return ""
+	}
+	return *i.ID
+}
+
+// GetName returns the Name field if it's non-nil, zero value otherwise.
+func (i *Iteration) GetName() string {
+	if i == nil || i.Name == nil {
+		return ""
+	}
+	return *i.Name
+}
+
+// GetPath returns the Path field if it's non-nil, zero value otherwise.
+func (i *Iteration) GetPath() string {
+	if i == nil || i.Path == nil {
+		return ""
+	}
+	return *i.Path
+}
+
+// GetStartDate returns the StartDate field if it's non-nil, zero value otherwise.
+func (i *Iteration) GetStartDate() string {
+	if i == nil || i.StartDate == nil {
+		return ""
+	}
+	return *i.StartDate
+}
+
+// GetURL returns the URL field if it's non-nil, zero value otherwise.
+func (i *Iteration) GetURL() string {
+	if i == nil || i.URL == nil {
+		return ""
+	}
+	return *i.URL
 }
 
 // GetLinks returns the Links field if it's non-nil, zero value otherwise.

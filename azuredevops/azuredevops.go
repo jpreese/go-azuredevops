@@ -16,8 +16,9 @@ import (
 )
 
 const (
-	// defaultBaseURL root URI for Azure Devops
-	defaultBaseURL string = "https://dev.azure.com/"
+	// Default API URLs
+	DefaultBaseURL      string = "https://dev.azure.com/"
+	DefaultVsspsBaseURL string = "https://vssps.dev.azure.com/"
 	// userAgent our HTTP client's user-agent
 	userAgent string = "go-azuredevops"
 )
@@ -27,14 +28,14 @@ type Client struct {
 	client *http.Client
 
 	// BaseURL Comprised of baseURL and account
-	BaseURL   url.URL
+	BaseURL url.URL
+
+	VsspsBaseURL url.URL
+
 	UserAgent string
 
 	// Account Default tenant identifier
 	Account string
-	// Project Default project for api calls
-	Project   string
-	AuthToken string
 
 	// Services used to proxy to other API endpoints
 	Boards           *BoardsService
@@ -55,48 +56,32 @@ type Client struct {
 // provided, http.DefaultClient will be used. To use API methods which require
 // authentication, provide an http.Client that will perform the authentication
 // for you (such as that provided by the golang.org/x/oauth2 library).
-// The client's base URL is constructed from the supplied account and project.
-// Token is a personal access token.
 func NewClient(httpClient *http.Client) (*Client, error) {
 	if httpClient == nil {
 		httpClient = http.DefaultClient
 	}
-	/*
-		// BaseURL
-		baseURLstr := fmt.Sprintf("%s/%s/", defaultBaseURL, account)
-		baseURL, _ := url.Parse(baseURLstr)
 
-		//account string, project string, token string,
+	c := &Client{}
+	baseURL, _ := url.Parse(DefaultBaseURL)
+	vsspsBaseURL, _ := url.Parse(DefaultVsspsBaseURL)
 
-		c := &Client{
-			client:    httpClient,
-			BaseURL:   *baseURL,
-			Account:   account,
-			Project:   project,
-			AuthToken: token,
-		}
-
-	*/
-
-	// BaseURL
-	baseURL, _ := url.Parse(defaultBaseURL)
-	c := &Client{
-		client:    httpClient,
-		BaseURL:   *baseURL,
-		UserAgent: userAgent,
-	}
+	c.client = httpClient
+	c.BaseURL = *baseURL
+	c.VsspsBaseURL = *vsspsBaseURL
+	c.UserAgent = userAgent
 
 	c.Boards = &BoardsService{client: c}
 	c.BuildDefinitions = &BuildDefinitionsService{client: c}
 	c.Builds = &BuildsService{client: c}
+	c.DeliveryPlans = &DeliveryPlansService{client: c}
 	c.Favourites = &FavouritesService{client: c}
 	c.Git = &GitService{client: c}
 	c.Iterations = &IterationsService{client: c}
 	c.PullRequests = &PullRequestsService{client: c}
-	c.WorkItems = &WorkItemsService{client: c}
 	c.Teams = &TeamsService{client: c}
 	c.Tests = &TestsService{client: c}
-	c.DeliveryPlans = &DeliveryPlansService{client: c}
+	c.Users = &UsersService{client: c}
+	c.WorkItems = &WorkItemsService{client: c}
 
 	return c, nil
 }
