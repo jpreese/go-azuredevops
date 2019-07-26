@@ -55,15 +55,16 @@ type TeamProjectCollectionReference struct {
 
 // TeamProjectReference Represents a shallow reference to a TeamProject.
 type TeamProjectReference struct {
-	Abbreviation        *string `json:"abbreviation,omitempty"`
-	DefaultTeamImageURL *string `json:"defaultTeamImageUrl,omitempty"`
-	Description         *string `json:"description,omitempty"`
-	ID                  *string `json:"id,omitempty"`
-	Name                *string `json:"name,omitempty"`
-	Revision            *int    `json:"revision,omitempty"`
-	State               *string `json:"state,omitempty"`
-	URL                 *string `json:"url,omitempty"`
-	Visibility          *string `json:"visibility,omitempty"`
+	Abbreviation        *string    `json:"abbreviation,omitempty"`
+	DefaultTeamImageURL *string    `json:"defaultTeamImageUrl,omitempty"`
+	Description         *string    `json:"description,omitempty"`
+	ID                  *string    `json:"id,omitempty"`
+	Name                *string    `json:"name,omitempty"`
+	Revision            *int       `json:"revision,omitempty"`
+	State               *string    `json:"state,omitempty"`
+	URL                 *string    `json:"url,omitempty"`
+	Visibility          *string    `json:"visibility,omitempty"`
+	LastUpdateTime      *time.Time `json:"lastUpdateTime,omitempty"`
 }
 
 // List returns list of the teams
