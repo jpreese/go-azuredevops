@@ -45,7 +45,8 @@ type PayloadType int
 
 const (
 	// PullRequestCommentedEvent Resource field is parsed as a pull
-	// request commented event
+	// request commented event (note this maps to resourceVersion
+	// 2.0 of the payload struct, which is incompatible with 1.0
 	PullRequestCommentedEvent PayloadType = iota
 	// PullRequestEvent Resource field is parsed as a pull request event
 	PullRequestEvent
