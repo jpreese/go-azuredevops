@@ -44,12 +44,15 @@ type Event struct {
 type PayloadType int
 
 const (
+	// PullRequestCommentedEvent Resource field is parsed as a pull
+	// request commented event
+	PullRequestCommentedEvent PayloadType = iota
 	// PullRequestEvent Resource field is parsed as a pull request event
-	PullRequestEvent PayloadType = iota
+	PullRequestEvent
 	// PushEvent Git push service event
 	PushEvent
 	// WorkItemCommentedEvent Resource field is parsed as a work item
-	// comment event
+	// commented event
 	WorkItemCommentedEvent
 	// WorkItemUpdatedEvent Resource field is parsed as a work item
 	// updated event
@@ -73,6 +76,9 @@ func (e *Event) ParsePayload() (payload interface{}, err error) {
 	case "git.push":
 		e.PayloadType = PushEvent
 		payload = &GitPush{}
+	case "ms.vss-code.git-pullrequest-comment-event":
+		e.PayloadType = PullRequestCommentedEvent
+		payload = &GitPullRequestWithComment{}
 	case "workitem.commented":
 		e.PayloadType = WorkItemCommentedEvent
 		payload = &WorkItem{}

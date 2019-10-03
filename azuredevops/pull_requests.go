@@ -340,6 +340,13 @@ type GitPullRequestCommentThreadContext struct {
 	RightFileStart *CommentPosition `json:"rightFileStart,omitempty"`
 }
 
+// GitPullRequestWithComment contains a reference to an existing pull request and a
+// comment.
+type GitPullRequestWithComment struct {
+	Comment     *Comment        `json:"comment,omitempty"`
+	PullRequest *GitPullRequest `json:"pullRequest,omitempty"`
+}
+
 // ListCommits lists the commits in a pull request.
 // Azure Devops API docs: https://docs.microsoft.com/en-us/rest/api/azure/devops/git/pull%20request%20commits/get%20pull%20request%20commits
 //

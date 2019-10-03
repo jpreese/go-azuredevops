@@ -48,6 +48,12 @@ func TestParsePayload(t *testing.T) {
 			err:       nil,
 		},
 		{
+			payload:   &azuredevops.GitPullRequestWithComment{},
+			eventType: "ms.vss-code.git-pullrequest-comment-event",
+			want:      &azuredevops.GitPullRequestWithComment{},
+			err:       nil,
+		},
+		{
 			payload:   &azuredevops.WorkItem{},
 			eventType: "workitem.commented",
 			want:      &azuredevops.WorkItem{},
