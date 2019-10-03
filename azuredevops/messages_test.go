@@ -28,8 +28,12 @@ func TestParseWebHook(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ParseWebHook: %v", err)
 	}
-	got.Resource = nil
-	want := &azuredevops.Event{}
+	want := &azuredevops.Event{
+		PayloadType: azuredevops.PullRequestEvent,
+		Resource: &azuredevops.GitPullRequest{
+			IsDraft: azuredevops.Bool(true),
+		},
+	}
 	err = json.Unmarshal([]byte(payload), &want)
 	if err != nil {
 		t.Fatalf("ParseWebHook: %v", err)
