@@ -371,3 +371,37 @@ func (s *PullRequestsService) ListCommits(ctx context.Context, owner, project, r
 
 	return r.GitCommitRefs, resp, err
 }
+
+// CreateComment adds a comment to a pull request thread.
+// Azure Devops API docs: https://docs.microsoft.com/en-us/rest/api/azure/devops/git/pull%20request%20thread%20comments/create
+//
+func (s *PullRequestsService) CreateComment(ctx context.Context, owner, project, repo string, pullNum int, threadId int, comment *Comment) (*Comment, *http.Response, error) {
+	URL := fmt.Sprintf("%s/%s/_apis/git/repositories/%s/pullrequests/%d/threads/%d/comments?api-version=5.1-preview.1",
+		owner,
+		project,
+		repo,
+		pullNum,
+		threadId,
+	)
+
+	if comment.GetContent() == "" {
+		return nil, nil, errors.New("PullRequests.CreateComment: Nil pointer or empty string in comment.Content field ")
+	}
+
+	if comment.GetCommentType() == "" {
+		comment.CommentType = String("text")
+	}
+
+	req, err := s.client.NewRequest("POST", URL, comment)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	r := new(Comment)
+	resp, err := s.client.Execute(ctx, req, r)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return r, resp, err
+}

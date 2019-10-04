@@ -323,3 +323,49 @@ func TestPullRequestsService_GetWithRepo(t *testing.T) {
 		t.Errorf("PullRequests.Get returned %+v, want %+v", got, want)
 	}
 }
+
+func TestPullRequestsService_CreateComment(t *testing.T) {
+	c, mux, _, teardown := setup()
+	defer teardown()
+	mux.HandleFunc("/o/p/_apis/git/repositories/r/pullrequests/1/threads/1/comments", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "POST")
+		w.Header().Set("Content-Type", "application/json")
+		b, _ := ioutil.ReadAll(r.Body)
+		parsed := &azuredevops.Comment{}
+		json.Unmarshal(b, parsed)
+		if parsed.GetContent() != "test comment" {
+			t.Errorf("GetContent error: %v", parsed.GetContent())
+		}
+		if parsed.GetParentCommentID() != 1 {
+			t.Errorf("GetParentCommentId error: %v", parsed.GetParentCommentID())
+		}
+		fmt.Fprint(w, `{
+                        "id": 2,
+			"parentCommentId": 1,
+			"content": "test comment",
+			"commentType": "text"
+		}`)
+	})
+
+	comment := &azuredevops.Comment{
+		Content:         String("test comment"),
+		ParentCommentID: Int(1),
+	}
+
+	got, _, err := c.PullRequests.CreateComment(context.Background(), "o", "p", "r", 1, 1, comment)
+	if err != nil {
+		t.Errorf("PullRequests.CreateComment returned error: %v", err)
+	}
+
+	want := &azuredevops.Comment{
+		ID:              Int(2),
+		ParentCommentID: Int(1),
+		Content:         String("test comment"),
+		CommentType:     String("text"),
+	}
+	if !cmp.Equal(got, want) {
+		diff := cmp.Diff(got, want)
+		fmt.Printf(diff)
+		t.Errorf("PullRequests.CreateComment returned %+v, want %+v", got, want)
+	}
+}
