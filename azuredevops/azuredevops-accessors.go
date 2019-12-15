@@ -1847,14 +1847,6 @@ func (g *GitPullRequestStatus) GetIterationID() int {
 	return *g.IterationID
 }
 
-// GetProperties returns the Properties field if it's non-nil, zero value otherwise.
-func (g *GitPullRequestStatus) GetProperties() time.Time {
-	if g == nil || g.Properties == nil {
-		return time.Time{}
-	}
-	return g.Properties
-}
-
 // GetComment returns the Comment field.
 func (g *GitPullRequestWithComment) GetComment() *Comment {
 	if g == nil {
