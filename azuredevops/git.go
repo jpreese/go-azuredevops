@@ -334,7 +334,7 @@ type GitStatus struct {
 // an iteration.
 type GitPullRequestStatus struct {
 	GitStatus
-	IterationID int        `json:"iterationId,omitempty"`
+	IterationID *int       `json:"iterationId,omitempty"`
 	Properties  *time.Time `json:"properties,omitempty"`
 }
 

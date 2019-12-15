@@ -1843,6 +1843,14 @@ func (g *GitPullRequestMergeOptions) GetDisableRenames() bool {
 	return *g.DisableRenames
 }
 
+// GetIterationID returns the IterationID field if it's non-nil, zero value otherwise.
+func (g *GitPullRequestStatus) GetIterationID() int {
+	if g == nil || g.IterationID == nil {
+		return 0
+	}
+	return *g.IterationID
+}
+
 // GetProperties returns the Properties field if it's non-nil, zero value otherwise.
 func (g *GitPullRequestStatus) GetProperties() time.Time {
 	if g == nil || g.Properties == nil {
