@@ -1839,10 +1839,18 @@ func (g *GitPullRequestMergeOptions) GetDisableRenames() bool {
 	return *g.DisableRenames
 }
 
-// GetProperties returns the Properties field.
-func (g *GitPullRequestStatus) GetProperties() *Time {
-	if g == nil {
-		return nil
+// GetIterationID returns the IterationID field if it's non-nil, zero value otherwise.
+func (g *GitPullRequestStatus) GetIterationID() int {
+	if g == nil || g.IterationID == nil {
+		return 0
+	}
+	return *g.IterationID
+}
+
+// GetProperties returns the Properties field if it's non-nil, zero value otherwise.
+func (g *GitPullRequestStatus) GetProperties() time.Time {
+	if g == nil || g.Properties == nil {
+		return time.Time{}
 	}
 	return g.Properties
 }

@@ -333,8 +333,8 @@ type GitStatus struct {
 // an iteration.
 type GitPullRequestStatus struct {
 	GitStatus
-	IterationID int   `json:"iterationId,omitempty"`
-	Properties  *Time `json:"properties,omitempty"`
+	IterationID *int       `json:"iterationId,omitempty"`
+	Properties  *time.Time `json:"properties,omitempty"`
 }
 
 // GitRefListOptions describes what the request to the API should look like

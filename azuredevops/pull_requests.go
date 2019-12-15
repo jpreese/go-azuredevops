@@ -444,3 +444,34 @@ func (s *PullRequestsService) CreateComments(ctx context.Context, owner, project
 
 	return r, resp, err
 }
+
+// CreateStatus Create a pull request status.
+// Azure Devops API docs: https://docs.microsoft.com/en-us/rest/api/azure/devops/git/pull%20request%20statuses/create
+//
+func (s *PullRequestsService) CreateStatus(ctx context.Context, owner, project, repo string, pullNum int, status *GitPullRequestStatus) (*GitPullRequestStatus, *http.Response, error) {
+	URL := fmt.Sprintf("%s/%s/_apis/git/repositories/%s/pullrequests/%d/statuses?api-version=5.1-preview.1",
+		owner,
+		project,
+		repo,
+		pullNum,
+	)
+
+	if context := status.GetContext(); context != nil {
+		if context.GetName() == "" {
+			return nil, nil, errors.New("CreateStatus: Must supply a value for Context.Name")
+		}
+	}
+
+	req, err := s.client.NewRequest("POST", URL, status)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	r := new(GitPullRequestStatus)
+	resp, err := s.client.Execute(ctx, req, r)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return r, resp, err
+}

@@ -427,3 +427,67 @@ func TestPullRequestsService_CreateComments(t *testing.T) {
 		t.Errorf("PullRequests.CreateComments returned %+v, want %+v", got, want)
 	}
 }
+
+func TestPullRequestsService_CreateStatus(t *testing.T) {
+	c, mux, _, teardown := setup()
+	defer teardown()
+	mux.HandleFunc("/o/p/_apis/git/repositories/r/pullrequests/1/statuses", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "POST")
+		w.Header().Set("Content-Type", "application/json")
+		b, _ := ioutil.ReadAll(r.Body)
+		parsed := &azuredevops.GitPullRequestStatus{}
+		json.Unmarshal(b, parsed)
+		if parsed.Context == nil {
+			t.Errorf("Context error: %v", parsed.Context)
+		}
+		if *parsed.Context.Name == "" {
+			t.Errorf("Context.Name cannot be an empty string: %v", *parsed.Context.Name)
+		}
+		fmt.Fprint(w, `{
+			"id": 1,
+			"iterationId": 1,
+			"context": {
+				"genre": "genre",
+				"name": "name"
+			},
+			"description": "description"
+		}`)
+	})
+
+	gscBad := &azuredevops.GitStatusContext{
+		Genre: String("genre"),
+	}
+	statusBad := &azuredevops.GitPullRequestStatus{
+		IterationID: Int(1),
+	}
+	statusBad.Context = gscBad
+
+	got, _, err := c.PullRequests.CreateStatus(context.Background(), "o", "p", "r", 1, statusBad)
+	if err == nil {
+		t.Errorf("Empty Context.Name passed to CreateStatus: %v", err)
+	}
+
+	gsc := &azuredevops.GitStatusContext{
+		Genre: String("genre"),
+		Name:  String("name"),
+	}
+	status := &azuredevops.GitPullRequestStatus{
+		IterationID: Int(1),
+	}
+	status.Context = gsc
+	status.Description = String("description")
+
+	got, _, err = c.PullRequests.CreateStatus(context.Background(), "o", "p", "r", 1, status)
+	if err != nil {
+		t.Errorf("PullRequests.CreateStatus returned error: %v", err)
+	}
+
+	status.ID = Int(1)
+	want := status
+
+	if !cmp.Equal(got, want) {
+		diff := cmp.Diff(got, want)
+		fmt.Printf(diff)
+		t.Errorf("PullRequests.CreateStatus returned %+v, want %+v", got, want)
+	}
+}
