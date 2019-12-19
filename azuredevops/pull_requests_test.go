@@ -491,3 +491,146 @@ func TestPullRequestsService_CreateStatus(t *testing.T) {
 		t.Errorf("PullRequests.CreateStatus returned %+v, want %+v", got, want)
 	}
 }
+
+func TestPullRequestsService_GetIteration(t *testing.T) {
+	c, mux, _, teardown := setup()
+	defer teardown()
+	mux.HandleFunc("/o/p/_apis/git/repositories/r/pullrequests/1/iterations/1", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "GET")
+		w.Header().Set("Content-Type", "application/json")
+		fmt.Fprint(w, `{
+				"id": 1,
+				"description": "Updates 1",
+				"author": {
+					"displayName": "Normal Paulk",
+					"url": "https://vssps.dev.azure.com/fabrikam/_apis/Identities/ac5aaba6-a66a-4e1d-b508-b060ec624fa9",
+					"_links": {
+						"avatar": {
+							"href": "https://dev.azure.com/fabrikam/_apis/GraphProfile/MemberAvatars/aad.YmFjMGYyZDctNDA3ZC03OGRhLTlhMjUtNmJhZjUwMWFjY2U5"
+						}
+					},
+					"id": "ac5aaba6-a66a-4e1d-b508-b060ec624fa9",
+					"uniqueName": "dev@mailserver.com",
+					"imageUrl": "https://dev.azure.com/fabrikam/_api/_common/identityImage?id=ac5aaba6-a66a-4e1d-b508-b060ec624fa9",
+					"descriptor": "aad.YmFjMGYyZDctNDA3ZC03OGRhLTlhMjUtNmJhZjUwMWFjY2U5"
+				},
+				"createdDate": "2019-12-14T16:00:43.0018749Z",
+				"updatedDate": "2019-12-14T16:00:43.0018749Z",
+				"sourceRefCommit": {
+					"commitId": "ec167f85cc82b15940e26b587039b145ff96a1f1"
+				},
+				"targetRefCommit": {
+					"commitId": "7435d15b499f36aa7eac7c58d97cdbf9979a1f17"
+				},
+				"commonRefCommit": {
+					"commitId": "2674e8e0f7899e40a37241563c17d001f3e2d075"
+				},
+				"hasMoreCommits": false,
+				"reason": "push"
+			}`)
+	})
+
+	_, _, err := c.PullRequests.GetIteration(context.Background(), "o", "p", "r", 1, 1)
+	if err != nil {
+		t.Errorf("PullRequests.GetIteration returned error: %v", err)
+	}
+}
+
+func TestPullRequestsService_ListIterations(t *testing.T) {
+	c, mux, _, teardown := setup()
+	defer teardown()
+	mux.HandleFunc("/o/p/_apis/git/repositories/r/pullrequests/1/iterations", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "GET")
+		testFormValues(t, r, values{
+			"includeCommits": "true",
+		})
+		w.Header().Set("Content-Type", "application/json")
+		fmt.Fprint(w, `{
+				"value": [
+					{
+						"id": 1,
+						"description": "Updates 1",
+						"author": {
+							"displayName": "Normal Paulk",
+							"url": "https://vssps.dev.azure.com/fabrikam/_apis/Identities/ac5aaba6-a66a-4e1d-b508-b060ec624fa9",
+							"_links": {
+								"avatar": {
+									"href": "https://dev.azure.com/fabrikam/_apis/GraphProfile/MemberAvatars/aad.YmFjMGYyZDctNDA3ZC03OGRhLTlhMjUtNmJhZjUwMWFjY2U5"
+								}
+							},
+							"id": "ac5aaba6-a66a-4e1d-b508-b060ec624fa9",
+							"uniqueName": "dev@mailserver.com",
+							"imageUrl": "https://dev.azure.com/fabrikam/_api/_common/identityImage?id=ac5aaba6-a66a-4e1d-b508-b060ec624fa9",
+							"descriptor": "aad.YmFjMGYyZDctNDA3ZC03OGRhLTlhMjUtNmJhZjUwMWFjY2U5"
+						},
+						"createdDate": "2019-12-14T16:00:43.0018749Z",
+						"updatedDate": "2019-12-14T16:00:43.0018749Z",
+						"sourceRefCommit": {
+							"commitId": "ec167f85cc82b15940e26b587039b145ff96a1f1"
+						},
+						"targetRefCommit": {
+							"commitId": "7435d15b499f36aa7eac7c58d97cdbf9979a1f17"
+						},
+						"commonRefCommit": {
+							"commitId": "2674e8e0f7899e40a37241563c17d001f3e2d075"
+						},
+						"hasMoreCommits": false,
+						"reason": "push"
+					},
+					{
+						"id": 2,
+						"description": "Updates 2",
+						"author": {
+							"displayName": "Normal Paulk",
+							"url": "https://vssps.dev.azure.com/fabrikam/_apis/Identities/ac5aaba6-a66a-4e1d-b508-b060ec624fa9",
+							"_links": {
+								"avatar": {
+									"href": "https://dev.azure.com/fabrikam/_apis/GraphProfile/MemberAvatars/aad.YmFjMGYyZDctNDA3ZC03OGRhLTlhMjUtNmJhZjUwMWFjY2U5"
+								}
+							},
+							"id": "ac5aaba6-a66a-4e1d-b508-b060ec624fa9",
+							"uniqueName": "dev@mailserver.com",
+							"imageUrl": "https://dev.azure.com/fabrikam/_api/_common/identityImage?id=ac5aaba6-a66a-4e1d-b508-b060ec624fa9",
+							"descriptor": "aad.YmFjMGYyZDctNDA3ZC03OGRhLTlhMjUtNmJhZjUwMWFjY2U5"
+						},
+						"createdDate": "2019-12-14T16:08:52.4086118Z",
+						"updatedDate": "2019-12-14T16:08:52.4086118Z",
+						"sourceRefCommit": {
+							"commitId": "330d4ce19fbfd0b6760d53014f2f279f47c9ae7e"
+						},
+						"targetRefCommit": {
+							"commitId": "7435d15b499f36aa7eac7c58d97cdbf9979a1f17"
+						},
+						"commonRefCommit": {
+							"commitId": "2674e8e0f7899e40a37241563c17d001f3e2d075"
+						},
+						"hasMoreCommits": false,
+						"reason": "push",
+						"push": {
+							"pushId": 338
+						}
+					}
+				],
+				"count": 2
+			}`)
+	})
+
+	opts := new(azuredevops.PullRequestIterationListOptions)
+	opts.IncludeCommits = true
+	got, _, err := c.PullRequests.ListIterations(context.Background(), "o", "p", "r", 1, opts)
+	if err != nil {
+		t.Errorf("PullRequests.ListIterations returned error: %v", err)
+	}
+
+	want := []*azuredevops.GitPullRequestIteration{}
+	want = append(want, &azuredevops.GitPullRequestIteration{ID: Int(1)})
+	want = append(want, &azuredevops.GitPullRequestIteration{ID: Int(2)})
+
+	if len(got) != 2 {
+		t.Errorf("PullRequests.ListIterations didn't return two items got %+v, want %+v", len(got), len(want))
+	}
+
+	if *got[0].ID != *want[0].ID || *got[1].ID != *want[1].ID {
+		t.Errorf("PullRequests.ListIterations IDs don't match ID 0 = %+v ID 1 = %+v, want ID 0 = %+v ID 1 = %+v", *got[0].ID, *got[1].ID, *want[0].ID, *want[1].ID)
+	}
+}
