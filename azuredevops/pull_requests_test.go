@@ -615,7 +615,7 @@ func TestPullRequestsService_ListIterations(t *testing.T) {
 			}`)
 	})
 
-	opts := new(azuredevops.PullRequestIterationListOptions)
+	opts := new(azuredevops.PullRequestIterationsListOptions)
 	opts.IncludeCommits = true
 	got, _, err := c.PullRequests.ListIterations(context.Background(), "o", "p", "r", 1, opts)
 	if err != nil {

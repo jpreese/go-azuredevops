@@ -129,8 +129,8 @@ type PullRequestGetOptions struct {
 	Top int `url:"$top,omitempty"`
 }
 
-// PullRequestIterationListOptions describes what the request to the API should look like
-type PullRequestIterationListOptions struct {
+// PullRequestIterationsListOptions describes what the request to the API should look like
+type PullRequestIterationsListOptions struct {
 	IncludeCommits bool `url:"includeCommits,omitempty"`
 }
 
@@ -516,7 +516,7 @@ func (s *PullRequestsService) GetIteration(ctx context.Context, owner, project, 
 // ListIterations Lists all iterations on a pull request.
 // Azure Devops API docs: https://docs.microsoft.com/en-us/rest/api/azure/devops/git/pull%20request%20iterations/list?view=azure-devops-rest-5.1
 //
-func (s *PullRequestsService) ListIterations(ctx context.Context, owner, project, repo string, pullNum int, opts *PullRequestIterationListOptions) ([]*GitPullRequestIteration, *http.Response, error) {
+func (s *PullRequestsService) ListIterations(ctx context.Context, owner, project, repo string, pullNum int, opts *PullRequestIterationsListOptions) ([]*GitPullRequestIteration, *http.Response, error) {
 	URL := fmt.Sprintf("%s/%s/_apis/git/repositories/%s/pullrequests/%d/iterations?api-version=5.1",
 		owner,
 		project,
