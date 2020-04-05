@@ -55,10 +55,16 @@ type PolicyTypeRef struct {
 	Url         *string `json:"url,omitempty"`
 }
 
+// GetPullRequestArtifactID gets the Artifact ID of a pull request.
+// ex: vstfs:///CodeReview/CodeReviewId/{projectId}/{pullRequestId}
+func (s *PolicyEvaluationsService) GetPullRequestArtifactID(projectID string, pullRequestID string) string {
+	return fmt.Sprintf("vstfs:///CodeReview/CodeReviewId/%s/%s", projectID, pullRequestID)
+}
+
 // List retrieves a list of all the policy evaluation statuses for a specific pull request.
 // https://docs.microsoft.com/en-us/rest/api/azure/devops/policy/evaluations/list?view=azure-devops-rest-5.1
 func (s *PolicyEvaluationsService) List(ctx context.Context, owner, project, artifactID string, opts *PolicyEvaluationsListOptions) ([]*PolicyEvaluationRecord, *http.Response, error) {
-	URL := fmt.Sprintf("%s/%s/_apis/policy/evaluations?artifactId=%sapi-version=5.1-preview.1",
+	URL := fmt.Sprintf("%s/%s/_apis/policy/evaluations?artifactId=%s&api-version=5.1-preview",
 		owner,
 		project,
 		artifactID,
