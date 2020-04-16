@@ -260,3 +260,51 @@ func TestGitService_GetChanges(t *testing.T) {
 		t.Errorf("Git.GetChanges returned %+v, want %+v", got, want)
 	}
 }
+
+func TestGitService_GetDiffs(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
+	mux.HandleFunc("/o/p/_apis/git/repositories/r/diffs/commits", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "GET")
+		w.Header().Set("Content-Type", "application/json")
+		fmt.Fprint(w, `{
+			"changes": [{
+				"item": {
+					"objectId": "277065fc0114f735f76a0dcb85770f2d22b0d156",
+					"gitObjectType": "tree",
+					"commitId": "4df30d979b7bb573a7e104a9a2345aa4ec41fb04",
+					"path": "/folder",
+					"isFolder": true
+				},
+				"changeType": "add"
+			},
+			{
+				"item": {
+					"objectId": "277065fc0114f735f76a0dcb85770f2d22b0d156",
+					"gitObjectType": "blob",
+					"commitId": "4df30d979b7bb573a7e104a9a2345aa4ec41fb04",
+					"path": "/folder/foo.txt",
+					"isFolder": false
+				},
+				"changeType": "add"
+			}]
+			}`)
+	})
+
+	got, _, err := client.Git.GetDiffs(context.Background(), "o", "p", "r", "master", "prbranch")
+	if err != nil {
+		t.Fatalf("returned error: %v", err)
+	}
+
+	if len(got.Changes) != 2 {
+		t.Errorf("expected %d changes, got %d", 2, len(got.Changes))
+	}
+
+	if *got.Changes[0].Item.Path != "/folder" {
+		t.Errorf("expected path %s to be changed, got %s", "/folder", *got.Changes[0].Item.Path)
+	}
+
+	if *got.Changes[1].Item.Path != "/folder/foo.txt" {
+		t.Errorf("expected path %s to be changed, got %s", "/folder/foo.txt", *got.Changes[1].Item.Path)
+	}
+}
